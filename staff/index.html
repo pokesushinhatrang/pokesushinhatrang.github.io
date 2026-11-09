@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#33241A">
+<meta name="robots" content="noindex">
+<title>SUSHI GO · Đơn hàng</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap">
+<style>
+:root{--bg:#FAF4EC;--surface:#fff;--ink:#33241A;--muted:#806A5A;--line:#EADBC8;--pink:#B8456A;--pink-soft:#F8E3EA;--green:#3E7A5A;--green-soft:#DCEDE3;--amber:#C98A3D;--amber-soft:#F6E8D3;--blue:#3F5F8F;--blue-soft:#DDE5F1}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro",system-ui,sans-serif}
+[hidden]{display:none!important}
+button{font:inherit;cursor:pointer}
+.top{position:sticky;top:0;z-index:5;background:var(--ink);color:#fff;padding:max(10px,env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.top b{font-size:17px}
+.top .st{font-size:13px;opacity:.85;display:flex;align-items:center;gap:6px}
+.dot{width:9px;height:9px;border-radius:50%;background:#7a7a7a}
+.dot.on{background:#5BD18B}.dot.err{background:#E0563B}
+.top .sp{flex:1}
+.top button{border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;border-radius:999px;padding:7px 12px;font-size:13px;font-weight:700}
+.wrap{max-width:820px;margin:0 auto;padding:14px 14px 40px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;margin-top:24px;text-align:center}
+.panel h1{font-size:22px;margin:0 0 6px}
+.panel p{color:var(--muted);margin:0 0 14px;line-height:1.45}
+.panel input{font:inherit;font-size:26px;letter-spacing:.3em;text-align:center;width:180px;padding:10px;border:2px solid var(--line);border-radius:12px}
+.big{display:block;width:100%;max-width:380px;margin:14px auto 0;border:0;border-radius:14px;padding:16px;font-size:17px;font-weight:800;background:var(--pink);color:#fff}
+.big.alt{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.err-t{color:#B33A2E;font-weight:700;min-height:1.4em;margin-top:8px}
+.bar{display:flex;gap:8px;align-items:center;margin:4px 0 12px;flex-wrap:wrap}
+.bar h2{font-size:15px;margin:0;color:var(--muted);font-weight:700}
+.bar .sp{flex:1}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:700;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.list{display:grid;gap:12px}
+.o{background:var(--surface);border:2px solid var(--line);border-left-width:10px;border-radius:14px;padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start}
+.o.new{animation:pulse 1.6s ease-in-out 3}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(184,69,106,.25)}}
+.o.k-order{border-left-color:var(--pink)}.o.k-add{border-left-color:var(--amber)}.o.k-waiter{border-left-color:var(--blue)}.o.k-bill{border-left-color:var(--green)}
+.o .h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.o .tb{font-size:26px;font-weight:800;line-height:1}
+.o .tag{font-size:12px;font-weight:800;letter-spacing:.04em;border-radius:999px;padding:3px 9px}
+.k-order .tag{background:var(--pink-soft);color:var(--pink)}.k-add .tag{background:var(--amber-soft);color:#8a5a1c}.k-waiter .tag{background:var(--blue-soft);color:var(--blue)}.k-bill .tag{background:var(--green-soft);color:var(--green)}
+.o .tm{font-size:13px;color:var(--muted)}
+.o pre{margin:8px 0 0;font:inherit;font-size:16px;line-height:1.5;white-space:pre-wrap}
+.o .ok{border:0;border-radius:12px;padding:14px 16px;font-size:16px;font-weight:800;background:var(--green);color:#fff;white-space:nowrap}
+.o.done{opacity:.55;border-left-color:var(--line)!important}
+.o.done .ok{background:var(--line);color:var(--muted)}
+.o.done pre{max-height:3em;overflow:hidden}
+.empty{color:var(--muted);text-align:center;padding:40px 10px}
+.hint{font-size:13px;color:var(--muted);text-align:center;margin-top:18px;line-height:1.5}
+@media (max-width:520px){.o{grid-template-columns:1fr}.o .ok{width:100%}}
+</style>
+</head>
+<body>
+<header class="top">
+  <b>SUSHI GO · Đơn hàng</b>
+  <span class="st"><span class="dot" id="dot"></span><span id="stText">Chưa kết nối</span></span>
+  <span class="sp"></span>
+  <button id="soundBtn" hidden>🔔 Âm thanh: bật</button>
+  <button id="logoutBtn" hidden>Đổi mã</button>
+</header>
+
+<main class="wrap">
+  <!-- 1. staff code -->
+  <section class="panel" id="login" hidden>
+    <h1>Nhập mã nhân viên</h1>
+    <p>Mã do chủ quán cung cấp. Chỉ cần nhập một lần trên máy này.</p>
+    <input id="code" inputmode="numeric" autocomplete="off" maxlength="12">
+    <button class="big" id="loginBtn">Tiếp tục</button>
+    <div class="err-t" id="loginErr"></div>
+  </section>
+
+  <!-- 2. start (unlocks sound, keeps the screen on) -->
+  <section class="panel" id="start" hidden>
+    <h1>Sẵn sàng nhận đơn</h1>
+    <p>Bấm để bật âm thanh báo đơn mới và giữ màn hình luôn sáng.</p>
+    <button class="big" id="startBtn">▶ Bắt đầu nhận đơn</button>
+    <button class="big alt" id="pushBtn">📳 Bật thông báo trên điện thoại này</button>
+    <div class="err-t" id="pushErr"></div>
+    <p class="hint" id="iosHint" hidden>iPhone: bấm nút <b>Chia sẻ</b> → <b>Thêm vào MH chính</b>, mở ứng dụng từ màn hình chính, rồi bấm «Bật thông báo».</p>
+  </section>
+
+  <!-- 3. orders -->
+  <section id="board" hidden>
+    <div class="bar"><h2 id="countH">Đơn mới</h2><span class="sp"></span>
+      <button class="chip" data-f="new" aria-pressed="true">Chưa nhận</button><button class="chip" data-f="all" aria-pressed="false">Tất cả (12 giờ)</button></div>
+    <div class="list" id="list"></div>
+    <p class="hint">Màn hình tự cập nhật mỗi vài giây. Đơn mới có âm thanh và nhấp nháy.<br>
+      <button class="chip" id="pushBtn2">📳 Thông báo trên điện thoại</button> <button class="chip" id="testBtn">🔊 Thử âm thanh</button></p>
+  </section>
+</main>
+
+<script>
+const API = new URLSearchParams(location.search).get('api') || 'https://cafeupnhatrang.nhatrang.workers.dev';
+const VENUE = 'sushigo';
+const POLL_MS = 4000;
+const $ = id => document.getElementById(id);
+const store = { get: k => { try { return localStorage.getItem('sg_' + k) } catch (e) { return null } }, set: (k, v) => { try { localStorage.setItem('sg_' + k, v) } catch (e) {} }, del: k => { try { localStorage.removeItem('sg_' + k) } catch (e) {} } };
+
+let code = store.get('code') || '';
+let orders = new Map();      // id → order
+let maxId = 0, lastNow = 0, filter = 'new', soundOn = store.get('sound') !== '0', audio = null, timer = null, wake = null, remind = 0;
+
+/* ---------- server ---------- */
+async function api(path, body) {
+  const r = await fetch(API + path + (path.includes('?') ? '&' : '?') + 'venue=' + VENUE, {
+    method: body ? 'POST' : 'GET', cache: 'no-store',
+    headers: Object.assign({ 'X-Staff-Key': code }, body ? { 'Content-Type': 'application/json' } : {}),
+    body: body ? JSON.stringify(Object.assign({ venue: VENUE }, body)) : undefined });
+  if (r.status === 401) throw new Error('code');
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+/* ---------- sound (Web Audio: three short rising beeps) ---------- */
+function beep() {
+  if (!soundOn || !audio) return;
+  const t0 = audio.currentTime;
+  [880, 1175, 1568].forEach((f, i) => {
+    const o = audio.createOscillator(), g = audio.createGain(); o.type = 'sine'; o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, t0 + i * 0.22); g.gain.exponentialRampToValueAtTime(0.6, t0 + i * 0.22 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t0 + i * 0.22 + 0.2);
+    o.connect(g).connect(audio.destination); o.start(t0 + i * 0.22); o.stop(t0 + i * 0.22 + 0.22);
+  });
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+}
+
+/* ---------- orders ---------- */
+const KIND = o => o.text.startsWith('GỌI THÊM') ? ['add', '➕ GỌI THÊM'] : o.kind === 'bill' ? ['bill', '💳 TÍNH TIỀN'] : o.kind === 'waiter' ? ['waiter', '🔔 GỌI PHỤC VỤ'] : ['order', '🧾 ĐƠN MỚI'];
+const ago = ms => { const m = Math.max(0, Math.round((Date.now() - ms) / 60000)); return m < 1 ? 'vừa xong' : m < 60 ? m + ' phút trước' : Math.floor(m / 60) + ' giờ trước' };
+const hhmm = ms => { const d = new Date(ms); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') };
+const esc = s => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+
+function render(freshIds = []) {
+  const all = [...orders.values()].sort((a, b) => b.id - a.id);
+  const open = all.filter(o => o.status === 'new');
+  const show = filter === 'new' ? open : all;
+  $('countH').textContent = open.length ? `Chưa nhận: ${open.length}` : 'Không có đơn chờ';
+  document.title = (open.length ? `(${open.length}) ` : '') + 'SUSHI GO · Đơn hàng';
+  $('list').innerHTML = show.length ? show.map(o => {
+    const [k, label] = KIND(o), body = o.text.split('\n').slice(1).join('\n');
+    return `<article class="o k-${k}${o.status === 'done' ? ' done' : ''}${freshIds.includes(o.id) ? ' new' : ''}" data-id="${o.id}">
+      <div><div class="h"><span class="tb">Bàn ${esc(o.tbl || '?')}</span><span class="tag">${label}</span><span class="tm">${hhmm(o.created)} · ${ago(o.created)}</span></div>
+      <pre>${esc(body)}</pre></div>
+      <button class="ok" data-ack="${o.id}" ${o.status === 'done' ? 'disabled' : ''}>${o.status === 'done' ? '✓ Đã nhận' : 'Đã nhận ✓'}</button></article>`;
+  }).join('') : `<div class="empty">${filter === 'new' ? 'Chưa có đơn mới. Đơn sẽ hiện ở đây kèm âm thanh.' : 'Chưa có đơn trong 12 giờ qua.'}</div>`;
+}
+
+async function poll() {
+  try {
+    const d = await api(`/staff/orders?since=${maxId}&changed=${lastNow}`);
+    const fresh = [];
+    d.orders.forEach(o => { if (!orders.has(o.id)) { orders.set(o.id, o); if (o.status === 'new' && maxId) fresh.push(o.id); } maxId = Math.max(maxId, o.id) });
+    d.done.forEach(x => { const o = orders.get(x.id); if (o) { o.status = 'done'; o.done_at = x.done_at } });
+    for (const [id, o] of orders) if (Date.now() - o.created > 12 * 3600e3) orders.delete(id);
+    lastNow = d.now;
+    setStatus('on', 'Đang nhận đơn');
+    if (fresh.length || d.done.length || !render.once) { render(fresh); render.once = true }
+    if (fresh.length) { beep(); remind = Date.now() }
+    else if ([...orders.values()].some(o => o.status === 'new') && Date.now() - remind > 45000) { beep(); remind = Date.now() }  /* reminder while something waits */
+  } catch (e) {
+    if (e.message === 'code') return logout('Mã không đúng hoặc đã đổi. Nhập lại mã.');
+    setStatus('err', 'Mất kết nối, đang thử lại…');
+  }
+}
+function setStatus(c, t) { $('dot').className = 'dot ' + c; $('stText').textContent = t }
+
+/* ---------- screens ---------- */
+function show(id) { ['login', 'start', 'board'].forEach(x => $(x).hidden = x !== id); $('soundBtn').hidden = $('logoutBtn').hidden = id === 'login' }
+function logout(msg) { clearInterval(timer); timer = null; code = ''; store.del('code'); show('login'); $('loginErr').textContent = msg || ''; setStatus('', 'Chưa kết nối') }
+
+$('loginBtn').onclick = async () => {
+  code = $('code').value.trim(); $('loginErr').textContent = '';
+  try { await api('/staff/orders?since=999999999'); store.set('code', code); show('start'); saveSwConfig() }
+  catch (e) { $('loginErr').textContent = e.message === 'code' ? 'Mã không đúng.' : 'Không kết nối được máy chủ. Kiểm tra mạng.'; code = '' }
+};
+$('code').addEventListener('keydown', e => { if (e.key === 'Enter') $('loginBtn').click() });
+
+$('startBtn').onclick = async () => {
+  try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); await audio.resume() } catch (e) {}
+  try { wake = await navigator.wakeLock.request('screen') } catch (e) {}
+  show('board'); await poll(); timer = timer || setInterval(poll, POLL_MS);
+};
+document.addEventListener('visibilitychange', async () => { if (!document.hidden && timer) { poll(); try { wake = await navigator.wakeLock.request('screen') } catch (e) {} } });
+$('soundBtn').onclick = () => { soundOn = !soundOn; store.set('sound', soundOn ? '1' : '0'); $('soundBtn').textContent = soundOn ? '🔔 Âm thanh: bật' : '🔕 Âm thanh: tắt' };
+$('soundBtn').textContent = soundOn ? '🔔 Âm thanh: bật' : '🔕 Âm thanh: tắt';
+$('logoutBtn').onclick = () => { if (confirm('Đăng xuất và nhập mã khác?')) logout() };
+$('testBtn').onclick = () => { if (!audio) { try { audio = new (window.AudioContext || window.webkitAudioContext)() } catch (e) {} } const s = soundOn; soundOn = true; beep(); soundOn = s };
+document.querySelectorAll('.chip[data-f]').forEach(b => b.onclick = () => { filter = b.dataset.f; document.querySelectorAll('.chip[data-f]').forEach(x => x.setAttribute('aria-pressed', x === b)); render() });
+
+$('list').addEventListener('click', async e => {
+  const b = e.target.closest('[data-ack]'); if (!b) return;
+  const id = Number(b.dataset.ack), o = orders.get(id); b.disabled = true;
+  try { await api('/staff/ack', { id }); o.status = 'done'; o.done_at = Date.now(); render() }
+  catch (err) { b.disabled = false; alert('Không gửi được. Thử lại.') }
+});
+
+/* ---------- push notifications ---------- */
+const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+if (isIOS && !standalone) $('iosHint').hidden = false;
+
+async function saveSwConfig() {   /* the service worker needs the code to read the order text */
+  if (!('caches' in window)) return;
+  try { const c = await caches.open('sg-config'); await c.put('/sg-config', new Response(JSON.stringify({ api: API, venue: VENUE, code }))) } catch (e) {}
+}
+async function enablePush() {
+  $('pushErr').textContent = '';
+  try {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) throw new Error(isIOS && !standalone ? 'iPhone: trước tiên thêm trang vào Màn hình chính (xem hướng dẫn bên dưới).' : 'Trình duyệt này không hỗ trợ thông báo. Dùng Chrome trên Android.');
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') throw new Error('Bạn chưa cho phép thông báo. Mở cài đặt trình duyệt → Thông báo → Cho phép.');
+    await saveSwConfig();
+    const reg = await navigator.serviceWorker.register('sw.js');
+    await navigator.serviceWorker.ready;
+    const { key } = await api('/staff/vapid');
+    const raw = Uint8Array.from(atob(key.replace(/-/g, '+').replace(/_/g, '/') + '=='.slice(0, (4 - key.length % 4) % 4)), c => c.charCodeAt(0));
+    const sub = (await reg.pushManager.getSubscription()) || await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: raw });
+    await api('/staff/subscribe', { sub: sub.toJSON() });
+    store.set('push', '1');
+    const msg = '✓ Đã bật thông báo trên điện thoại này.';
+    $('pushErr').textContent = msg; alert(msg);
+  } catch (e) { $('pushErr').textContent = e.message === 'code' ? 'Mã không đúng.' : e.message; if ($('board').hidden === false) alert(e.message) }
+}
+$('pushBtn').onclick = enablePush; $('pushBtn2').onclick = enablePush;
+if (store.get('push') === '1') { $('pushBtn').textContent = '📳 Thông báo đã bật (bấm để bật lại)' }
+
+/* ---------- boot ---------- */
+if (code) { show('start'); saveSwConfig() } else show('login');
+setInterval(() => { if (timer) render() }, 30000);   /* refresh “x phút trước” */
+</script>
+</body>
+</html>
