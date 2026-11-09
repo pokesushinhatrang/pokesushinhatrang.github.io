@@ -9,11 +9,12 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&family=Manrope:wght@400;600;700;800&display=swap">
 <style>
-:root{--bg:#FAF4EC;--surface:#fff;--ink:#33241A;--muted:#806A5A;--line:#EADBC8;--pink:#B8456A;--pink-soft:#F8E3EA;--green:#3E7A5A;--green-soft:#DCEDE3;--amber:#C98A3D;--amber-soft:#F6E8D3;--blue:#3F5F8F;--blue-soft:#DDE5F1}
+:root{--bg:#FAF4EC;--surface:#fff;--ink:#33241A;--muted:#806A5A;--line:#EADBC8;--pink:#B8456A;--pink-soft:#F8E3EA;--green:#3E7A5A;--green-soft:#DCEDE3;--amber:#C98A3D;--amber-soft:#F6E8D3;--blue:#3F5F8F;--blue-soft:#DDE5F1;--teal:#2F7F86;--teal-soft:#DAEEEF}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro",system-ui,sans-serif}
+:lang(ru) body{font-family:"Manrope","Be Vietnam Pro",system-ui,sans-serif}
 [hidden]{display:none!important}
 button{font:inherit;cursor:pointer}
 .top{position:sticky;top:0;z-index:5;background:var(--ink);color:#fff;padding:max(10px,env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -23,11 +24,14 @@ button{font:inherit;cursor:pointer}
 .dot.on{background:#5BD18B}.dot.err{background:#E0563B}
 .top .sp{flex:1}
 .top button{border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;border-radius:999px;padding:7px 12px;font-size:13px;font-weight:700}
+.lang{display:flex;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:2px}
+.top .lang button{border:0;padding:5px 10px;font-size:12px;letter-spacing:.06em}
+.top .lang button[aria-pressed="true"]{background:#fff;color:var(--ink)}
 .wrap{max-width:820px;margin:0 auto;padding:14px 14px 40px}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;margin-top:24px;text-align:center}
 .panel h1{font-size:22px;margin:0 0 6px}
 .panel p{color:var(--muted);margin:0 0 14px;line-height:1.45}
-.panel input{font:inherit;font-size:26px;letter-spacing:.3em;text-align:center;width:180px;padding:10px;border:2px solid var(--line);border-radius:12px}
+.panel input{font:inherit;font-size:26px;letter-spacing:.3em;text-align:center;width:200px;padding:10px;border:2px solid var(--line);border-radius:12px}
 .big{display:block;width:100%;max-width:380px;margin:14px auto 0;border:0;border-radius:14px;padding:16px;font-size:17px;font-weight:800;background:var(--pink);color:#fff}
 .big.alt{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
 .err-t{color:#B33A2E;font-weight:700;min-height:1.4em;margin-top:8px}
@@ -40,12 +44,13 @@ button{font:inherit;cursor:pointer}
 .o{background:var(--surface);border:2px solid var(--line);border-left-width:10px;border-radius:14px;padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start}
 .o.new{animation:pulse 1.6s ease-in-out 3}
 @keyframes pulse{50%{box-shadow:0 0 0 6px rgba(184,69,106,.25)}}
-.o.k-order{border-left-color:var(--pink)}.o.k-add{border-left-color:var(--amber)}.o.k-waiter{border-left-color:var(--blue)}.o.k-bill{border-left-color:var(--green)}
+.o.k-order{border-left-color:var(--pink)}.o.k-add{border-left-color:var(--amber)}.o.k-waiter{border-left-color:var(--blue)}.o.k-water{border-left-color:var(--teal)}.o.k-bill{border-left-color:var(--green)}
 .o .h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .o .tb{font-size:26px;font-weight:800;line-height:1}
 .o .tag{font-size:12px;font-weight:800;letter-spacing:.04em;border-radius:999px;padding:3px 9px}
-.k-order .tag{background:var(--pink-soft);color:var(--pink)}.k-add .tag{background:var(--amber-soft);color:#8a5a1c}.k-waiter .tag{background:var(--blue-soft);color:var(--blue)}.k-bill .tag{background:var(--green-soft);color:var(--green)}
+.k-order .tag{background:var(--pink-soft);color:var(--pink)}.k-add .tag{background:var(--amber-soft);color:#8a5a1c}.k-waiter .tag{background:var(--blue-soft);color:var(--blue)}.k-water .tag{background:var(--teal-soft);color:var(--teal)}.k-bill .tag{background:var(--green-soft);color:var(--green)}
 .o .tm{font-size:13px;color:var(--muted)}
+.o .who{font-size:16px;font-weight:800}
 .o pre{margin:8px 0 0;font:inherit;font-size:16px;line-height:1.5;white-space:pre-wrap}
 .o .ok{border:0;border-radius:12px;padding:14px 16px;font-size:16px;font-weight:800;background:var(--green);color:#fff;white-space:nowrap}
 .o.done{opacity:.55;border-left-color:var(--line)!important}
@@ -58,40 +63,38 @@ button{font:inherit;cursor:pointer}
 </head>
 <body>
 <header class="top">
-  <b>SUSHI GO · Đơn hàng</b>
-  <span class="st"><span class="dot" id="dot"></span><span id="stText">Chưa kết nối</span></span>
+  <b data-t="title"></b>
+  <span class="st"><span class="dot" id="dot"></span><span id="stText"></span></span>
   <span class="sp"></span>
-  <button id="soundBtn" hidden>🔔 Âm thanh: bật</button>
-  <button id="logoutBtn" hidden>Đổi mã</button>
+  <span class="lang" role="group" aria-label="Language"><button data-lang="vi">VI</button><button data-lang="en">EN</button><button data-lang="ru">RU</button></span>
+  <button id="soundBtn" hidden></button>
+  <button id="logoutBtn" data-t="changeCode" hidden></button>
 </header>
 
 <main class="wrap">
-  <!-- 1. staff code -->
   <section class="panel" id="login" hidden>
-    <h1>Nhập mã nhân viên</h1>
-    <p>Mã do chủ quán cung cấp. Chỉ cần nhập một lần trên máy này.</p>
+    <h1 data-t="loginH"></h1>
+    <p data-t="loginP"></p>
     <input id="code" inputmode="numeric" autocomplete="off" maxlength="12">
-    <button class="big" id="loginBtn">Tiếp tục</button>
+    <button class="big" id="loginBtn" data-t="cont"></button>
     <div class="err-t" id="loginErr"></div>
   </section>
 
-  <!-- 2. start (unlocks sound, keeps the screen on) -->
   <section class="panel" id="start" hidden>
-    <h1>Sẵn sàng nhận đơn</h1>
-    <p>Bấm để bật âm thanh báo đơn mới và giữ màn hình luôn sáng.</p>
-    <button class="big" id="startBtn">▶ Bắt đầu nhận đơn</button>
-    <button class="big alt" id="pushBtn">📳 Bật thông báo trên điện thoại này</button>
+    <h1 data-t="readyH"></h1>
+    <p data-t="readyP"></p>
+    <button class="big" id="startBtn" data-t="start"></button>
+    <button class="big alt" id="pushBtn" data-t="push"></button>
     <div class="err-t" id="pushErr"></div>
-    <p class="hint" id="iosHint" hidden>iPhone: bấm nút <b>Chia sẻ</b> → <b>Thêm vào MH chính</b>, mở ứng dụng từ màn hình chính, rồi bấm «Bật thông báo».</p>
+    <p class="hint" id="iosHint" data-t="iosHint" hidden></p>
   </section>
 
-  <!-- 3. orders -->
   <section id="board" hidden>
-    <div class="bar"><h2 id="countH">Đơn mới</h2><span class="sp"></span>
-      <button class="chip" data-f="new" aria-pressed="true">Chưa nhận</button><button class="chip" data-f="all" aria-pressed="false">Tất cả (12 giờ)</button></div>
+    <div class="bar"><h2 id="countH"></h2><span class="sp"></span>
+      <button class="chip" data-f="new" aria-pressed="true" data-t="filterNew"></button><button class="chip" data-f="all" aria-pressed="false" data-t="filterAll"></button></div>
     <div class="list" id="list"></div>
-    <p class="hint">Màn hình tự cập nhật mỗi vài giây. Đơn mới có âm thanh và nhấp nháy.<br>
-      <button class="chip" id="pushBtn2">📳 Thông báo trên điện thoại</button> <button class="chip" id="testBtn">🔊 Thử âm thanh</button></p>
+    <p class="hint"><span data-t="autoHint"></span><br>
+      <button class="chip" id="pushBtn2" data-t="pushShort"></button> <button class="chip" id="testBtn" data-t="testSound"></button></p>
   </section>
 </main>
 
@@ -99,14 +102,72 @@ button{font:inherit;cursor:pointer}
 const API = new URLSearchParams(location.search).get('api') || 'https://cafeupnhatrang.nhatrang.workers.dev';
 const VENUE = 'sushigo';
 const POLL_MS = 4000;
+/* dish names by menu number (filled from menu-data.js by tools/build_staff.py) */
+const NAMES = {"81":["Ebi tempura, 5 shrimp","Креветки темпура, 5 шт."],"82":["Mixed tempura","Темпура ассорти"],"83":["Tori karaage","Тори караагэ"],"84":["Tori katsu","Тори кацу"],"85":["Beef katsu","Говядина кацу"],"86":["Maguro katsu","Магуро кацу"],"87":["Sake katsu","Сякэ кацу (лосось)"],"109":["Tiger beer, can","Пиво Tiger, банка"],"110":["Saigon beer, can","Пиво Saigon, банка"],"111":["Heineken, can","Пиво Heineken, банка"],"112":["Coca-Cola, can","Coca-Cola, банка"],"113":["Pepsi, can","Pepsi, банка"],"114":["Still water, bottle","Вода без газа, бутылка"],"115":["Sprite, can","Sprite, банка"],"116":["Revive salted lemon","Revive с солёным лимоном"],"176":["Pepsi Zero, can","Pepsi Zero, банка"],"177":["Pepsi No Sugar Lemon, can","Pepsi без сахара со вкусом лимона, банка"],"178":["Soda water, can","Содовая, банка"],"179":["Coconut water, can","Кокосовая вода, банка"],"181":["Hot roll with tuna & cheese","Горячий ролл с тунцом и сыром"],"182":["Hot roll with salmon & cheese","Горячий ролл с лососем и сыром"],"183":["Hot roll with shrimp & cheese","Горячий ролл с креветкой и сыром"],"184":["Special futomaki seafood hot roll","Фирменный горячий футомаки с морепродуктами"],"185":["Hot roll with seafood & cheese","Горячий ролл с морепродуктами и сыром"],"186":["Sushi set C, 8 pcs","Суши-сет C, 8 шт."],"187":["LOVE YOU set (for sharing)","Сет LOVE YOU (на компанию)"],"200":["Soft-shell crab tempura","Краб с мягким панцирем в темпуре"],"210":["Salmon sushi combo","Сет «Лосось комбо»"]}/*NAMES*/;
+
+const L = {
+ vi: { title:'SUSHI GO · Đơn hàng', off:'Chưa kết nối', live:'Đang nhận đơn', lost:'Mất kết nối, đang thử lại…',
+   loginH:'Nhập mã nhân viên', loginP:'Mã do chủ quán cung cấp. Chỉ cần nhập một lần trên máy này.', cont:'Tiếp tục',
+   wrongCode:'Mã không đúng.', codeChanged:'Mã không đúng hoặc đã đổi. Nhập lại mã.', noServer:'Không kết nối được máy chủ. Kiểm tra mạng.',
+   readyH:'Sẵn sàng nhận đơn', readyP:'Bấm để bật âm thanh báo đơn mới và giữ màn hình luôn sáng.', start:'▶ Bắt đầu nhận đơn',
+   push:'📳 Bật thông báo trên điện thoại này', pushOn:'📳 Thông báo đã bật (bấm để bật lại)', pushShort:'📳 Thông báo trên điện thoại', testSound:'🔊 Thử âm thanh',
+   iosHint:'iPhone: bấm nút Chia sẻ → Thêm vào MH chính, mở ứng dụng từ màn hình chính, rồi bấm «Bật thông báo».',
+   waiting:n=>`Chưa nhận: ${n}`, none:'Không có đơn chờ', filterNew:'Chưa nhận', filterAll:'Tất cả (12 giờ)',
+   emptyNew:'Chưa có đơn mới. Đơn sẽ hiện ở đây kèm âm thanh.', emptyAll:'Chưa có đơn trong 12 giờ qua.',
+   autoHint:'Màn hình tự cập nhật mỗi vài giây. Đơn mới có âm thanh và nhấp nháy.',
+   soundOn:'🔔 Âm thanh: bật', soundOff:'🔕 Âm thanh: tắt', changeCode:'Đổi mã', confirmOut:'Đăng xuất và nhập mã khác?',
+   ack:'Đã nhận ✓', acked:'✓ Đã nhận', sendFail:'Không gửi được. Thử lại.', table:'Bàn',
+   now:'vừa xong', min:m=>`${m} phút trước`, hour:h=>`${h} giờ trước`,
+   tag:{order:'🧾 ĐƠN MỚI', add:'➕ GỌI THÊM', waiter:'🔔 GỌI PHỤC VỤ', water:'💧 NƯỚC ĐÁ / KHĂN GIẤY', bill:'💳 TÍNH TIỀN'},
+   noSupport:'Trình duyệt này không hỗ trợ thông báo. Dùng Chrome trên Android.', iosFirst:'iPhone: trước tiên thêm trang vào Màn hình chính (xem hướng dẫn).',
+   denied:'Bạn chưa cho phép thông báo. Mở cài đặt trình duyệt → Thông báo → Cho phép.', pushOk:'✓ Đã bật thông báo trên điện thoại này.' },
+ en: { title:'SUSHI GO · Orders', off:'Not connected', live:'Receiving orders', lost:'Connection lost, retrying…',
+   loginH:'Enter the staff code', loginP:'The code comes from the owner. Enter it once on this device.', cont:'Continue',
+   wrongCode:'Wrong code.', codeChanged:'The code is wrong or has changed. Enter it again.', noServer:'Cannot reach the server. Check the internet.',
+   readyH:'Ready for orders', readyP:'Tap to turn on the new-order sound and keep the screen on.', start:'▶ Start receiving orders',
+   push:'📳 Turn on notifications on this phone', pushOn:'📳 Notifications are on (tap to redo)', pushShort:'📳 Phone notifications', testSound:'🔊 Test sound',
+   iosHint:'iPhone: tap Share → Add to Home Screen, open the app from the home screen, then tap “Turn on notifications”.',
+   waiting:n=>`Waiting: ${n}`, none:'Nothing waiting', filterNew:'Waiting', filterAll:'All (12 hours)',
+   emptyNew:'No new orders yet. They appear here with a sound.', emptyAll:'No orders in the last 12 hours.',
+   autoHint:'The screen updates every few seconds. New orders beep and flash.',
+   soundOn:'🔔 Sound: on', soundOff:'🔕 Sound: off', changeCode:'Change code', confirmOut:'Log out and enter another code?',
+   ack:'Taken ✓', acked:'✓ Taken', sendFail:'Could not send. Try again.', table:'Table',
+   now:'just now', min:m=>`${m} min ago`, hour:h=>`${h} h ago`,
+   tag:{order:'🧾 NEW ORDER', add:'➕ ADD-ON', waiter:'🔔 CALL WAITER', water:'💧 ICE WATER / NAPKINS', bill:'💳 BILL'},
+   noSupport:'This browser has no notifications. Use Chrome on Android.', iosFirst:'iPhone: first add this page to the Home Screen (see the tip below).',
+   denied:'Notifications are not allowed. Open the browser settings → Notifications → Allow.', pushOk:'✓ Notifications are on for this phone.' },
+ ru: { title:'SUSHI GO · Заказы', off:'Нет подключения', live:'Принимаем заказы', lost:'Нет связи, пробуем снова…',
+   loginH:'Введите код персонала', loginP:'Код выдаёт владелец. Вводится один раз на этом устройстве.', cont:'Продолжить',
+   wrongCode:'Неверный код.', codeChanged:'Код неверный или изменился. Введите его снова.', noServer:'Нет связи с сервером. Проверьте интернет.',
+   readyH:'Готово к приёму заказов', readyP:'Нажмите, чтобы включить звук новых заказов и не гасить экран.', start:'▶ Начать приём заказов',
+   push:'📳 Включить уведомления на этом телефоне', pushOn:'📳 Уведомления включены (нажмите, чтобы повторить)', pushShort:'📳 Уведомления на телефон', testSound:'🔊 Проверить звук',
+   iosHint:'iPhone: «Поделиться» → «На экран Домой», откройте приложение с экрана Домой и нажмите «Включить уведомления».',
+   waiting:n=>`Ожидают: ${n}`, none:'Нет ожидающих заказов', filterNew:'Ожидают', filterAll:'Все (12 часов)',
+   emptyNew:'Новых заказов пока нет. Они появятся здесь со звуком.', emptyAll:'За последние 12 часов заказов нет.',
+   autoHint:'Экран обновляется каждые несколько секунд. Новые заказы — со звуком и миганием.',
+   soundOn:'🔔 Звук: вкл', soundOff:'🔕 Звук: выкл', changeCode:'Сменить код', confirmOut:'Выйти и ввести другой код?',
+   ack:'Принято ✓', acked:'✓ Принято', sendFail:'Не удалось отправить. Попробуйте ещё раз.', table:'Стол',
+   now:'только что', min:m=>`${m} мин назад`, hour:h=>`${h} ч назад`,
+   tag:{order:'🧾 НОВЫЙ ЗАКАЗ', add:'➕ ДОЗАКАЗ', waiter:'🔔 ЗОВУТ ОФИЦИАНТА', water:'💧 ВОДА / САЛФЕТКИ', bill:'💳 СЧЁТ'},
+   noSupport:'Этот браузер не поддерживает уведомления. Используйте Chrome на Android.', iosFirst:'iPhone: сначала добавьте страницу на экран Домой (подсказка ниже).',
+   denied:'Уведомления не разрешены. Настройки браузера → Уведомления → Разрешить.', pushOk:'✓ Уведомления на этом телефоне включены.' },
+};
+/* lines of the Vietnamese ticket, translated for EN / RU (the guest's own note stays as written) */
+const LINE = {
+ en: [[/^Tổng cộng: /,'Total with tip: '],[/^Tổng: /,'Total: '],[/^Tiền tip: /,'Tip: '],[/^Thanh toán: Chuyển khoản VietQR$/,'Payment: VietQR transfer'],[/^Thanh toán: Tiền mặt$/,'Payment: cash'],
+      [/^Ghi chú: /,'Note: '],[/^Khách nói tiếng Nga$/,'Guest speaks Russian'],[/^Khách nói tiếng Anh$/,'Guest speaks English'],[/^Khách nói tiếng Việt$/,'Guest speaks Vietnamese']],
+ ru: [[/^Tổng cộng: /,'Всего с чаевыми: '],[/^Tổng: /,'Итого: '],[/^Tiền tip: /,'Чаевые: '],[/^Thanh toán: Chuyển khoản VietQR$/,'Оплата: перевод VietQR'],[/^Thanh toán: Tiền mặt$/,'Оплата: наличные'],
+      [/^Ghi chú: /,'Комментарий: '],[/^Khách nói tiếng Nga$/,'Гость говорит по-русски'],[/^Khách nói tiếng Anh$/,'Гость говорит по-английски'],[/^Khách nói tiếng Việt$/,'Гость говорит по-вьетнамски']],
+};
+
 const $ = id => document.getElementById(id);
 const store = { get: k => { try { return localStorage.getItem('sg_' + k) } catch (e) { return null } }, set: (k, v) => { try { localStorage.setItem('sg_' + k, v) } catch (e) {} }, del: k => { try { localStorage.removeItem('sg_' + k) } catch (e) {} } };
+let lang = store.get('lang') || ({ ru: 'ru', en: 'en' }[(navigator.language || '').slice(0, 2)] || 'vi');
+const t = k => L[lang][k];
 
 let code = store.get('code') || '';
-let orders = new Map();      // id → order
-let maxId = 0, lastNow = 0, filter = 'new', soundOn = store.get('sound') !== '0', audio = null, timer = null, wake = null, remind = 0;
+let orders = new Map(), maxId = 0, lastNow = 0, filter = 'new', soundOn = store.get('sound') !== '0', audio = null, timer = null, wake = null, remind = 0, status = ['', 'off'];
 
-/* ---------- server ---------- */
 async function api(path, body) {
   const r = await fetch(API + path + (path.includes('?') ? '&' : '?') + 'venue=' + VENUE, {
     method: body ? 'POST' : 'GET', cache: 'no-store',
@@ -117,7 +178,6 @@ async function api(path, body) {
   return r.json();
 }
 
-/* ---------- sound (Web Audio: three short rising beeps) ---------- */
 function beep() {
   if (!soundOn || !audio) return;
   const t0 = audio.currentTime;
@@ -129,25 +189,34 @@ function beep() {
   if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 }
 
-/* ---------- orders ---------- */
-const KIND = o => o.text.startsWith('GỌI THÊM') ? ['add', '➕ GỌI THÊM'] : o.kind === 'bill' ? ['bill', '💳 TÍNH TIỀN'] : o.kind === 'waiter' ? ['waiter', '🔔 GỌI PHỤC VỤ'] : ['order', '🧾 ĐƠN MỚI'];
-const ago = ms => { const m = Math.max(0, Math.round((Date.now() - ms) / 60000)); return m < 1 ? 'vừa xong' : m < 60 ? m + ' phút trước' : Math.floor(m / 60) + ' giờ trước' };
+const kindOf = o => o.text.startsWith('GỌI THÊM') ? 'add' : o.text.startsWith('XIN THÊM') ? 'water' : o.kind === 'bill' ? 'bill' : o.kind === 'waiter' ? 'waiter' : 'order';
+const ago = ms => { const m = Math.max(0, Math.round((Date.now() - ms) / 60000)); return m < 1 ? t('now') : m < 60 ? t('min')(m) : t('hour')(Math.floor(m / 60)) };
 const hhmm = ms => { const d = new Date(ms); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') };
 const esc = s => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+function body(o) {
+  let lines = o.text.split('\n').slice(1);
+  if (lang !== 'vi') lines = lines.map(l => {
+    const m = l.match(/^(\d+ × )\[(\d+)\] (.+?)( — .*)$/);
+    if (m) { const n = NAMES[m[2]]; return `${m[1]}[${m[2]}] ${n ? n[lang === 'en' ? 0 : 1] : m[3]}${m[4]}` }
+    for (const [re, to] of LINE[lang]) if (re.test(l)) return l.replace(re, to);
+    return l;
+  });
+  return lines.join('\n');
+}
 
 function render(freshIds = []) {
   const all = [...orders.values()].sort((a, b) => b.id - a.id);
   const open = all.filter(o => o.status === 'new');
   const show = filter === 'new' ? open : all;
-  $('countH').textContent = open.length ? `Chưa nhận: ${open.length}` : 'Không có đơn chờ';
-  document.title = (open.length ? `(${open.length}) ` : '') + 'SUSHI GO · Đơn hàng';
+  $('countH').textContent = open.length ? t('waiting')(open.length) : t('none');
+  document.title = (open.length ? `(${open.length}) ` : '') + t('title');
   $('list').innerHTML = show.length ? show.map(o => {
-    const [k, label] = KIND(o), body = o.text.split('\n').slice(1).join('\n');
+    const k = kindOf(o);
     return `<article class="o k-${k}${o.status === 'done' ? ' done' : ''}${freshIds.includes(o.id) ? ' new' : ''}" data-id="${o.id}">
-      <div><div class="h"><span class="tb">Bàn ${esc(o.tbl || '?')}</span><span class="tag">${label}</span><span class="tm">${hhmm(o.created)} · ${ago(o.created)}</span></div>
-      <pre>${esc(body)}</pre></div>
-      <button class="ok" data-ack="${o.id}" ${o.status === 'done' ? 'disabled' : ''}>${o.status === 'done' ? '✓ Đã nhận' : 'Đã nhận ✓'}</button></article>`;
-  }).join('') : `<div class="empty">${filter === 'new' ? 'Chưa có đơn mới. Đơn sẽ hiện ở đây kèm âm thanh.' : 'Chưa có đơn trong 12 giờ qua.'}</div>`;
+      <div><div class="h"><span class="tb">${t('table')} ${esc(o.tbl || '?')}</span>${(o.text.split('\n')[0].match(/ · Bàn [^ ]+ · (.+)$/) || [])[1] ? `<span class="who">👤 ${esc(o.text.split('\n')[0].match(/ · Bàn [^ ]+ · (.+)$/)[1])}</span>` : ''}<span class="tag">${t('tag')[k]}</span><span class="tm">${hhmm(o.created)} · ${ago(o.created)}</span></div>
+      <pre>${esc(body(o))}</pre></div>
+      <button class="ok" data-ack="${o.id}" ${o.status === 'done' ? 'disabled' : ''}>${o.status === 'done' ? t('acked') : t('ack')}</button></article>`;
+  }).join('') : `<div class="empty">${filter === 'new' ? t('emptyNew') : t('emptyAll')}</div>`;
 }
 
 async function poll() {
@@ -158,25 +227,35 @@ async function poll() {
     d.done.forEach(x => { const o = orders.get(x.id); if (o) { o.status = 'done'; o.done_at = x.done_at } });
     for (const [id, o] of orders) if (Date.now() - o.created > 12 * 3600e3) orders.delete(id);
     lastNow = d.now;
-    setStatus('on', 'Đang nhận đơn');
+    setStatus('on', 'live');
     if (fresh.length || d.done.length || !render.once) { render(fresh); render.once = true }
     if (fresh.length) { beep(); remind = Date.now() }
-    else if ([...orders.values()].some(o => o.status === 'new') && Date.now() - remind > 45000) { beep(); remind = Date.now() }  /* reminder while something waits */
+    else if ([...orders.values()].some(o => o.status === 'new') && Date.now() - remind > 45000) { beep(); remind = Date.now() }
   } catch (e) {
-    if (e.message === 'code') return logout('Mã không đúng hoặc đã đổi. Nhập lại mã.');
-    setStatus('err', 'Mất kết nối, đang thử lại…');
+    if (e.message === 'code') return logout(t('codeChanged'));
+    setStatus('err', 'lost');
   }
 }
-function setStatus(c, t) { $('dot').className = 'dot ' + c; $('stText').textContent = t }
+function setStatus(c, key) { status = [c, key]; $('dot').className = 'dot ' + c; $('stText').textContent = t(key) }
 
-/* ---------- screens ---------- */
 function show(id) { ['login', 'start', 'board'].forEach(x => $(x).hidden = x !== id); $('soundBtn').hidden = $('logoutBtn').hidden = id === 'login' }
-function logout(msg) { clearInterval(timer); timer = null; code = ''; store.del('code'); show('login'); $('loginErr').textContent = msg || ''; setStatus('', 'Chưa kết nối') }
+function logout(msg) { clearInterval(timer); timer = null; code = ''; store.del('code'); show('login'); $('loginErr').textContent = msg || ''; setStatus('', 'off') }
+
+function setLang(l) {
+  lang = L[l] ? l : 'vi'; store.set('lang', lang); document.documentElement.lang = lang;
+  document.querySelectorAll('[data-t]').forEach(el => el.textContent = t(el.dataset.t));
+  document.querySelectorAll('.lang button').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === lang));
+  $('soundBtn').textContent = soundOn ? t('soundOn') : t('soundOff');
+  if (store.get('push') === '1') $('pushBtn').textContent = t('pushOn');
+  setStatus(status[0], status[1]);
+  if (render.once) render();
+}
+document.querySelector('.lang').onclick = e => { const b = e.target.closest('[data-lang]'); if (b) setLang(b.dataset.lang) };
 
 $('loginBtn').onclick = async () => {
   code = $('code').value.trim(); $('loginErr').textContent = '';
   try { await api('/staff/orders?since=999999999'); store.set('code', code); show('start'); saveSwConfig() }
-  catch (e) { $('loginErr').textContent = e.message === 'code' ? 'Mã không đúng.' : 'Không kết nối được máy chủ. Kiểm tra mạng.'; code = '' }
+  catch (e) { $('loginErr').textContent = e.message === 'code' ? t('wrongCode') : t('noServer'); code = '' }
 };
 $('code').addEventListener('keydown', e => { if (e.key === 'Enter') $('loginBtn').click() });
 
@@ -186,9 +265,8 @@ $('startBtn').onclick = async () => {
   show('board'); await poll(); timer = timer || setInterval(poll, POLL_MS);
 };
 document.addEventListener('visibilitychange', async () => { if (!document.hidden && timer) { poll(); try { wake = await navigator.wakeLock.request('screen') } catch (e) {} } });
-$('soundBtn').onclick = () => { soundOn = !soundOn; store.set('sound', soundOn ? '1' : '0'); $('soundBtn').textContent = soundOn ? '🔔 Âm thanh: bật' : '🔕 Âm thanh: tắt' };
-$('soundBtn').textContent = soundOn ? '🔔 Âm thanh: bật' : '🔕 Âm thanh: tắt';
-$('logoutBtn').onclick = () => { if (confirm('Đăng xuất và nhập mã khác?')) logout() };
+$('soundBtn').onclick = () => { soundOn = !soundOn; store.set('sound', soundOn ? '1' : '0'); $('soundBtn').textContent = soundOn ? t('soundOn') : t('soundOff') };
+$('logoutBtn').onclick = () => { if (confirm(t('confirmOut'))) logout() };
 $('testBtn').onclick = () => { if (!audio) { try { audio = new (window.AudioContext || window.webkitAudioContext)() } catch (e) {} } const s = soundOn; soundOn = true; beep(); soundOn = s };
 document.querySelectorAll('.chip[data-f]').forEach(b => b.onclick = () => { filter = b.dataset.f; document.querySelectorAll('.chip[data-f]').forEach(x => x.setAttribute('aria-pressed', x === b)); render() });
 
@@ -196,24 +274,23 @@ $('list').addEventListener('click', async e => {
   const b = e.target.closest('[data-ack]'); if (!b) return;
   const id = Number(b.dataset.ack), o = orders.get(id); b.disabled = true;
   try { await api('/staff/ack', { id }); o.status = 'done'; o.done_at = Date.now(); render() }
-  catch (err) { b.disabled = false; alert('Không gửi được. Thử lại.') }
+  catch (err) { b.disabled = false; alert(t('sendFail')) }
 });
 
-/* ---------- push notifications ---------- */
 const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
 const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
 if (isIOS && !standalone) $('iosHint').hidden = false;
 
-async function saveSwConfig() {   /* the service worker needs the code to read the order text */
+async function saveSwConfig() {
   if (!('caches' in window)) return;
   try { const c = await caches.open('sg-config'); await c.put('/sg-config', new Response(JSON.stringify({ api: API, venue: VENUE, code }))) } catch (e) {}
 }
 async function enablePush() {
   $('pushErr').textContent = '';
   try {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) throw new Error(isIOS && !standalone ? 'iPhone: trước tiên thêm trang vào Màn hình chính (xem hướng dẫn bên dưới).' : 'Trình duyệt này không hỗ trợ thông báo. Dùng Chrome trên Android.');
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) throw new Error(isIOS && !standalone ? t('iosFirst') : t('noSupport'));
     const perm = await Notification.requestPermission();
-    if (perm !== 'granted') throw new Error('Bạn chưa cho phép thông báo. Mở cài đặt trình duyệt → Thông báo → Cho phép.');
+    if (perm !== 'granted') throw new Error(t('denied'));
     await saveSwConfig();
     const reg = await navigator.serviceWorker.register('sw.js');
     await navigator.serviceWorker.ready;
@@ -221,17 +298,15 @@ async function enablePush() {
     const raw = Uint8Array.from(atob(key.replace(/-/g, '+').replace(/_/g, '/') + '=='.slice(0, (4 - key.length % 4) % 4)), c => c.charCodeAt(0));
     const sub = (await reg.pushManager.getSubscription()) || await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: raw });
     await api('/staff/subscribe', { sub: sub.toJSON() });
-    store.set('push', '1');
-    const msg = '✓ Đã bật thông báo trên điện thoại này.';
-    $('pushErr').textContent = msg; alert(msg);
-  } catch (e) { $('pushErr').textContent = e.message === 'code' ? 'Mã không đúng.' : e.message; if ($('board').hidden === false) alert(e.message) }
+    store.set('push', '1'); $('pushBtn').textContent = t('pushOn');
+    $('pushErr').textContent = t('pushOk'); alert(t('pushOk'));
+  } catch (e) { const m = e.message === 'code' ? t('wrongCode') : e.message; $('pushErr').textContent = m; if (!$('board').hidden) alert(m) }
 }
 $('pushBtn').onclick = enablePush; $('pushBtn2').onclick = enablePush;
-if (store.get('push') === '1') { $('pushBtn').textContent = '📳 Thông báo đã bật (bấm để bật lại)' }
 
-/* ---------- boot ---------- */
+setLang(lang);
 if (code) { show('start'); saveSwConfig() } else show('login');
-setInterval(() => { if (timer) render() }, 30000);   /* refresh “x phút trước” */
+setInterval(() => { if (timer) render() }, 30000);
 </script>
 </body>
 </html>
