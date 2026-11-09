@@ -466,6 +466,9 @@ body.has-ostrip #menuApp .toast{bottom:calc(150px + env(safe-area-inset-bottom,0
 #menuApp footer a{color:inherit}
 #menuApp .it .ph0{display:grid;place-items:center;font-family:var(--f-display);font-size:26px;color:var(--primary);background:var(--primary-soft) ;}
 #menuApp .wrap::before{top:44px;width:130px;height:170px}
+/* category bar stays on top while scrolling (the art layer rule had turned sticky off) */
+#menuApp .cats{position:sticky;top:0;z-index:6;margin-inline:-16px;padding-inline:16px;padding-top:max(10px,env(safe-area-inset-top,0px));box-shadow:0 6px 10px -10px rgba(80,50,30,.35)}
+#menuApp .sect{scroll-margin-top:72px}
 #menuApp .pay{grid-template-columns:1fr}
 #menuApp .pay img{width:100%;max-width:260px;justify-self:center;border-radius:8px;background:#fff}
 #menuApp .pay small{font-size:13px;line-height:1.45;margin-top:4px}
@@ -581,7 +584,8 @@ const CONFIG={
   googleReview:'',            // venue Google Maps review link, e.g. 'https://g.page/r/XXXX/review'
   orderEndpoint:'https://cafeupnhatrang.nhatrang.workers.dev/',
   umamiId:'',                 // Umami Website ID of the "Sushi Go" site
-  vietqr:{bank:'', account:'', name:''}  // bank code (e.g. 'VCB', 'MB', 'TCB'), account number, account holder (CAPITALS, no accents)
+  vietqr:{bank:'', account:'', name:''},  // bank code (e.g. 'VCB', 'MB', 'TCB'), account number, account holder (CAPITALS, no accents)
+  sheetId:'1U_hNYZbWaZgpX_Bgw0AbhVJ1xovGlWeSHL170R3wlEI'  // Google Sheet "SUSHI GO · Thực đơn & hết món": prices + sold out (anyone with the link can view)
 };
 /* counter: sends events to Umami when umamiId is set; does nothing otherwise */
 function track(name,data){try{if(window.umami&&umami.track)umami.track(name,data)}catch(e){}}
@@ -1002,9 +1006,9 @@ document.getElementById('list').addEventListener('click',e=>{
 });
 document.getElementById('cats').addEventListener('click',e=>{
   const b=e.target.closest('button[data-cat]');if(!b)return;
-  document.querySelectorAll('#cats button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  document.querySelectorAll('#cats button').forEach(x=>x.setAttribute('aria-pressed',x===b));b.scrollIntoView({inline:'center',block:'nearest'});
   const s=document.getElementById('s-'+b.dataset.cat);
-  window.scrollTo({top:s.getBoundingClientRect().top+scrollY-64,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+  spyLock=Date.now()+900;window.scrollTo({top:s.getBoundingClientRect().top+scrollY-document.getElementById('cats').offsetHeight-6,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
 });
 const bg=document.getElementById('sheetBg');
 document.getElementById('openCart').addEventListener('click',()=>{renderSheet();bg.hidden=false;document.getElementById('closeSheet').focus()});
@@ -1085,6 +1089,48 @@ document.querySelector('#menuApp .lang').addEventListener('click',e=>{const b=e.
 
 if(!ON)return;
 setTimeout(()=>{loadSent();renderList();renderBar();renderChip();syncDirect();loadCounter()},0);
+/* ---- stop-list and prices from the venue's Google Sheet (re-read every minute and when the guest comes back to the tab) ---- */
+function parseCSV(t){const rows=[];let r=[],f='',q=false;for(let i=0;i<t.length;i++){const c=t[i];
+  if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+  else if(c==='"')q=true;else if(c===','){r.push(f);f=''}else if(c==='\n'){r.push(f);rows.push(r);r=[];f=''}else if(c!=='\r')f+=c}
+  if(f||r.length){r.push(f);rows.push(r)}return rows}
+async function loadSheet(){
+  if(!CONFIG.sheetId)return;
+  try{
+    const res=await fetch(`https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}/gviz/tq?tqx=out:csv&_=${Date.now()}`,{cache:'no-store'});
+    if(!res.ok)return;
+    const rows=parseCSV(await res.text()).slice(1);
+    if(!rows.length)return;
+    const so=[];let changed=false;
+    rows.forEach(r=>{
+      const id=String(r[0]||'').trim().replace(/\.0+$/,''), m=MENU.find(x=>x.id===id); if(!m)return;
+      const p=parseInt(String(r[2]||'').replace(/\D/g,''),10);
+      if(p>=1000&&p!==m.price){m.price=p;changed=true}
+      if(String(r[3]||'').trim())so.push(id);
+    });
+    if(so.join()!==SOLD_OUT.join()){SOLD_OUT.length=0;SOLD_OUT.push(...so);changed=true}
+    SOLD_OUT.forEach(id=>{if(cart[id]){delete cart[id];changed=true}});
+    if(changed){renderList();renderBar();saveSent();if(!document.getElementById('sheetBg').hidden)renderSheet()}
+  }catch(e){}
+}
+setTimeout(loadSheet,0);setInterval(loadSheet,60000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadSheet()});
+
+/* ---- active category follows the scroll ---- */
+var spyLock=0;
+function spy(){
+  if(Date.now()<spyLock)return;
+  const bar=document.getElementById('cats'), edge=bar.getBoundingClientRect().bottom+12;
+  let cur=CATS[0];
+  CATS.forEach(c=>{const s=document.getElementById('s-'+c);if(s&&s.getBoundingClientRect().top<=edge)cur=c});
+  if(innerHeight+scrollY>=document.documentElement.scrollHeight-4)cur=CATS[CATS.length-1];
+  const b=bar.querySelector(`button[data-cat="${cur}"]`);
+  if(!b||b.getAttribute('aria-pressed')==='true')return;
+  bar.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  bar.scrollTo({left:b.offsetLeft-(bar.clientWidth-b.offsetWidth)/2,behavior:'smooth'});
+}
+let spyT;addEventListener('scroll',()=>{clearTimeout(spyT);spyT=setTimeout(spy,60)},{passive:true});
+
 /* table from #table-N, language from storage or phone */
 (function(){
   const m=(location.hash||'').match(/^#table-(\d{1,4})$/);if(m){table=m[1];hashTable=m[1];}
