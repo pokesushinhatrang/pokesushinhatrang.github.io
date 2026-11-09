@@ -52,6 +52,9 @@ button{font:inherit;cursor:pointer}
 .o .tm{font-size:13px;color:var(--muted)}
 .o .who{font-size:16px;font-weight:800}
 .o pre{margin:8px 0 0;font:inherit;font-size:16px;line-height:1.5;white-space:pre-wrap}
+.o .acts{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.o .pr{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 12px;font-size:14px;font-weight:700;color:var(--ink)}
+.chip.on{background:var(--green);border-color:var(--green);color:#fff}
 .o .ok{border:0;border-radius:12px;padding:14px 16px;font-size:16px;font-weight:800;background:var(--green);color:#fff;white-space:nowrap}
 .o.done{opacity:.55;border-left-color:var(--line)!important}
 .o.done .ok{background:var(--line);color:var(--muted)}
@@ -94,7 +97,7 @@ button{font:inherit;cursor:pointer}
       <button class="chip" data-f="new" aria-pressed="true" data-t="filterNew"></button><button class="chip" data-f="all" aria-pressed="false" data-t="filterAll"></button></div>
     <div class="list" id="list"></div>
     <p class="hint"><span data-t="autoHint"></span><br>
-      <button class="chip" id="pushBtn2" data-t="pushShort"></button> <button class="chip" id="testBtn" data-t="testSound"></button></p>
+      <button class="chip" id="pushBtn2" data-t="pushShort"></button> <button class="chip" id="testBtn" data-t="testSound"></button> <button class="chip" id="autoPrintBtn"></button> <button class="chip" id="testPrintBtn" data-t="testPrint"></button></p>
   </section>
 </main>
 
@@ -116,7 +119,7 @@ const L = {
    emptyNew:'Chưa có đơn mới. Đơn sẽ hiện ở đây kèm âm thanh.', emptyAll:'Chưa có đơn trong 12 giờ qua.',
    autoHint:'Màn hình tự cập nhật mỗi vài giây. Đơn mới có âm thanh và nhấp nháy.',
    soundOn:'🔔 Âm thanh: bật', soundOff:'🔕 Âm thanh: tắt', changeCode:'Đổi mã', confirmOut:'Đăng xuất và nhập mã khác?',
-   ack:'Đã nhận ✓', acked:'✓ Đã nhận', sendFail:'Không gửi được. Thử lại.', table:'Bàn',
+   printBtn:'🖨 In', autoOn:'🖨 Tự động in hóa đơn: bật', autoOff:'🖨 Tự động in hóa đơn: tắt', testPrint:'🧪 In thử', ack:'Đã nhận ✓', acked:'✓ Đã nhận', sendFail:'Không gửi được. Thử lại.', table:'Bàn',
    now:'vừa xong', min:m=>`${m} phút trước`, hour:h=>`${h} giờ trước`,
    tag:{order:'🧾 ĐƠN MỚI', add:'➕ GỌI THÊM', waiter:'🔔 GỌI PHỤC VỤ', water:'💧 NƯỚC ĐÁ / KHĂN GIẤY', bill:'💳 TÍNH TIỀN'},
    noSupport:'Trình duyệt này không hỗ trợ thông báo. Dùng Chrome trên Android.', iosFirst:'iPhone: trước tiên thêm trang vào Màn hình chính (xem hướng dẫn).',
@@ -131,7 +134,7 @@ const L = {
    emptyNew:'No new orders yet. They appear here with a sound.', emptyAll:'No orders in the last 12 hours.',
    autoHint:'The screen updates every few seconds. New orders beep and flash.',
    soundOn:'🔔 Sound: on', soundOff:'🔕 Sound: off', changeCode:'Change code', confirmOut:'Log out and enter another code?',
-   ack:'Taken ✓', acked:'✓ Taken', sendFail:'Could not send. Try again.', table:'Table',
+   printBtn:'🖨 Print', autoOn:'🖨 Auto-print bills: on', autoOff:'🖨 Auto-print bills: off', testPrint:'🧪 Test print', ack:'Taken ✓', acked:'✓ Taken', sendFail:'Could not send. Try again.', table:'Table',
    now:'just now', min:m=>`${m} min ago`, hour:h=>`${h} h ago`,
    tag:{order:'🧾 NEW ORDER', add:'➕ ADD-ON', waiter:'🔔 CALL WAITER', water:'💧 ICE WATER / NAPKINS', bill:'💳 BILL'},
    noSupport:'This browser has no notifications. Use Chrome on Android.', iosFirst:'iPhone: first add this page to the Home Screen (see the tip below).',
@@ -146,7 +149,7 @@ const L = {
    emptyNew:'Новых заказов пока нет. Они появятся здесь со звуком.', emptyAll:'За последние 12 часов заказов нет.',
    autoHint:'Экран обновляется каждые несколько секунд. Новые заказы — со звуком и миганием.',
    soundOn:'🔔 Звук: вкл', soundOff:'🔕 Звук: выкл', changeCode:'Сменить код', confirmOut:'Выйти и ввести другой код?',
-   ack:'Принято ✓', acked:'✓ Принято', sendFail:'Не удалось отправить. Попробуйте ещё раз.', table:'Стол',
+   printBtn:'🖨 Печать', autoOn:'🖨 Автопечать счетов: вкл', autoOff:'🖨 Автопечать счетов: выкл', testPrint:'🧪 Тестовая печать', ack:'Принято ✓', acked:'✓ Принято', sendFail:'Не удалось отправить. Попробуйте ещё раз.', table:'Стол',
    now:'только что', min:m=>`${m} мин назад`, hour:h=>`${h} ч назад`,
    tag:{order:'🧾 НОВЫЙ ЗАКАЗ', add:'➕ ДОЗАКАЗ', waiter:'🔔 ЗОВУТ ОФИЦИАНТА', water:'💧 ВОДА / САЛФЕТКИ', bill:'💳 СЧЁТ'},
    noSupport:'Этот браузер не поддерживает уведомления. Используйте Chrome на Android.', iosFirst:'iPhone: сначала добавьте страницу на экран Домой (подсказка ниже).',
@@ -215,7 +218,7 @@ function render(freshIds = []) {
     return `<article class="o k-${k}${o.status === 'done' ? ' done' : ''}${freshIds.includes(o.id) ? ' new' : ''}" data-id="${o.id}">
       <div><div class="h"><span class="tb">${t('table')} ${esc(o.tbl || '?')}</span>${(o.text.split('\n')[0].match(/ · Bàn [^ ]+ · (.+)$/) || [])[1] ? `<span class="who">👤 ${esc(o.text.split('\n')[0].match(/ · Bàn [^ ]+ · (.+)$/)[1])}</span>` : ''}<span class="tag">${t('tag')[k]}</span><span class="tm">${hhmm(o.created)} · ${ago(o.created)}</span></div>
       <pre>${esc(body(o))}</pre></div>
-      <button class="ok" data-ack="${o.id}" ${o.status === 'done' ? 'disabled' : ''}>${o.status === 'done' ? t('acked') : t('ack')}</button></article>`;
+      <div class="acts"><button class="ok" data-ack="${o.id}" ${o.status === 'done' ? 'disabled' : ''}>${o.status === 'done' ? t('acked') : t('ack')}</button>${['order','add','bill'].includes(k) ? `<button class="pr" data-print="${o.id}">${t('printBtn')}</button>` : ''}</div></article>`;
   }).join('') : `<div class="empty">${filter === 'new' ? t('emptyNew') : t('emptyAll')}</div>`;
 }
 
@@ -229,7 +232,7 @@ async function poll() {
     lastNow = d.now;
     setStatus('on', 'live');
     if (fresh.length || d.done.length || !render.once) { render(fresh); render.once = true }
-    if (fresh.length) { beep(); remind = Date.now() }
+    if (fresh.length) { beep(); remind = Date.now(); if (autoPrint) fresh.map(id => orders.get(id)).filter(o => o.kind === 'bill' && !printed.has(o.id)).forEach(o => printOrder(o)) }
     else if ([...orders.values()].some(o => o.status === 'new') && Date.now() - remind > 45000) { beep(); remind = Date.now() }
   } catch (e) {
     if (e.message === 'code') return logout(t('codeChanged'));
@@ -247,7 +250,7 @@ function setLang(l) {
   document.querySelectorAll('.lang button').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === lang));
   $('soundBtn').textContent = soundOn ? t('soundOn') : t('soundOff');
   if (store.get('push') === '1') $('pushBtn').textContent = t('pushOn');
-  setStatus(status[0], status[1]);
+  setStatus(status[0], status[1]); if ($('autoPrintBtn')) syncAutoBtn();
   if (render.once) render();
 }
 document.querySelector('.lang').onclick = e => { const b = e.target.closest('[data-lang]'); if (b) setLang(b.dataset.lang) };
@@ -303,6 +306,56 @@ async function enablePush() {
   } catch (e) { const m = e.message === 'code' ? t('wrongCode') : e.message; $('pushErr').textContent = m; if (!$('board').hidden) alert(m) }
 }
 $('pushBtn').onclick = enablePush; $('pushBtn2').onclick = enablePush;
+
+/* ---------- printing (80 mm receipt through the device's print system) ---------- */
+let autoPrint = store.get('autoprint') === '1';
+const printed = new Set(JSON.parse(store.get('printed') || '[]'));
+const money = n => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' ₫';
+const guestOf = o => ((o.text.split('\n')[0].match(/ · Bàn [^ ]+ · (.+)$/) || [])[1] || '');
+function itemsFor(bill) {          /* all orders of this table (and guest) since the previous bill */
+  const all = [...orders.values()].filter(o => o.tbl === bill.tbl).sort((a, b) => a.id - b.id);
+  const prev = all.filter(o => o.kind === 'bill' && o.id < bill.id && guestOf(o) === guestOf(bill)).pop();
+  const lines = {};
+  all.filter(o => o.kind === 'order' && o.id < bill.id && (!prev || o.id > prev.id) && (!guestOf(bill) || guestOf(o) === guestOf(bill)))
+    .forEach(o => o.text.split('\n').forEach(l => { const m = l.match(/^(\d+) × \[(\d+)\] (.+?) — ([\d.]+) ₫$/);
+      if (m) { const k = '#' + m[2]; lines[k] = lines[k] || { q: 0, name: m[3], sum: 0 }; lines[k].q += +m[1]; lines[k].sum += +m[4].replace(/\./g, '') } }));
+  return Object.entries(lines).map(([k, v]) => [k.slice(1), v]);
+}
+function receiptHTML(o) {
+  const d = new Date(o.created), when = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} ${hhmm(o.created)}`;
+  const tl = o.text.split('\n'), rest = tl.slice(1).filter(l => !/^Khách nói/.test(l));
+  let body = '';
+  if (o.kind === 'bill') {
+    const it = itemsFor(o);
+    body = (it.length ? `<table>${it.map(([id, x]) => `<tr><td>${x.q} × ${esc(x.name)}<small> [${id}]</small></td><td class="r">${money(x.sum)}</td></tr>`).join('')}</table><hr>` : '')
+      + rest.map(l => { const m = l.match(/^(Tổng cộng|Tổng|Tiền tip)( \(\d+%\))?: (.+)$/) || l.match(/^(Tiền tip): (.+?)( \(\d+%\))$/);
+          return /^Tổng cộng|^Tổng:/.test(l) ? `<div class="row big"><span>${esc(l.split(': ')[0])}</span><span>${esc(l.split(': ')[1])}</span></div>` : `<div class="row"><span>${esc(l.split(': ')[0])}</span><span>${esc(l.split(': ').slice(1).join(': '))}</span></div>` }).join('');
+  } else {
+    body = rest.map(l => { const m = l.match(/^(\d+ × )\[(\d+)\] (.+?) — (.+)$/);
+      return m ? `<div class="row"><span><b>${m[1]}</b>${esc(m[3])}<small> [${m[2]}]</small></span><span>${esc(m[4])}</span></div>` : `<div class="row ${/^Tổng/.test(l) ? 'big' : ''}"><span>${esc(l)}</span></div>` }).join('');
+  }
+  const head = { order: tl[0].startsWith('GỌI THÊM') ? 'GỌI THÊM' : 'PHIẾU GỌI MÓN', bill: 'HÓA ĐƠN TẠM TÍNH' }[o.kind] || tl[0].split(' · ')[0];
+  return `<!doctype html><html><head><meta charset="utf-8"><style>
+@page{size:80mm auto;margin:0} *{box-sizing:border-box} body{width:72mm;margin:0 auto;padding:3mm 0 6mm;font:12px/1.35 "Be Vietnam Pro",Arial,sans-serif;color:#000}
+.c{text-align:center} h1{font-size:16px;margin:0} h2{font-size:14px;margin:2mm 0 0;letter-spacing:.04em} .tb{font-size:22px;font-weight:800;margin:1mm 0}
+hr{border:0;border-top:1px dashed #000;margin:2mm 0} table{width:100%;border-collapse:collapse} td{padding:.6mm 0;vertical-align:top} .r{text-align:right;white-space:nowrap;padding-left:2mm}
+.row{display:flex;justify-content:space-between;gap:2mm;padding:.5mm 0} .row span:last-child{white-space:nowrap;text-align:right} .big{font-weight:800;font-size:14px} small{color:#444}
+</style></head><body><div class="c"><h1>Poke Sushi Nha Trang</h1><div>SUSHI GO</div><h2>${head}</h2><div class="tb">Bàn ${esc(o.tbl || '?')}${guestOf(o) ? ' · ' + esc(guestOf(o)) : ''}</div><div>${when} · #${o.id}</div></div><hr>${body}<hr>
+<div class="c">${o.kind === 'bill' ? 'Cảm ơn quý khách! · Thank you!<br>Wi-Fi: pokesushinhatrang · xincamon' : 'Bếp / Kitchen'}</div></body></html>`;
+}
+let printQueue = Promise.resolve();
+function printOrder(o) {
+  printed.add(o.id); store.set('printed', JSON.stringify([...printed].slice(-200)));
+  printQueue = printQueue.then(() => new Promise(done => {
+    const f = document.createElement('iframe'); f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0';
+    document.body.appendChild(f); f.contentDocument.open(); f.contentDocument.write(receiptHTML(o)); f.contentDocument.close();
+    setTimeout(() => { try { f.contentWindow.focus(); f.contentWindow.print() } catch (e) {} setTimeout(() => { f.remove(); done() }, 1500) }, 400);
+  }));
+}
+function syncAutoBtn() { const b = $('autoPrintBtn'); b.textContent = autoPrint ? t('autoOn') : t('autoOff'); b.classList.toggle('on', autoPrint) }
+$('autoPrintBtn').onclick = () => { autoPrint = !autoPrint; store.set('autoprint', autoPrint ? '1' : '0'); syncAutoBtn() };
+$('testPrintBtn').onclick = () => printOrder({ id: 0, kind: 'bill', tbl: '0', created: Date.now(), text: 'TÍNH TIỀN · Bàn 0\nTổng: 100.000 ₫\nThanh toán: Tiền mặt' });
+$('list').addEventListener('click', e => { const b = e.target.closest('[data-print]'); if (b) printOrder(orders.get(Number(b.dataset.print))) });
 
 setLang(lang);
 if (code) { show('start'); saveSwConfig() } else show('login');
