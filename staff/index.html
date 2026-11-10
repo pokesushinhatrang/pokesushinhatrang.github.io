@@ -74,7 +74,9 @@ button{font:inherit;cursor:pointer}
 .cpay button[aria-pressed="true"]{border-color:var(--pink);background:var(--pink-soft)}
 .prow{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px dashed var(--line);font-size:16px;cursor:pointer}
 .dsearch{margin-top:12px;position:relative}
-.dsearch input{width:100%;font:inherit;font-size:16px;padding:12px 12px 12px 40px;border:1px solid var(--line);border-radius:12px;background:var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='none' stroke='%23806A5A' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='8' cy='8' r='6'/%3E%3Cpath d='M12.5 12.5 17 17'/%3E%3C/svg%3E") no-repeat 13px center}
+.drow{display:flex;gap:8px}
+.drow select{flex:0 0 38%;min-width:0;font:inherit;font-size:15px;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}
+.dsearch input{flex:1;min-width:0;width:100%;font:inherit;font-size:16px;padding:12px 12px 12px 40px;border:1px solid var(--line);border-radius:12px;background:var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='none' stroke='%23806A5A' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='8' cy='8' r='6'/%3E%3Cpath d='M12.5 12.5 17 17'/%3E%3C/svg%3E") no-repeat 13px center}
 .dres{display:grid;gap:4px;margin-top:6px}
 .dres button{display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;width:100%;font:inherit;font-size:15px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
 .dres button:hover,.dres button:focus{border-color:var(--pink);background:var(--pink-soft)}
@@ -503,8 +505,9 @@ const dishOptions = () => `<option value="">${t('addDish')}</option>` + Object.e
 /* dish search: type part of the name (any language, accents optional) or the menu number, tap a result to add it */
 const norm = x => String(x).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/gi, 'd').toLowerCase();
 function mountSearch(box, pick) {
-  box.innerHTML = `<input type="search" placeholder="${t('searchPh')}" autocomplete="off" enterkeyhint="search"><div class="dres"></div>`;
-  const inp = box.querySelector('input'), res = box.querySelector('.dres');
+  box.innerHTML = `<div class="drow"><input type="search" placeholder="${t('searchPh')}" autocomplete="off" enterkeyhint="search"><select aria-label="${t('addDish')}">${dishOptions()}</select></div><div class="dres"></div>`;
+  const inp = box.querySelector('input'), res = box.querySelector('.dres'), sel = box.querySelector('select');
+  sel.addEventListener('change', () => { if (sel.value) { pick(sel.value); sel.value = '' } });
   const draw = () => { const q = norm(inp.value.trim()); if (!q) { res.innerHTML = ''; return }
     const hits = Object.entries(NAMES).filter(([id, n]) => id.startsWith(q) || norm(n.slice(0, 3).join(' · ')).includes(q)).slice(0, 8);
     res.innerHTML = hits.length ? hits.map(([id, n]) => `<button type="button" data-pick="${id}" class="${(typeof SOLD !== 'undefined' && SOLD.includes(id)) ? 'so' : ''}"><span>[${id}] ${esc(lang === 'vi' ? n[2] : n[lang === 'en' ? 0 : 1])}${lang !== 'vi' ? `<small>${esc(n[2])}</small>` : ''}</span><b>${money(n[3])}</b></button>`).join('') : `<div class="dnone">${t('searchNone')}</div>` };
