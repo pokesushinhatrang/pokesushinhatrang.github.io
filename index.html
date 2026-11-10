@@ -680,7 +680,8 @@ const D={
  thanks_p:["Bạn thấy ngon không? Đánh giá quán trên Google Maps chỉ mất 30 giây và giúp quán rất nhiều.", "Enjoyed it? Rating us on Google Maps takes 30 seconds and helps us a lot.", "Понравилось? Оценка в Google Maps займёт 30 секунд и очень нам поможет."],
  rate_toast:["Cảm ơn bạn!", "Thank you!", "Спасибо!"],
  cat_set:["Set sushi", "Sushi sets", "Суши-сеты"],
- cat_ssm:["Sashimi", "Sashimi", "Сашими"],
+ cat_ssm:["Set sashimi", "Sashimi sets", "Сашими-сеты"],
+ cat_sas:["Sashimi", "Sashimi", "Сашими"],
  cat_hot:["Cuộn chiên", "Hot rolls", "Горячие роллы"],
  cat_age:["Món chiên", "Fried dishes", "Жареное"],
  cat_drink:["Đồ uống", "Drinks", "Напитки"],
@@ -732,6 +733,48 @@ const MENU=[
    en:['Chef’s special sashimi set (30 pcs)', '30 slices of the chef’s choice of the freshest fish of the day: salmon, tuna, mackerel and more, on a big red boat. The selection changes daily.'],
    ru:['Сашими-сет от шефа (30 шт.)', '30 ломтиков самой свежей рыбы дня на выбор шефа: лосось, тунец, скумбрия и другое, в большой красной лодке. Состав меняется каждый день.'],
    vd:'30 miếng, cá tươi nhất trong ngày do bếp trưởng chọn, thay đổi theo ngày.'},
+
+  /* ---------- Sashimi by the portion and carpaccio (menu page «Sashimi 刺身», 10 Nov 2026; temporary photos cut from that page) ---------- */
+  {id:'9', cat:'sas', vi:'Trứng cá chuồn (Tobiko)', price:95000, img:'d9',
+   en:['Tobiko, flying fish roe', 'Crunchy bright orange flying fish roe served in a glass with shiso leaf and lime.'],
+   ru:['Тобико, икра летучей рыбы', 'Хрустящая ярко-оранжевая икра летучей рыбы в бокале, с листом шисо и лаймом.'],
+   vd:'Trứng cá chuồn giòn, lá tía tô, chanh.'},
+  {id:'10', cat:'sas', vi:'Sashimi sake udon (cá hồi sợi)', price:199000, img:'d10',
+   en:['Salmon “udon” sashimi', 'Fresh salmon cut into long thin strips like noodles, served on ice with wasabi and pickled ginger.'],
+   ru:['Сашими «удон» из лосося', 'Свежий лосось, нарезанный длинными тонкими полосками, как лапша. Подаётся на льду с васаби и маринованным имбирём.'],
+   vd:'Cá hồi tươi thái sợi dài như mì, trên đá, wasabi, gừng hồng.'},
+  {id:'11', cat:'sas', vi:'Sashimi cá ngừ', price:109000, img:'d11',
+   en:['Tuna sashimi (maguro)', 'Thick slices of fresh red tuna on ice with shiso leaf and wasabi.'],
+   ru:['Сашими из тунца (магуро)', 'Толстые ломтики свежего красного тунца на льду, с листом шисо и васаби.'],
+   vd:'Cá ngừ đỏ tươi thái lát, trên đá, tía tô, wasabi.'},
+  {id:'12', cat:'sas', vi:'Sashimi cá trích ép trứng', price:99000, img:'d12',
+   en:['Herring with roe sashimi (komochi nishin)', 'Herring fillet covered with a crunchy layer of pressed herring roe, lightly salty. A Japanese delicacy.'],
+   ru:['Сашими из сельди с икрой (комочи нишин)', 'Филе сельди под хрустящим слоем прессованной сельдевой икры, слегка солоноватое. Японский деликатес.'],
+   vd:'Cá trích phủ lớp trứng cá ép giòn, vị mặn nhẹ.'},
+  {id:'13', cat:'sas', vi:'Sashimi bạch tuộc', price:95000, img:'d13',
+   en:['Octopus sashimi (tako)', 'Tender boiled octopus sliced thin, served on ice with wasabi.'],
+   ru:['Сашими из осьминога (тако)', 'Нежный отварной осьминог тонкими ломтиками, на льду, с васаби.'],
+   vd:'Bạch tuộc luộc thái mỏng, trên đá, wasabi.'},
+  {id:'14', cat:'sas', vi:'Sashimi cá hồi', price:119000, img:'d14',
+   en:['Salmon sashimi (sake)', 'Thick slices of fresh salmon on ice with shiso leaf, wasabi and pickled ginger.'],
+   ru:['Сашими из лосося (сакэ)', 'Толстые ломтики свежего лосося на льду, с листом шисо, васаби и маринованным имбирём.'],
+   vd:'Cá hồi tươi thái lát dày, trên đá, tía tô, wasabi.'},
+  {id:'15', cat:'sas', vi:'Sashimi bụng cá hồi', price:129000, img:'d15',
+   en:['Salmon belly sashimi (sake hara)', 'The fattiest, softest part of the salmon: rich slices that melt in the mouth, on ice with wasabi.'],
+   ru:['Сашими из брюшка лосося (сакэ хара)', 'Самая жирная и нежная часть лосося: ломтики тают во рту. На льду, с васаби.'],
+   vd:'Phần bụng cá hồi béo, mềm tan, trên đá, wasabi.'},
+  {id:'180', cat:'sas', vi:'Sashimi cá trắng', price:119000, img:'d180',
+   en:['White fish sashimi', 'Fresh white fish sliced thin; the fish changes daily, ask the waiter which one is today.'],
+   ru:['Сашими из белой рыбы', 'Тонко нарезанная свежая белая рыба. Вид рыбы меняется каждый день, спросите у официанта.'],
+   vd:'Cá trắng tươi thái lát, loại cá thay đổi theo ngày.'},
+  {id:'16', cat:'sas', vi:'Cá hồi Carpaccio', price:119000, img:'d16',
+   en:['Salmon carpaccio', 'Thin slices of salmon with lightly seared edges in a sweet soy dressing, with shredded daikon and shiso leaf.'],
+   ru:['Карпаччо из лосося', 'Тонкие ломтики лосося, слегка обожжённые по краям, в сладком соевом соусе, с дайконом и листом шисо.'],
+   vd:'Cá hồi thái mỏng khò sơ, sốt tương ngọt, củ cải, tía tô.'},
+  {id:'17', cat:'sas', vi:'Cá ngừ Carpaccio', price:99000, img:'d17',
+   en:['Tuna carpaccio', 'Thin slices of tuna with lightly seared edges in a sweet soy dressing, with shredded daikon and shiso leaf.'],
+   ru:['Карпаччо из тунца', 'Тонкие ломтики тунца, слегка обожжённые по краям, в сладком соевом соусе, с дайконом и листом шисо.'],
+   vd:'Cá ngừ thái mỏng khò sơ, sốt tương ngọt, củ cải, tía tô.'},
 
   /* ---------- Hot rolls ---------- */
   {id:'181', cat:'hot', vi:'Cuộn cá ngừ & phô mai chiên', price:79000, img:'d181',
@@ -840,7 +883,7 @@ const MENU=[
 ];
 let POPULAR=[];
 const catList=()=>POPULAR.length?['pop',...CATS]:CATS;
-const CATS=['set', 'ssm', 'hot', 'age', 'drink'];
+const CATS=['set', 'ssm', 'sas', 'hot', 'age', 'drink'];
 /* stop-list: dishes that ran out today (demo: set by hand; for clients this comes from the café's Google Sheet) */
 const SOLD_OUT=[];   /* ids of dishes that ran out today */
 const cart={};
