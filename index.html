@@ -466,6 +466,15 @@ body.has-ostrip #menuApp .toast{bottom:calc(150px + env(safe-area-inset-bottom,0
 #menuApp footer a{color:inherit}
 #menuApp .notice{position:relative;z-index:1;margin:2px 0 10px;padding:12px 14px 12px 42px;border-radius:14px;background:var(--primary-soft);border:1px solid var(--line);color:var(--ink);font-size:15px;line-height:1.45;white-space:pre-line}
 #menuApp .notice b{font-weight:800}
+#menuApp .bpick{position:fixed;inset:0;z-index:30;background:color-mix(in srgb,var(--ink) 45%,transparent);display:flex;align-items:flex-end;justify-content:center}
+#menuApp .bpick[hidden]{display:none}
+#menuApp .bpbox{width:100%;max-width:520px;background:var(--surface);border-radius:22px 22px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom))}
+#menuApp .bpbox h3{margin:0;font-size:22px}
+#menuApp .bpn{font-weight:700;margin-top:4px}
+#menuApp .bps{color:var(--muted);font-size:14px;margin:4px 0 12px}
+#menuApp .bpo{display:grid;gap:8px}
+#menuApp .bpo button{font:inherit;font-size:17px;font-weight:700;text-align:left;padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+#menuApp .bpc{display:block;width:100%;margin-top:10px;font:inherit;font-weight:700;padding:12px;border:0;background:none;color:var(--muted)}
 body.view-only #menuApp .qty,body.view-only #menuApp .bar,body.view-only #menuApp .tablechip,body.view-only #menuApp .sheet-bg{display:none!important}
 #menuApp .notice::before{content:"📢";position:absolute;left:13px;top:11px;font-size:18px}
 #menuApp .it .ph0{display:grid;place-items:center;font-family:var(--f-display);font-size:26px;color:var(--primary);background:var(--primary-soft) ;}
@@ -499,6 +508,7 @@ body.view-only #menuApp .qty,body.view-only #menuApp .bar,body.view-only #menuAp
 
 <div class="bar"><button class="ostrip" id="ostrip" hidden><span class="ol"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><b data-mt="ordered_h"></b><span id="osCount"></span></span><span class="or"><span class="mono" id="osSum"></span><span class="ov" data-mt="os_view"></span></span></button><div class="barin"><button class="callw" id="callW"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span data-mt="waiter_btn"></span></button><button id="openCart" disabled><span id="barCount"></span><span class="mono" id="barSum"></span></button></div></div>
 
+<div class="bpick" id="bpick" hidden><div class="bpbox" role="dialog" aria-modal="true"><h3></h3><div class="bpn"></div><div class="bps"></div><div class="bpo"></div><button class="bpc"></button></div></div>
 <div class="sheet-bg" id="sheetBg" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
     <div class="top"><h3 id="sheetTitle" data-mt="your_order"></h3><button class="x" id="closeSheet" aria-label="Close">×</button></div>
@@ -1141,127 +1151,127 @@ const MENU=[
 
   /* ---------- Poke (menu pages «Poke Salad», «Poke & Curry», 10 Nov 2026; photos generated in Gemini); M and L sizes are separate items ---------- */
   {id:'117', cat:'poke', vi:'Poke cá ngừ thanh cua (M)', price:68000, img:'d117',
-   en:['Poke with tuna & crab stick, size M', 'Tuna, crab stick, edamame, sweet corn, avocado, seaweed salad and pickled ginger with mayo. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с тунцом и крабовой палочкой, размер M', 'Тунец, крабовая палочка, эдамаме, кукуруза, авокадо, салат из водорослей и маринованный имбирь с майонезом. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Cá ngừ, thanh cua, đậu nành, bắp, bơ, rong biển, gừng, mayo. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Poke with tuna & crab stick, size M', 'Tuna, crab stick, edamame, sweet corn, avocado, seaweed salad and pickled ginger with mayo. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с тунцом и крабовой палочкой, размер M', 'Тунец, крабовая палочка, эдамаме, кукуруза, авокадо, салат из водорослей и маринованный имбирь с майонезом. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Cá ngừ, thanh cua, đậu nành, bắp, bơ, rong biển, gừng, mayo. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'118', cat:'poke', vi:'Poke cá ngừ thanh cua (L)', price:95000, img:'d117',
-   en:['Poke with tuna & crab stick, size L', 'Tuna, crab stick, edamame, sweet corn, avocado, seaweed salad and pickled ginger with mayo. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с тунцом и крабовой палочкой, размер L', 'Тунец, крабовая палочка, эдамаме, кукуруза, авокадо, салат из водорослей и маринованный имбирь с майонезом. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Cá ngừ, thanh cua, đậu nành, bắp, bơ, rong biển, gừng, mayo. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Poke with tuna & crab stick, size L', 'Tuna, crab stick, edamame, sweet corn, avocado, seaweed salad and pickled ginger with mayo. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с тунцом и крабовой палочкой, размер L', 'Тунец, крабовая палочка, эдамаме, кукуруза, авокадо, салат из водорослей и маринованный имбирь с майонезом. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Cá ngừ, thanh cua, đậu nành, bắp, bơ, rong biển, gừng, mayo. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'119', cat:'poke', vi:'Poke ức gà áp chảo (M)', price:68000, img:'d119',
-   en:['Poke with pan-fried chicken breast, size M', 'Sliced chicken breast in teriyaki sauce with edamame, sweet corn, tomatoes, cucumber and seaweed salad. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с куриной грудкой, размер M', 'Ломтики куриной грудки в соусе терияки с эдамаме, кукурузой, помидорами, огурцом и салатом из водорослей. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Ức gà áp chảo sốt teriyaki, đậu nành, bắp, cà chua, dưa leo, rong biển. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Poke with pan-fried chicken breast, size M', 'Sliced chicken breast in teriyaki sauce with edamame, sweet corn, tomatoes, cucumber and seaweed salad. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с куриной грудкой, размер M', 'Ломтики куриной грудки в соусе терияки с эдамаме, кукурузой, помидорами, огурцом и салатом из водорослей. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Ức gà áp chảo sốt teriyaki, đậu nành, bắp, cà chua, dưa leo, rong biển. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'120', cat:'poke', vi:'Poke ức gà áp chảo (L)', price:95000, img:'d119',
-   en:['Poke with pan-fried chicken breast, size L', 'Sliced chicken breast in teriyaki sauce with edamame, sweet corn, tomatoes, cucumber and seaweed salad. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с куриной грудкой, размер L', 'Ломтики куриной грудки в соусе терияки с эдамаме, кукурузой, помидорами, огурцом и салатом из водорослей. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Ức gà áp chảo sốt teriyaki, đậu nành, bắp, cà chua, dưa leo, rong biển. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Poke with pan-fried chicken breast, size L', 'Sliced chicken breast in teriyaki sauce with edamame, sweet corn, tomatoes, cucumber and seaweed salad. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с куриной грудкой, размер L', 'Ломтики куриной грудки в соусе терияки с эдамаме, кукурузой, помидорами, огурцом и салатом из водорослей. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Ức gà áp chảo sốt teriyaki, đậu nành, bắp, cà chua, dưa leo, rong biển. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'121', cat:'poke', vi:'Poke hải sản chín (M)', price:96000, img:'d121',
-   en:['Poke with cooked seafood, size M', 'Tempura shrimp with spicy mayo, crab stick, salmon, avocado, sweet corn, tomatoes and greens. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с морепродуктами, размер M', 'Креветка темпура с острым майонезом, крабовая палочка, лосось, авокадо, кукуруза, помидоры и зелень. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Tôm chiên tempura, mayo cay, thanh cua, cá hồi, bơ, bắp, cà chua, rau. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Poke with cooked seafood, size M', 'Tempura shrimp with spicy mayo, crab stick, salmon, avocado, sweet corn, tomatoes and greens. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с морепродуктами, размер M', 'Креветка темпура с острым майонезом, крабовая палочка, лосось, авокадо, кукуруза, помидоры и зелень. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Tôm chiên tempura, mayo cay, thanh cua, cá hồi, bơ, bắp, cà chua, rau. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'122', cat:'poke', vi:'Poke hải sản chín (L)', price:128000, img:'d121',
-   en:['Poke with cooked seafood, size L', 'Tempura shrimp with spicy mayo, crab stick, salmon, avocado, sweet corn, tomatoes and greens. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с морепродуктами, размер L', 'Креветка темпура с острым майонезом, крабовая палочка, лосось, авокадо, кукуруза, помидоры и зелень. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Tôm chiên tempura, mayo cay, thanh cua, cá hồi, bơ, bắp, cà chua, rau. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Poke with cooked seafood, size L', 'Tempura shrimp with spicy mayo, crab stick, salmon, avocado, sweet corn, tomatoes and greens. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с морепродуктами, размер L', 'Креветка темпура с острым майонезом, крабовая палочка, лосось, авокадо, кукуруза, помидоры и зелень. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Tôm chiên tempura, mayo cay, thanh cua, cá hồi, bơ, bắp, cà chua, rau. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'123', cat:'poke', vi:'Poke đùi gà sốt teriyaki (M)', price:74000, img:'d123',
-   en:['Poke with chicken teriyaki, size M', 'Chicken thigh in teriyaki sauce with edamame, sweet corn, tomatoes, avocado and seaweed salad. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с курицей терияки, размер M', 'Куриное бедро в соусе терияки с эдамаме, кукурузой, помидорами, авокадо и салатом из водорослей. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Đùi gà sốt teriyaki, đậu nành, bắp, cà chua, bơ, rong biển. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Poke with chicken teriyaki, size M', 'Chicken thigh in teriyaki sauce with edamame, sweet corn, tomatoes, avocado and seaweed salad. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с курицей терияки, размер M', 'Куриное бедро в соусе терияки с эдамаме, кукурузой, помидорами, авокадо и салатом из водорослей. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Đùi gà sốt teriyaki, đậu nành, bắp, cà chua, bơ, rong biển. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'124', cat:'poke', vi:'Poke đùi gà sốt teriyaki (L)', price:99000, img:'d123',
-   en:['Poke with chicken teriyaki, size L', 'Chicken thigh in teriyaki sauce with edamame, sweet corn, tomatoes, avocado and seaweed salad. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с курицей терияки, размер L', 'Куриное бедро в соусе терияки с эдамаме, кукурузой, помидорами, авокадо и салатом из водорослей. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Đùi gà sốt teriyaki, đậu nành, bắp, cà chua, bơ, rong biển. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Poke with chicken teriyaki, size L', 'Chicken thigh in teriyaki sauce with edamame, sweet corn, tomatoes, avocado and seaweed salad. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с курицей терияки, размер L', 'Куриное бедро в соусе терияки с эдамаме, кукурузой, помидорами, авокадо и салатом из водорослей. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Đùi gà sốt teriyaki, đậu nành, bắp, cà chua, bơ, rong biển. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'125', cat:'poke', vi:'Poke hải sản tổng hợp (M)', price:119000, img:'d125',
-   en:['Poke with assorted seafood, size M', 'Raw salmon and tuna, tempura flakes with sweet sauce, crab stick, avocado, sweet corn, tomatoes and seaweed salad. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с ассорти морепродуктов, размер M', 'Сырой лосось и тунец, хлопья темпуры со сладким соусом, крабовая палочка, авокадо, кукуруза, помидоры и салат из водорослей. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Cá hồi, cá ngừ sống, vụn tempura, thanh cua, bơ, bắp, cà chua, rong biển. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Poke with assorted seafood, size M', 'Raw salmon and tuna, tempura flakes with sweet sauce, crab stick, avocado, sweet corn, tomatoes and seaweed salad. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с ассорти морепродуктов, размер M', 'Сырой лосось и тунец, хлопья темпуры со сладким соусом, крабовая палочка, авокадо, кукуруза, помидоры и салат из водорослей. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Cá hồi, cá ngừ sống, vụn tempura, thanh cua, bơ, bắp, cà chua, rong biển. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'126', cat:'poke', vi:'Poke hải sản tổng hợp (L)', price:148000, img:'d125',
-   en:['Poke with assorted seafood, size L', 'Raw salmon and tuna, tempura flakes with sweet sauce, crab stick, avocado, sweet corn, tomatoes and seaweed salad. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с ассорти морепродуктов, размер L', 'Сырой лосось и тунец, хлопья темпуры со сладким соусом, крабовая палочка, авокадо, кукуруза, помидоры и салат из водорослей. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Cá hồi, cá ngừ sống, vụn tempura, thanh cua, bơ, bắp, cà chua, rong biển. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Poke with assorted seafood, size L', 'Raw salmon and tuna, tempura flakes with sweet sauce, crab stick, avocado, sweet corn, tomatoes and seaweed salad. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с ассорти морепродуктов, размер L', 'Сырой лосось и тунец, хлопья темпуры со сладким соусом, крабовая палочка, авокадо, кукуруза, помидоры и салат из водорослей. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Cá hồi, cá ngừ sống, vụn tempura, thanh cua, bơ, bắp, cà chua, rong biển. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'127', cat:'poke', vi:'Poke lươn Nhật (M)', price:135000, img:'d127',
-   en:['Poke with grilled eel (unagi), size M', 'Grilled eel in sweet unagi sauce with avocado, sweet corn, tomatoes and seaweed salad. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с угрём, размер M', 'Жареный угорь в сладком соусе унаги с авокадо, кукурузой, помидорами и салатом из водорослей. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Lươn nướng sốt lươn, bơ, bắp, cà chua, rong biển. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Poke with grilled eel (unagi), size M', 'Grilled eel in sweet unagi sauce with avocado, sweet corn, tomatoes and seaweed salad. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с угрём, размер M', 'Жареный угорь в сладком соусе унаги с авокадо, кукурузой, помидорами и салатом из водорослей. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Lươn nướng sốt lươn, bơ, bắp, cà chua, rong biển. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'128', cat:'poke', vi:'Poke lươn Nhật (L)', price:175000, img:'d127',
-   en:['Poke with grilled eel (unagi), size L', 'Grilled eel in sweet unagi sauce with avocado, sweet corn, tomatoes and seaweed salad. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с угрём, размер L', 'Жареный угорь в сладком соусе унаги с авокадо, кукурузой, помидорами и салатом из водорослей. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Lươn nướng sốt lươn, bơ, bắp, cà chua, rong biển. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Poke with grilled eel (unagi), size L', 'Grilled eel in sweet unagi sauce with avocado, sweet corn, tomatoes and seaweed salad. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с угрём, размер L', 'Жареный угорь в сладком соусе унаги с авокадо, кукурузой, помидорами и салатом из водорослей. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Lươn nướng sốt lươn, bơ, bắp, cà chua, rong biển. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'144', cat:'poke', vi:'Poke thanh cua rong biển (M)', price:50000, img:'d144',
-   en:['Poke with crab stick & seaweed, size M', 'Crab stick, chuka wakame seaweed, avocado, tomatoes, sweet corn, edamame and pickled ginger. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с крабовой палочкой и водорослями, размер M', 'Крабовая палочка, салат чука, авокадо, помидоры, кукуруза, эдамаме и маринованный имбирь. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Thanh cua, rong biển chuka, bơ, cà chua, bắp, đậu nành, gừng. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Poke with crab stick & seaweed, size M', 'Crab stick, chuka wakame seaweed, avocado, tomatoes, sweet corn, edamame and pickled ginger. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с крабовой палочкой и водорослями, размер M', 'Крабовая палочка, салат чука, авокадо, помидоры, кукуруза, эдамаме и маринованный имбирь. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Thanh cua, rong biển chuka, bơ, cà chua, bắp, đậu nành, gừng. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'145', cat:'poke', vi:'Poke thanh cua rong biển (L)', price:70000, img:'d144',
-   en:['Poke with crab stick & seaweed, size L', 'Crab stick, chuka wakame seaweed, avocado, tomatoes, sweet corn, edamame and pickled ginger. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с крабовой палочкой и водорослями, размер L', 'Крабовая палочка, салат чука, авокадо, помидоры, кукуруза, эдамаме и маринованный имбирь. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Thanh cua, rong biển chuka, bơ, cà chua, bắp, đậu nành, gừng. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Poke with crab stick & seaweed, size L', 'Crab stick, chuka wakame seaweed, avocado, tomatoes, sweet corn, edamame and pickled ginger. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с крабовой палочкой и водорослями, размер L', 'Крабовая палочка, салат чука, авокадо, помидоры, кукуруза, эдамаме и маринованный имбирь. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Thanh cua, rong biển chuka, bơ, cà chua, bắp, đậu nành, gừng. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'146', cat:'poke', vi:'Poke gà chiên xù (M)', price:68000, img:'d146',
-   en:['Poke with crispy chicken schnitzel, size M', 'Crispy breaded chicken with sauce, avocado, tomatoes, sweet corn and seaweed salad. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с курицей в панко, размер M', 'Хрустящая курица в панировке с соусом, авокадо, помидорами, кукурузой и салатом из водорослей. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Gà chiên xù, sốt, bơ, cà chua, bắp, rong biển. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Poke with crispy chicken schnitzel, size M', 'Crispy breaded chicken with sauce, avocado, tomatoes, sweet corn and seaweed salad. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с курицей в панко, размер M', 'Хрустящая курица в панировке с соусом, авокадо, помидорами, кукурузой и салатом из водорослей. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Gà chiên xù, sốt, bơ, cà chua, bắp, rong biển. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'147', cat:'poke', vi:'Poke gà chiên xù (L)', price:95000, img:'d146',
-   en:['Poke with crispy chicken schnitzel, size L', 'Crispy breaded chicken with sauce, avocado, tomatoes, sweet corn and seaweed salad. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с курицей в панко, размер L', 'Хрустящая курица в панировке с соусом, авокадо, помидорами, кукурузой и салатом из водорослей. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Gà chiên xù, sốt, bơ, cà chua, bắp, rong biển. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Poke with crispy chicken schnitzel, size L', 'Crispy breaded chicken with sauce, avocado, tomatoes, sweet corn and seaweed salad. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с курицей в панко, размер L', 'Хрустящая курица в панировке с соусом, авокадо, помидорами, кукурузой и салатом из водорослей. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Gà chiên xù, sốt, bơ, cà chua, bắp, rong biển. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
 
   /* more poke (menu page «Poke Salad» 129-143, 10 Nov 2026; photos generated in Gemini) */
   {id:'129', cat:'poke', vi:'Poke rong biển chay (M)', price:50000, img:'d129',
-   en:['Vegetarian poke, size M', 'Seaweed salad with sesame, edamame, sweet corn, tomatoes, pickled ginger and pineapple. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Вегетарианский поке, размер M', 'Салат из водорослей с кунжутом, эдамаме, кукуруза, помидоры, маринованный имбирь и ананас. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Rong biển trộn mè, đậu nành, bắp, cà chua, gừng, thơm. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Vegetarian poke, size M', 'Seaweed salad with sesame, edamame, sweet corn, tomatoes, pickled ginger and pineapple. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Вегетарианский поке, размер M', 'Салат из водорослей с кунжутом, эдамаме, кукуруза, помидоры, маринованный имбирь и ананас. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Rong biển trộn mè, đậu nành, bắp, cà chua, gừng, thơm. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'130', cat:'poke', vi:'Poke rong biển chay (L)', price:70000, img:'d129',
-   en:['Vegetarian poke, size L', 'Seaweed salad with sesame, edamame, sweet corn, tomatoes, pickled ginger and pineapple. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Вегетарианский поке, размер L', 'Салат из водорослей с кунжутом, эдамаме, кукуруза, помидоры, маринованный имбирь и ананас. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Rong biển trộn mè, đậu nành, bắp, cà chua, gừng, thơm. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Vegetarian poke, size L', 'Seaweed salad with sesame, edamame, sweet corn, tomatoes, pickled ginger and pineapple. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Вегетарианский поке, размер L', 'Салат из водорослей с кунжутом, эдамаме, кукуруза, помидоры, маринованный имбирь и ананас. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Rong biển trộn mè, đậu nành, bắp, cà chua, gừng, thơm. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'131', cat:'poke', vi:'Poke cá hồi ngâm tương (M)', price:135000, img:'d131',
-   en:['Salmon yuke poke, size M', 'Cubes of raw salmon marinated in soy sauce with a soft-boiled egg, avocado, tomatoes, edamame, sweet corn and seaweed salad. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с лососем юкэ, размер M', 'Кубики сырого лосося в соевом маринаде с яйцом, авокадо, помидорами, эдамаме, кукурузой и салатом из водорослей. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Cá hồi sống ngâm tương, trứng, bơ, cà chua, đậu nành, bắp, rong biển. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Salmon yuke poke, size M', 'Cubes of raw salmon marinated in soy sauce with a soft-boiled egg, avocado, tomatoes, edamame, sweet corn and seaweed salad. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с лососем юкэ, размер M', 'Кубики сырого лосося в соевом маринаде с яйцом, авокадо, помидорами, эдамаме, кукурузой и салатом из водорослей. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Cá hồi sống ngâm tương, trứng, bơ, cà chua, đậu nành, bắp, rong biển. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'132', cat:'poke', vi:'Poke cá hồi ngâm tương (L)', price:168000, img:'d131',
-   en:['Salmon yuke poke, size L', 'Cubes of raw salmon marinated in soy sauce with a soft-boiled egg, avocado, tomatoes, edamame, sweet corn and seaweed salad. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с лососем юкэ, размер L', 'Кубики сырого лосося в соевом маринаде с яйцом, авокадо, помидорами, эдамаме, кукурузой и салатом из водорослей. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Cá hồi sống ngâm tương, trứng, bơ, cà chua, đậu nành, bắp, rong biển. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Salmon yuke poke, size L', 'Cubes of raw salmon marinated in soy sauce with a soft-boiled egg, avocado, tomatoes, edamame, sweet corn and seaweed salad. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с лососем юкэ, размер L', 'Кубики сырого лосося в соевом маринаде с яйцом, авокадо, помидорами, эдамаме, кукурузой и салатом из водорослей. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Cá hồi sống ngâm tương, trứng, bơ, cà chua, đậu nành, bắp, rong biển. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'133', cat:'poke', vi:'Poke cá ngừ ngâm tương (M)', price:110000, img:'d133',
-   en:['Tuna yuke poke, size M', 'Slices of tuna marinated in soy sauce with a soft-boiled egg, avocado, tomatoes, sweet corn and seaweed salad. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с тунцом юкэ, размер M', 'Ломтики тунца в соевом маринаде с яйцом, авокадо, помидорами, кукурузой и салатом из водорослей. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Cá ngừ ngâm tương, trứng, bơ, cà chua, bắp, rong biển. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Tuna yuke poke, size M', 'Slices of tuna marinated in soy sauce with a soft-boiled egg, avocado, tomatoes, sweet corn and seaweed salad. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с тунцом юкэ, размер M', 'Ломтики тунца в соевом маринаде с яйцом, авокадо, помидорами, кукурузой и салатом из водорослей. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Cá ngừ ngâm tương, trứng, bơ, cà chua, bắp, rong biển. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'134', cat:'poke', vi:'Poke cá ngừ ngâm tương (L)', price:150000, img:'d133',
-   en:['Tuna yuke poke, size L', 'Slices of tuna marinated in soy sauce with a soft-boiled egg, avocado, tomatoes, sweet corn and seaweed salad. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с тунцом юкэ, размер L', 'Ломтики тунца в соевом маринаде с яйцом, авокадо, помидорами, кукурузой и салатом из водорослей. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Cá ngừ ngâm tương, trứng, bơ, cà chua, bắp, rong biển. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Tuna yuke poke, size L', 'Slices of tuna marinated in soy sauce with a soft-boiled egg, avocado, tomatoes, sweet corn and seaweed salad. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с тунцом юкэ, размер L', 'Ломтики тунца в соевом маринаде с яйцом, авокадо, помидорами, кукурузой и салатом из водорослей. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Cá ngừ ngâm tương, trứng, bơ, cà chua, bắp, rong biển. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'135', cat:'poke', vi:'Poke cá hồi sốt teriyaki (M)', price:135000, img:'d135',
-   en:['Salmon teriyaki poke, size M', 'Grilled salmon in teriyaki sauce with sesame, edamame, sweet corn, avocado, tomatoes and seaweed salad. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с лососем терияки, размер M', 'Жареный лосось в соусе терияки с кунжутом, эдамаме, кукурузой, авокадо, помидорами и салатом из водорослей. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Cá hồi sốt teriyaki, mè, đậu nành, bắp, bơ, cà chua, rong biển. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Salmon teriyaki poke, size M', 'Grilled salmon in teriyaki sauce with sesame, edamame, sweet corn, avocado, tomatoes and seaweed salad. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с лососем терияки, размер M', 'Жареный лосось в соусе терияки с кунжутом, эдамаме, кукурузой, авокадо, помидорами и салатом из водорослей. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Cá hồi sốt teriyaki, mè, đậu nành, bắp, bơ, cà chua, rong biển. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'136', cat:'poke', vi:'Poke cá hồi sốt teriyaki (L)', price:168000, img:'d135',
-   en:['Salmon teriyaki poke, size L', 'Grilled salmon in teriyaki sauce with sesame, edamame, sweet corn, avocado, tomatoes and seaweed salad. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с лососем терияки, размер L', 'Жареный лосось в соусе терияки с кунжутом, эдамаме, кукурузой, авокадо, помидорами и салатом из водорослей. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Cá hồi sốt teriyaki, mè, đậu nành, bắp, bơ, cà chua, rong biển. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Salmon teriyaki poke, size L', 'Grilled salmon in teriyaki sauce with sesame, edamame, sweet corn, avocado, tomatoes and seaweed salad. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с лососем терияки, размер L', 'Жареный лосось в соусе терияки с кунжутом, эдамаме, кукурузой, авокадо, помидорами и салатом из водорослей. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Cá hồi sốt teriyaki, mè, đậu nành, bắp, bơ, cà chua, rong biển. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'137', cat:'poke', vi:'Poke cá ngừ sốt teriyaki (M)', price:110000, img:'d137',
-   en:['Pan-fried tuna teriyaki poke, size M', 'Pan-fried tuna in teriyaki sauce with sesame, cherry tomatoes, sweet corn, avocado and seaweed salad. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с тунцом терияки, размер M', 'Обжаренный тунец в соусе терияки с кунжутом, черри, кукурузой, авокадо и салатом из водорослей. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Cá ngừ áp chảo sốt teriyaki, mè, cà chua, bắp, bơ, rong biển. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Pan-fried tuna teriyaki poke, size M', 'Pan-fried tuna in teriyaki sauce with sesame, cherry tomatoes, sweet corn, avocado and seaweed salad. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с тунцом терияки, размер M', 'Обжаренный тунец в соусе терияки с кунжутом, черри, кукурузой, авокадо и салатом из водорослей. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Cá ngừ áp chảo sốt teriyaki, mè, cà chua, bắp, bơ, rong biển. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'138', cat:'poke', vi:'Poke cá ngừ sốt teriyaki (L)', price:145000, img:'d137',
-   en:['Pan-fried tuna teriyaki poke, size L', 'Pan-fried tuna in teriyaki sauce with sesame, cherry tomatoes, sweet corn, avocado and seaweed salad. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с тунцом терияки, размер L', 'Обжаренный тунец в соусе терияки с кунжутом, черри, кукурузой, авокадо и салатом из водорослей. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Cá ngừ áp chảo sốt teriyaki, mè, cà chua, bắp, bơ, rong biển. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Pan-fried tuna teriyaki poke, size L', 'Pan-fried tuna in teriyaki sauce with sesame, cherry tomatoes, sweet corn, avocado and seaweed salad. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с тунцом терияки, размер L', 'Обжаренный тунец в соусе терияки с кунжутом, черри, кукурузой, авокадо и салатом из водорослей. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Cá ngừ áp chảo sốt teriyaki, mè, cà chua, bắp, bơ, rong biển. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'139', cat:'poke', vi:'Poke cá ngừ chiên xù (M)', price:90000, img:'d139',
-   en:['Tuna katsu poke, size M', 'Crispy breaded tuna with sweet sauce and sesame, tomatoes, sweet corn, radish and seaweed salad. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с тунцом в панко, размер M', 'Хрустящий тунец в панировке со сладким соусом и кунжутом, помидоры, кукуруза, редис и салат из водорослей. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Cá ngừ chiên xù sốt ngọt, mè, cà chua, bắp, củ cải, rong biển. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Tuna katsu poke, size M', 'Crispy breaded tuna with sweet sauce and sesame, tomatoes, sweet corn, radish and seaweed salad. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с тунцом в панко, размер M', 'Хрустящий тунец в панировке со сладким соусом и кунжутом, помидоры, кукуруза, редис и салат из водорослей. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Cá ngừ chiên xù sốt ngọt, mè, cà chua, bắp, củ cải, rong biển. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'140', cat:'poke', vi:'Poke cá ngừ chiên xù (L)', price:135000, img:'d139',
-   en:['Tuna katsu poke, size L', 'Crispy breaded tuna with sweet sauce and sesame, tomatoes, sweet corn, radish and seaweed salad. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с тунцом в панко, размер L', 'Хрустящий тунец в панировке со сладким соусом и кунжутом, помидоры, кукуруза, редис и салат из водорослей. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Cá ngừ chiên xù sốt ngọt, mè, cà chua, bắp, củ cải, rong biển. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Tuna katsu poke, size L', 'Crispy breaded tuna with sweet sauce and sesame, tomatoes, sweet corn, radish and seaweed salad. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с тунцом в панко, размер L', 'Хрустящий тунец в панировке со сладким соусом и кунжутом, помидоры, кукуруза, редис и салат из водорослей. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Cá ngừ chiên xù sốt ngọt, mè, cà chua, bắp, củ cải, rong biển. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'142', cat:'poke', vi:'Poke bò áp chảo (M, 100g)', price:140000, img:'d142',
-   en:['Beef steak poke, size M, 100 g', 'Slices of pan-seared beef in sweet sauce with sesame, a soft-boiled egg, avocado, tomatoes, edamame, sweet corn and seaweed salad. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с говяжьим стейком, размер M, 100 г', 'Ломтики обжаренной говядины в сладком соусе с кунжутом, яйцо, авокадо, помидоры, эдамаме, кукуруза и салат из водорослей. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Bò áp chảo sốt ngọt, mè, trứng, bơ, cà chua, đậu nành, bắp, rong biển. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Beef steak poke, size M, 100 g', 'Slices of pan-seared beef in sweet sauce with sesame, a soft-boiled egg, avocado, tomatoes, edamame, sweet corn and seaweed salad. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с говяжьим стейком, размер M, 100 г', 'Ломтики обжаренной говядины в сладком соусе с кунжутом, яйцо, авокадо, помидоры, эдамаме, кукуруза и салат из водорослей. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Bò áp chảo sốt ngọt, mè, trứng, bơ, cà chua, đậu nành, bắp, rong biển. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
   {id:'143', cat:'poke', vi:'Poke bò áp chảo (L, 200g)', price:195000, img:'d142',
-   en:['Beef steak poke, size L, 200 g', 'Slices of pan-seared beef in sweet sauce with sesame, a soft-boiled egg, avocado, tomatoes, edamame, sweet corn and seaweed salad. Base of your choice: half sushi rice or brown rice with half salad, or full salad. Tell the waiter or write it in the order note.'],
-   ru:['Поке с говяжьим стейком, размер L, 200 г', 'Ломтики обжаренной говядины в сладком соусе с кунжутом, яйцо, авокадо, помидоры, эдамаме, кукуруза и салат из водорослей. Основа на выбор: половина риса (рис для суши или бурый) и половина салата, или только салат. Скажите официанту или напишите в комментарии к заказу.'],
-   vd:'Bò áp chảo sốt ngọt, mè, trứng, bơ, cà chua, đậu nành, bắp, rong biển. Đế: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
+   en:['Beef steak poke, size L, 200 g', 'Slices of pan-seared beef in sweet sauce with sesame, a soft-boiled egg, avocado, tomatoes, edamame, sweet corn and seaweed salad. You choose the base when adding: half sushi rice or brown rice with half salad, or salad only.'],
+   ru:['Поке с говяжьим стейком, размер L, 200 г', 'Ломтики обжаренной говядины в сладком соусе с кунжутом, яйцо, авокадо, помидоры, эдамаме, кукуруза и салат из водорослей. Основу выбираете при добавлении: половина риса (рис для суши или бурый) и половина салата, или только салат.'],
+   vd:'Bò áp chảo sốt ngọt, mè, trứng, bơ, cà chua, đậu nành, bắp, rong biển. Chọn đế khi thêm món: nửa cơm (cơm sushi hoặc gạo lứt) và nửa salad, hoặc toàn bộ salad.'},
 
   /* ---------- Udon & ramen (menu page «Udon Ramen», 10 Nov 2026; photos generated in Gemini) ---------- */
   {id:'101', cat:'noodle', vi:'Mì ramen nước cốt thịt heo', price:109000, img:'d101',
@@ -1487,7 +1497,7 @@ function loadSent(){try{
   if(hashTable&&d.table!==hashTable)return;        /* a different table's QR: start fresh */
   if(!hashTable&&d.table)table=d.table;            /* opened without a table number: keep the saved one */
   sent=d.sent||[];
-  Object.entries(d.cart||{}).forEach(([id,q])=>{if(MENU.some(m=>m.id===id)&&q>0)cart[id]=q});
+  Object.entries(d.cart||{}).forEach(([id,q])=>{if(MENU.some(m=>m.id===idOf(id))&&q>0)cart[id]=q});
   if(d.pm)pm=d.pm;
   if(d.guestName){guestName=d.guestName;document.getElementById('guestName').value=guestName;}
   document.getElementById('table').value=table;
@@ -1495,13 +1505,35 @@ function loadSent(){try{
 const sentItems=()=>{const a={};sent.forEach(o=>Object.entries(o.items).forEach(([id,q])=>a[id]=(a[id]||0)+q));return a};
 const sentTotal=()=>sent.reduce((s,o)=>s+o.total,0);
 let closedBill=0;
-const billTotal=()=>sentTotal()||closedBill||MENU.reduce((s,m)=>s+(cart[m.id]||0)*m.price,0);
+const billTotal=()=>sentTotal()||closedBill||total();
 
 function fmt(n,l){l=l||lang;const s=Math.round(n).toString(),sep=l==='vi'?'.':l==='en'?',':' ';return s.replace(/\B(?=(\d{3})+(?!\d))/g,sep)+' ₫'}
 const name=m=>lang==='vi'?m.vi:m[lang][0];
 const desc=m=>lang==='vi'?m.vd:m[lang][1];
-const total=()=>MENU.reduce((s,m)=>s+(cart[m.id]||0)*m.price,0);
+const total=()=>rows(cart).reduce((s,r)=>s+r.q*r.m.price,0);
 const count=()=>Object.values(cart).reduce((a,b)=>a+b,0);
+const BASES={s:['cơm sushi','sushi rice + salad','рис для суши + салат'],g:['gạo lứt','brown rice + salad','бурый рис + салат'],x:['toàn salad','salad only','только салат']};
+const BP_T={vi:['Chọn đế cho poke','Nửa cơm và nửa salad, hoặc toàn bộ salad.','Hủy'],en:['Choose the base','Half rice and half salad, or salad only.','Cancel'],ru:['Выберите основу','Половина риса и половина салата или только салат.','Отмена']};
+const idOf=k=>k.split('~')[0];
+const baseName=(k,l)=>{const b=BASES[k.split('~')[1]];return b?b[{vi:0,en:1,ru:2}[l||lang]]:''};
+function rows(o){const r=[];MENU.forEach(m=>Object.keys(o).forEach(k=>{if(idOf(k)===m.id&&o[k]>0)r.push({k,m,q:o[k]})}));return r}
+const rowName=(r,l)=>{l=l||lang;const n=l==='vi'?r.m.vi:r.m[l][0],b=baseName(r.k,l);return b?n+' · '+b:n};
+const inCart=id=>Object.keys(cart).reduce((a,k)=>a+(idOf(k)===id?cart[k]:0),0);
+const lastBase={};
+function askBase(m){
+  const el=document.getElementById('bpick'),t=BP_T[lang]||BP_T.en;
+  el.querySelector('h3').textContent=t[0];el.querySelector('.bpn').textContent=(lang==='vi'?m.vi:m[lang][0]);el.querySelector('.bps').textContent=t[1];
+  el.querySelector('.bpo').innerHTML=Object.keys(BASES).map(b=>`<button data-base="${b}">${{s:'🍚',g:'🟤',x:'🥗'}[b]} ${BASES[b][{vi:0,en:1,ru:2}[lang]]}</button>`).join('');
+  el.querySelector('.bpc').textContent=t[2];el.dataset.id=m.id;el.hidden=false;
+}
+setTimeout(()=>document.getElementById('bpick').addEventListener('click',e=>{
+  const el=document.getElementById('bpick');
+  if(e.target===el||e.target.closest('.bpc')){el.hidden=true;return}
+  const b=e.target.closest('[data-base]');if(!b)return;
+  const id=el.dataset.id,k=id+'~'+b.dataset.base;cart[k]=(cart[k]||0)+1;lastBase[id]=k;el.hidden=true;
+  track('add_dish',{dish:MENU.find(m=>m.id===id).vi,lang});renderList();renderBar();saveSent();
+}),0);
+
 function plural(n){
   if(lang==='vi')return `${n} món`;
   if(lang==='en')return `${n} item${n===1?'':'s'}`;
@@ -1512,7 +1544,7 @@ function renderCats(){
   document.getElementById('cats').innerHTML=catList().map((c,i)=>`<button data-cat="${c}" aria-pressed="${i===0}">${T('cat_'+c)}</button>`).join('');
 }
 function itemHTML(m){
-  const q=cart[m.id]||0;
+  const q=inCart(m.id);
   const usd=lang==='vi'?'':` <span class="usd">≈ $${(m.price/26000).toFixed(1)}</span>`;
   const so=SOLD_OUT.includes(m.id);
   return `<article class="it${so?' so':''}">${(m.img||(window.__PH||{})[m.id])?`<img class="ph" src="${photoSrc(m)}" alt="" loading="lazy">`:`<div class="ph ph0" aria-hidden="true">${m.id}</div>`}
@@ -1536,19 +1568,19 @@ function renderBar(){
 let pm='qr', reason='come';
 function kitchenText(){
   const langName={vi:'tiếng Việt',en:'tiếng Anh',ru:'tiếng Nga'}[lang];
-  const lines=MENU.filter(m=>cart[m.id]).map(m=>`${cart[m.id]} × [${m.id}] ${m.vi} — ${fmt(cart[m.id]*m.price,'vi')}`).join('\n');
+  const lines=rows(cart).map(r=>`${r.q} × [${r.m.id}] ${r.m.vi}${baseName(r.k,'vi')?' · Đế: '+baseName(r.k,'vi'):''} — ${fmt(r.q*r.m.price,'vi')}`).join('\n');
   const note=document.getElementById('note').value.trim();
   return `${sent.length?`GỌI THÊM (lần ${sent.length+1})`:'ĐƠN MỚI'} · Bàn ${table||'?'}${guestName?` · ${guestName}`:''}\n${lines}\nTổng: ${fmt(total(),'vi')}\nThanh toán: ${pm==='cash'?'Tiền mặt':'Chuyển khoản VietQR'}${note?`\nGhi chú: ${note}`:''}\nKhách nói ${langName}`;
 }
 function renderSheet(){
   const si=sentItems(), n=count();
   document.getElementById('ordered').hidden=!sent.length;
-  document.getElementById('orderedLines').innerHTML=MENU.filter(m=>si[m.id]).map(m=>`<li><span>${si[m.id]} × ${name(m)}</span><span class="mono">${fmt(si[m.id]*m.price)}</span></li>`).join('');
+  document.getElementById('orderedLines').innerHTML=rows(si).map(r=>`<li><span>${r.q} × ${rowName(r)}</span><span class="mono">${fmt(r.q*r.m.price)}</span></li>`).join('');
   document.getElementById('orderedSum').textContent=fmt(sentTotal());
   document.getElementById('newPart').hidden=!n;
   document.getElementById('newH').hidden=!sent.length;
   document.getElementById('emptyNew').hidden=!!n;
-  document.getElementById('lines').innerHTML=MENU.filter(m=>cart[m.id]).map(m=>`<li><span>${cart[m.id]} × ${name(m)}</span><span class="mono">${fmt(cart[m.id]*m.price)}</span></li>`).join('');
+  document.getElementById('lines').innerHTML=rows(cart).map(r=>`<li><span>${r.q} × ${rowName(r)}</span><span class="mono">${fmt(r.q*r.m.price)}</span></li>`).join('');
   document.getElementById('sum').textContent=fmt(total());
   document.getElementById('kitchenText').textContent=kitchenText();
   const txt=encodeURIComponent(kitchenText());
@@ -1564,7 +1596,7 @@ let tipPct=0, splitMode='none', splitN=2, assign=[];
 /* split inside one phone (equally / by dish): switched off — guests order from their own phones instead */
 const SPLIT_ENABLED=false;
 /* one row per ordered portion, so "2 × coffee" can be paid by two people */
-function units(){const si=sentItems(),u=[];MENU.forEach(m=>{for(let i=0;i<(si[m.id]||0);i++)u.push(m)});return u}
+function units(){const si=sentItems(),u=[];rows(si).forEach(r=>{for(let i=0;i<r.q;i++)u.push(r.m)});return u}
 function shares(){
   const tot=billTotal(), tip=tipAmt(), r1k=v=>Math.round(v/1000)*1000;
   /* round every share to 1 000 ₫; the last guest pays the remainder so the parts always add up to the bill */
@@ -1664,7 +1696,13 @@ let tt;function toast(s){const el=document.getElementById('toast');el.textConten
 
 document.getElementById('list').addEventListener('click',e=>{
   const b=e.target.closest('button[data-id]');if(!b)return;
-  const id=b.dataset.id;cart[id]=(cart[id]||0)+(+b.dataset.d);if(cart[id]<=0)delete cart[id];
+  const id=b.dataset.id,m=MENU.find(x=>x.id===id),d=+b.dataset.d;
+  if(m&&m.cat==='poke'){
+    if(d>0)return askBase(m);
+    const ks=Object.keys(cart).filter(k=>idOf(k)===id),k=ks.includes(lastBase[id])?lastBase[id]:ks[ks.length-1];if(!k)return;
+    cart[k]--;if(cart[k]<=0)delete cart[k];renderList();renderBar();saveSent();return;
+  }
+  cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];
   if(+b.dataset.d>0)track('add_dish',{dish:MENU.find(m=>m.id===id).vi,lang});
   renderList();renderBar();saveSent();
 });
@@ -1703,7 +1741,7 @@ document.getElementById('billBtn').addEventListener('click',()=>{bg.hidden=true;
 function renderHist(){
   const tf=d=>{const x=new Date(d);return String(x.getHours()).padStart(2,'0')+':'+String(x.getMinutes()).padStart(2,'0')};
   document.getElementById('rounds').innerHTML=sent.map((o,i)=>`<div class="round"><div class="rh"><b>${i?T('round_more'):T('round_first')} ${i+1}</b><span>${tf(o.at)}</span></div><ul class="lines">${
-    MENU.filter(m=>o.items[m.id]).map(m=>`<li><span>${o.items[m.id]} × ${name(m)}</span><span class="mono">${fmt(o.items[m.id]*m.price)}</span></li>`).join('')}</ul></div>`).join('');
+    rows(o.items).map(r=>`<li><span>${r.q} × ${rowName(r)}</span><span class="mono">${fmt(r.q*r.m.price)}</span></li>`).join('')}</ul></div>`).join('');
   document.getElementById('histSum').textContent=fmt(sentTotal());
 }
 const hbg=document.getElementById('histBg');
@@ -1782,7 +1820,7 @@ var SOLD_SHEET=[],SOLD_STAFF=[],PRICES={};
 function applySold(){
   const so=[...new Set([...SOLD_STAFF,...SOLD_SHEET])].sort();let changed=false;
   if(so.join()!==SOLD_OUT.slice().sort().join()){SOLD_OUT.length=0;SOLD_OUT.push(...so);changed=true}
-  SOLD_OUT.forEach(id=>{if(cart[id]){delete cart[id];changed=true}});
+  Object.keys(cart).forEach(k=>{if(SOLD_OUT.includes(idOf(k))){delete cart[k];changed=true}});
   return changed;
 }
 setTimeout(loadSheet,0);

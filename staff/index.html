@@ -386,11 +386,14 @@ function noteTr(o, note, tl = lang) {
       .catch(() => {}); }
   return '';
 }
+/* poke base chosen by the guest: «… · Đế: gạo lứt» → shown in the screen language */
+const BASE_TR = { 'cơm sushi': ['sushi rice + salad', 'рис для суши + салат'], 'gạo lứt': ['brown rice + salad', 'бурый рис + салат'], 'toàn salad': ['salad only', 'только салат'] };
+const baseTr = vi => { const m = String(vi).match(/ · Đế: (.+)$/); if (!m) return ''; const t = BASE_TR[m[1]]; return ' · ' + (lang === 'vi' || !t ? 'Đế: ' + m[1] : (lang === 'en' ? 'base: ' : 'основа: ') + t[lang === 'en' ? 0 : 1]) };
 function body(o) {
   let lines = o.text.split('\n').slice(1);
   if (lang !== 'vi') lines = lines.map(l => {
     const m = l.match(/^(\d+ × )\[(\d+)\] (.+?)( — .*)$/);
-    if (m) { const n = NAMES[m[2]]; return `${m[1]}[${m[2]}] ${n ? n[lang === 'en' ? 0 : 1] : m[3]}${m[4]}` }
+    if (m) { const n = NAMES[m[2]]; return `${m[1]}[${m[2]}] ${n ? n[lang === 'en' ? 0 : 1] + baseTr(m[3]) : m[3]}${m[4]}` }
     for (const [re, to] of LINE[lang]) if (re.test(l)) return l.replace(re, to);
     return l;
   });
@@ -609,7 +612,7 @@ function openEdit(o) {
   renderEdit(); $('editBg').hidden = false;
 }
 function renderEdit() {
-  const e = editing, nm = it => { const n = NAMES[it.id]; return lang === 'vi' || !n ? it.vi : n[lang === 'en' ? 0 : 1] };
+  const e = editing, nm = it => { const n = NAMES[it.id]; return lang === 'vi' || !n ? it.vi : n[lang === 'en' ? 0 : 1] + baseTr(it.vi) };
   $('editRows').innerHTML = e.items.map((it, i) => `<div class="erow${it.q ? '' : ' zero'}"><div class="nm">[${it.id}] ${esc(nm(it))}${lang !== 'vi' ? `<small>${esc(it.vi)}</small>` : ''}</div>
     <div class="qty"><button data-q="${i}" data-d="-1" aria-label="−">−</button><b>${it.q}</b><button data-q="${i}" data-d="1" aria-label="+">+</button></div><div class="sum">${money(it.q * it.unit)}</div><button class="rm" data-rm="${i}" aria-label="${it.q ? t('editRm') : t('editBack')}">${it.q ? '✕' : '↺'}</button></div>`).join('');
   $('editSum').textContent = money(e.items.reduce((a, it) => a + it.q * it.unit, 0));
@@ -635,7 +638,7 @@ function inlineBody(o) {
   const tr = l => { if (lang === 'vi') return l; for (const [re, to] of LINE[lang]) if (re.test(l)) return l.replace(re, to); return l };
   const rows = o.text.split('\n').slice(1).map(l => { const m = l.match(LINE_RE);
     if (!m) { const n = l.match(/^Ghi chú: (.+)$/), x = n && noteTr(o, n[1]); return `<div class="il">${esc(tr(l))}</div>${x ? `<div class="il trn">🌐 ${esc(x)}</div>` : ''}` }
-    const n = NAMES[m[2]], nm = lang === 'vi' || !n ? m[3] : n[lang === 'en' ? 0 : 1];
+    const n = NAMES[m[2]], nm = lang === 'vi' || !n ? m[3] : n[lang === 'en' ? 0 : 1] + baseTr(m[3]);
     return `<div class="ir"><span class="in">${m[1]} × [${m[2]}] ${esc(nm)} — ${m[4]} ₫</span><span class="ib"><button data-iq="${o.id}:${m[2]}@${Math.round(+m[4].replace(/\./g, '') / +m[1])}:-1" aria-label="−">−</button><button data-iq="${o.id}:${m[2]}@${Math.round(+m[4].replace(/\./g, '') / +m[1])}:1" aria-label="+">+</button><button class="x" data-iq="${o.id}:${m[2]}@${Math.round(+m[4].replace(/\./g, '') / +m[1])}:x" aria-label="${t('editRm')}">✕</button></span></div>` }).join('');
   return `<div class="ibody">${rows}<select class="iadd" data-iadd="${o.id}">${dishOptions()}</select></div>`;
 }
@@ -696,7 +699,7 @@ function activeTables() {
 }
 function tableCalc(g) {
   const ords = g.ses.filter(o => o.kind === 'order'), lines = [];
-  ords.forEach(o => parseOrder(o).items.forEach(it => { if (!it.q) return; let l = lines.find(x => x.id === it.id && x.unit === it.unit);
+  ords.forEach(o => parseOrder(o).items.forEach(it => { if (!it.q) return; let l = lines.find(x => x.id === it.id && x.unit === it.unit && x.vi === it.vi);
     if (!l) lines.push(l = { id: it.id, vi: it.vi, unit: it.unit, q: 0, sum: 0 }); l.q += it.q; l.sum += it.q * it.unit }));
   lines.sort((a, b) => (+a.id - +b.id) || (b.unit - a.unit));
   const st = tbState.get(g.key) || {}, sub = lines.reduce((a, l) => a + l.sum, 0);
@@ -720,7 +723,7 @@ function renderTb() {
   $('tbEmpty').hidden = !!groups.length; $('tbCard').hidden = !groups.length;
   $('tbTabs').innerHTML = groups.map(g => `<button data-tg="${esc(g.key)}" aria-pressed="${g.key === tbSel}"><b>${t('table')} ${esc(g.tbl)}</b>${g.guest ? `<small>👤 ${esc(g.guest)}</small>` : ''}<span>${money(tableCalc(g).total)}</span>${tableCalc(g).asked ? '<i>💳</i>' : ''}</button>`).join('');
   const g = groups.find(x => x.key === tbSel); if (!g) return;
-  const c = tableCalc(g), nm = l => { const n = NAMES[l.id]; return lang === 'vi' || !n ? l.vi : n[lang === 'en' ? 0 : 1] };
+  const c = tableCalc(g), nm = l => { const n = NAMES[l.id]; return lang === 'vi' || !n ? l.vi : n[lang === 'en' ? 0 : 1] + baseTr(l.vi) };
   $('tbHead').innerHTML = `<b>${t('table')} ${esc(g.tbl)}</b>${g.guest ? ` · 👤 ${esc(g.guest)}` : ''} · ${t('tbOrders')(c.ords.length)} · ${t('tbSince')} ${hhmm(c.ords[0].created)}${c.asked ? `<span class="ask">${t('tbAsk')}</span>` : ''}`;
   $('tbRows').innerHTML = c.lines.length ? c.lines.map(l => `<div class="trow"><div class="nm">[${l.id}] ${esc(nm(l))}${lang !== 'vi' ? `<small>${esc(l.vi)}</small>` : ''}${NAMES[l.id] && NAMES[l.id][3] !== l.unit ? `<small class="chg">✏️ ${t('tbChanged')} · ${t('prWas')}: ${money(NAMES[l.id][3])}</small>` : ''}</div>
     <div class="qty"><button data-tq="${l.id}@${l.unit}:-1" aria-label="−">−</button><b>${l.q}</b><button data-tq="${l.id}@${l.unit}:1" aria-label="+">+</button></div>
