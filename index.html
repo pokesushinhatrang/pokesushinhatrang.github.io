@@ -464,6 +464,8 @@ body.has-ostrip #menuApp .toast{bottom:calc(150px + env(safe-area-inset-bottom,0
 #menuApp .it .ph{width:84px;height:84px;object-fit:cover;background:var(--accent-soft)}
 #menuApp .it .no{font-family:var(--f-mono);font-size:12px;font-weight:500;color:var(--primary);background:var(--primary-soft);border-radius:6px;padding:1px 6px;margin-right:2px;vertical-align:2px}
 #menuApp footer a{color:inherit}
+#menuApp .notice{position:relative;z-index:1;margin:2px 0 10px;padding:12px 14px 12px 42px;border-radius:14px;background:var(--primary-soft);border:1px solid var(--line);color:var(--ink);font-size:15px;line-height:1.45;white-space:pre-line}
+#menuApp .notice::before{content:"📢";position:absolute;left:13px;top:11px;font-size:18px}
 #menuApp .it .ph0{display:grid;place-items:center;font-family:var(--f-display);font-size:26px;color:var(--primary);background:var(--primary-soft) ;}
 #menuApp .wrap::before{top:44px;width:130px;height:170px}
 /* category bar stays on top while scrolling (the art layer rule had turned sticky off) */
@@ -487,6 +489,7 @@ body.has-ostrip #menuApp .toast{bottom:calc(150px + env(safe-area-inset-bottom,0
       <button data-lang="vi">VI</button><button data-lang="en">EN</button><button data-lang="ru">RU</button>
     </div>
   </header>
+  <div class="notice" id="notice" hidden></div>
   <nav class="cats" id="cats"></nav>
   <main id="list"></main>
   <footer><span data-mt="foot"></span> · <a href="https://milanovajina.github.io/cafeup/" target="_blank" rel="noopener">CafeUp</a></footer>
@@ -1130,6 +1133,7 @@ async function loadPopular(){
     const r=await fetch(CONFIG.orderEndpoint.replace(/\/$/,'')+'/popular?venue='+CONFIG.venue,{cache:'no-store'});
     if(!r.ok)return; const d=await r.json(); const ids=(d.ids||[]).filter(id=>MENU.some(m=>m.id===id));
     SOLD_STAFF=(d.soldout||[]).filter(id=>MENU.some(m=>m.id===id));
+    NOTICE=d.notice||{}; renderNotice();
     PRICES=d.prices||{}; let priceChanged=false;
     MENU.forEach(m=>{const p=+PRICES[m.id];if(p>=1000&&p!==m.price){m.price=p;priceChanged=true}});
     const soldChanged=applySold(), popChanged=ids.join()!==POPULAR.join();
@@ -1137,6 +1141,12 @@ async function loadPopular(){
     if(!document.getElementById('sheetBg').hidden)renderSheet();
   }catch(e){}
 }
+var NOTICE={};
+function renderNotice(){
+  const el=document.getElementById('notice'), tx=(NOTICE[lang]||NOTICE.en||NOTICE.vi||NOTICE.ru||'').trim();
+  el.hidden=!tx; el.textContent=tx;
+}
+document.querySelector('#menuApp .lang').addEventListener('click',()=>setTimeout(renderNotice,0));
 setTimeout(loadPopular,0);setInterval(loadPopular,60000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadPopular()});setInterval(loadSheet,60000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadSheet()});
