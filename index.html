@@ -466,6 +466,7 @@ body.has-ostrip #menuApp .toast{bottom:calc(150px + env(safe-area-inset-bottom,0
 #menuApp footer a{color:inherit}
 #menuApp .notice{position:relative;z-index:1;margin:2px 0 10px;padding:12px 14px 12px 42px;border-radius:14px;background:var(--primary-soft);border:1px solid var(--line);color:var(--ink);font-size:15px;line-height:1.45;white-space:pre-line}
 #menuApp .notice b{font-weight:800}
+body.view-only #menuApp .qty,body.view-only #menuApp .bar,body.view-only #menuApp .tablechip,body.view-only #menuApp .sheet-bg{display:none!important}
 #menuApp .notice::before{content:"📢";position:absolute;left:13px;top:11px;font-size:18px}
 #menuApp .it .ph0{display:grid;place-items:center;font-family:var(--f-display);font-size:26px;color:var(--primary);background:var(--primary-soft) ;}
 #menuApp .wrap::before{top:44px;width:130px;height:170px}
@@ -579,6 +580,9 @@ body.has-ostrip #menuApp .toast{bottom:calc(150px + env(safe-area-inset-bottom,0
 <script>
 (function(){
 const ON=true;document.body.classList.add('menu-mode');
+/* without a table number in the link (the A4 poster, #menu) the menu is view-only: no ordering, no waiter calls */
+const VIEW_ONLY=!/^#table-\d{1,4}$/.test(location.hash);if(VIEW_ONLY)document.body.classList.add('view-only');
+window.addEventListener('hashchange',()=>{if(VIEW_ONLY!==!/^#table-\d{1,4}$/.test(location.hash))location.reload()});
 
 /* ===== Settings: put the café's contacts here ===== */
 const CONFIG={
