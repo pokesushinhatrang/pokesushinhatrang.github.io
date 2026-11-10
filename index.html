@@ -468,6 +468,11 @@ body.has-ostrip #menuApp .toast{bottom:calc(150px + env(safe-area-inset-bottom,0
 #menuApp .notice b{font-weight:800}
 #menuApp .bpick{position:fixed;inset:0;z-index:30;background:color-mix(in srgb,var(--ink) 45%,transparent);display:flex;align-items:flex-end;justify-content:center}
 #menuApp .bpick[hidden]{display:none}
+#menuApp .lines li>span:first-child{min-width:0}
+#menuApp .dnb{display:block;margin-top:4px;font:inherit;font-size:13px;font-weight:600;color:var(--muted);background:none;border:1px dashed var(--line);border-radius:999px;padding:3px 10px;text-align:left}
+#menuApp .dnb.has{color:var(--ink);border-style:solid;background:var(--bg);white-space:normal}
+#menuApp .dnote input{width:100%;margin-top:6px;font:inherit;font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+#menuApp .lines li.dnh{display:block;font-size:12px;color:var(--muted)}
 #menuApp .bpbox{width:100%;max-width:520px;background:var(--surface);border-radius:22px 22px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom))}
 #menuApp .bpbox h3{margin:0;font-size:22px}
 #menuApp .bpn{font-weight:700;margin-top:4px}
@@ -1520,6 +1525,24 @@ function rows(o){const r=[];MENU.forEach(m=>Object.keys(o).forEach(k=>{if(idOf(k
 const rowName=(r,l)=>{l=l||lang;const n=l==='vi'?r.m.vi:r.m[l][0],b=baseName(r.k,l);return b?n+' · '+b:n};
 const inCart=id=>Object.keys(cart).reduce((a,k)=>a+(idOf(k)===id?cart[k]:0),0);
 const lastBase={};
+const NOTES=(()=>{try{return JSON.parse(localStorage.getItem('sushigo_notes')||'{}')}catch(e){return{}}})();let noteEdit=null;
+const NT_L={vi:['✏️ Yêu cầu','Ví dụ: gấp đôi cá hồi, không dưa leo','Món có thay đổi tính phí: nhân viên sẽ cộng vào hóa đơn.'],en:['✏️ Request','e.g. double salmon, no cucumber','Paid changes are added to the bill by the waiter.'],ru:['✏️ Пожелание','Например: двойной лосось, без огурца','Платные изменения официант добавит в счёт.']};
+const ntl=i=>(NT_L[lang]||NT_L.en)[i];
+const cleanNote=t=>String(t||'').replace(/[—\n\r]+/g,' - ').replace(/\s+/g,' ').trim().slice(0,80);
+function saveNotes(){Object.keys(NOTES).forEach(k=>{if(!cart[k]||!cleanNote(NOTES[k]))delete NOTES[k]});try{localStorage.setItem('sushigo_notes',JSON.stringify(NOTES))}catch(e){}}
+const escH=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function noteRow(r){
+  const k=r.k,n=cleanNote(NOTES[k]);
+  if(noteEdit===k)return `<div class="dnote"><input data-ni="${escH(k)}" maxlength="80" value="${escH(NOTES[k]||'')}" placeholder="${escH(ntl(1))}" enterkeyhint="done"></div>`;
+  return n?`<button class="dnb has" data-nk="${escH(k)}">✏️ ${escH(n)}</button>`:`<button class="dnb" data-nk="${escH(k)}">${ntl(0)}</button>`;
+}
+setTimeout(()=>{const L=document.getElementById('lines');
+  L.addEventListener('click',e=>{const b=e.target.closest('[data-nk]');if(!b)return;noteEdit=b.dataset.nk;renderSheet();const i=L.querySelector('[data-ni]');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}});
+  L.addEventListener('input',e=>{const i=e.target.closest('[data-ni]');if(!i)return;NOTES[i.dataset.ni]=i.value;saveNotes();document.getElementById('kitchenText').textContent=kitchenText()});
+  L.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.closest('[data-ni]')){e.preventDefault();e.target.blur()}});
+  L.addEventListener('focusout',e=>{if(e.target.closest('[data-ni]')){noteEdit=null;setTimeout(renderSheet,0)}});
+},0);
+
 function askBase(m){
   const el=document.getElementById('bpick'),t=BP_T[lang]||BP_T.en;
   el.querySelector('h3').textContent=t[0];el.querySelector('.bpn').textContent=(lang==='vi'?m.vi:m[lang][0]);el.querySelector('.bps').textContent=t[1];
@@ -1568,7 +1591,7 @@ function renderBar(){
 let pm='qr', reason='come';
 function kitchenText(){
   const langName={vi:'tiếng Việt',en:'tiếng Anh',ru:'tiếng Nga'}[lang];
-  const lines=rows(cart).map(r=>`${r.q} × [${r.m.id}] ${r.m.vi}${baseName(r.k,'vi')?' · Đế: '+baseName(r.k,'vi'):''} — ${fmt(r.q*r.m.price,'vi')}`).join('\n');
+  const lines=rows(cart).map(r=>`${r.q} × [${r.m.id}] ${r.m.vi}${baseName(r.k,'vi')?' · Đế: '+baseName(r.k,'vi'):''}${cleanNote(NOTES[r.k])?' · Yêu cầu: '+cleanNote(NOTES[r.k]):''} — ${fmt(r.q*r.m.price,'vi')}`).join('\n');
   const note=document.getElementById('note').value.trim();
   return `${sent.length?`GỌI THÊM (lần ${sent.length+1})`:'ĐƠN MỚI'} · Bàn ${table||'?'}${guestName?` · ${guestName}`:''}\n${lines}\nTổng: ${fmt(total(),'vi')}\nThanh toán: ${pm==='cash'?'Tiền mặt':'Chuyển khoản VietQR'}${note?`\nGhi chú: ${note}`:''}\nKhách nói ${langName}`;
 }
@@ -1580,7 +1603,7 @@ function renderSheet(){
   document.getElementById('newPart').hidden=!n;
   document.getElementById('newH').hidden=!sent.length;
   document.getElementById('emptyNew').hidden=!!n;
-  document.getElementById('lines').innerHTML=rows(cart).map(r=>`<li><span>${r.q} × ${rowName(r)}</span><span class="mono">${fmt(r.q*r.m.price)}</span></li>`).join('');
+  document.getElementById('lines').innerHTML=rows(cart).map(r=>`<li><span>${r.q} × ${rowName(r)}${noteRow(r)}</span><span class="mono">${fmt(r.q*r.m.price)}</span></li>`).join('')+(rows(cart).length?`<li class="dnh">${ntl(2)}</li>`:'');
   document.getElementById('sum').textContent=fmt(total());
   document.getElementById('kitchenText').textContent=kitchenText();
   const txt=encodeURIComponent(kitchenText());
@@ -1684,7 +1707,7 @@ function commitOrder(){
   if(!count())return;
   closedBill=0;
   sent.push({at:Date.now(),items:{...cart},total:total()});
-  Object.keys(cart).forEach(k=>delete cart[k]);
+  Object.keys(cart).forEach(k=>delete cart[k]);Object.keys(NOTES).forEach(k=>delete NOTES[k]);saveNotes();
   document.getElementById('note').value='';
   saveSent();renderList();renderBar();renderSheet();toast(T('sent_ok'));
 }

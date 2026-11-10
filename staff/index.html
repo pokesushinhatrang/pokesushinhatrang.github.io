@@ -59,7 +59,8 @@ button{font:inherit;cursor:pointer}
 .ib{display:flex;gap:4px;flex:none}
 .ib button{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--bg);font-size:16px;font-weight:800;line-height:1}
 .ib button.x{border-color:#F0CFCF;background:#FDF1F1;color:#B33A2E;font-size:13px}
-.il{padding:2px 0}.il.trn{font-weight:800;color:var(--ink);padding-left:12px}
+.il{padding:2px 0}.rtr{display:block;font-weight:800;font-size:15px}
+.il.trn{font-weight:800;color:var(--ink);padding-left:12px}
 .iadd{margin-top:8px;width:100%;font:inherit;font-size:14px;padding:8px;border:1px dashed var(--line);border-radius:10px;background:var(--bg);color:var(--muted)}
 .o .ed{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 12px;font-size:14px;font-weight:700;color:var(--ink)}
 .o .edited{font-size:12px;font-weight:800;color:#8a5a1c;background:var(--amber-soft);border-radius:999px;padding:3px 9px}
@@ -388,7 +389,8 @@ function noteTr(o, note, tl = lang) {
 }
 /* poke base chosen by the guest: «… · Đế: gạo lứt» → shown in the screen language */
 const BASE_TR = { 'cơm sushi': ['sushi rice + salad', 'рис для суши + салат'], 'gạo lứt': ['brown rice + salad', 'бурый рис + салат'], 'toàn salad': ['salad only', 'только салат'] };
-const baseTr = vi => { const m = String(vi).match(/ · Đế: (.+)$/); if (!m) return ''; const t = BASE_TR[m[1]]; return ' · ' + (lang === 'vi' || !t ? 'Đế: ' + m[1] : (lang === 'en' ? 'base: ' : 'основа: ') + t[lang === 'en' ? 0 : 1]) };
+const baseTr = vi => { const rq = (String(vi).match(/ · Yêu cầu: (.+)$/) || [])[1]; return baseOnly(String(vi).replace(/ · Yêu cầu: .+$/, '')) + (rq ? ' · ✏️ ' + rq : '') };
+const baseOnly = vi => { const m = String(vi).match(/ · Đế: (.+)$/); if (!m) return ''; const t = BASE_TR[m[1]]; return ' · ' + (lang === 'vi' || !t ? 'Đế: ' + m[1] : (lang === 'en' ? 'base: ' : 'основа: ') + t[lang === 'en' ? 0 : 1]) };
 function body(o) {
   let lines = o.text.split('\n').slice(1);
   if (lang !== 'vi') lines = lines.map(l => {
@@ -397,7 +399,7 @@ function body(o) {
     for (const [re, to] of LINE[lang]) if (re.test(l)) return l.replace(re, to);
     return l;
   });
-  return lines.map((l, i) => { const n = (o.text.split('\n')[i + 1] || '').match(/^Ghi chú: (.+)$/), x = n && noteTr(o, n[1]); return x ? l + '\n   🌐 ' + x : l }).join('\n');
+  return lines.map((l, i) => { const src = o.text.split('\n')[i + 1] || '', n = src.match(/^Ghi chú: (.+)$/) || src.match(/ · Yêu cầu: (.+?) — [\d.]+\s₫$/), x = n && noteTr(o, n[1]); return x ? l + '\n   🌐 ' + x : l }).join('\n');
 }
 
 function render(freshIds = []) {
@@ -545,7 +547,8 @@ function receiptHTML(o) {
           return /^Tổng cộng|^Tổng:/.test(l) ? `<div class="row big"><span>${esc(l.split(': ')[0])}</span><span>${esc(l.split(': ')[1])}</span></div>` : `<div class="row"><span>${esc(l.split(': ')[0])}</span><span>${esc(l.split(': ').slice(1).join(': '))}</span></div>` }).join('');
   } else {
     body = rest.map(l => { const m = l.match(/^(\d+ × )\[(\d+)\] (.+?) — (.+)$/);
-      return m ? `<div class="row"><span><b>${m[1]}</b>${esc(m[3])}<small> [${m[2]}]</small></span><span>${esc(m[4])}</span></div>` : `<div class="row ${/^Tổng/.test(l) ? 'big' : ''}"><span>${esc(l)}</span></div>` }).join('');
+      const rq = m && (m[3].match(/ · Yêu cầu: (.+)$/) || [])[1], rv = rq && noteTr(o, rq, 'vi');
+      return m ? `<div class="row"><span><b>${m[1]}</b>${esc(m[3])}<small> [${m[2]}]</small>${rv ? `<br><b>🌐 ${esc(rv)}</b>` : ''}</span><span>${esc(m[4])}</span></div>` : `<div class="row ${/^Tổng/.test(l) ? 'big' : ''}"><span>${esc(l)}</span></div>` }).join('');
   }
   const head = { order: tl[0].startsWith('GỌI THÊM') ? 'GỌI THÊM' : 'PHIẾU GỌI MÓN', bill: 'HÓA ĐƠN TẠM TÍNH', closed: 'HÓA ĐƠN' }[o.kind] || tl[0].split(' · ')[0];
   return `<!doctype html><html><head><meta charset="utf-8"><style>
@@ -639,7 +642,8 @@ function inlineBody(o) {
   const rows = o.text.split('\n').slice(1).map(l => { const m = l.match(LINE_RE);
     if (!m) { const n = l.match(/^Ghi chú: (.+)$/), x = n && noteTr(o, n[1]); return `<div class="il">${esc(tr(l))}</div>${x ? `<div class="il trn">🌐 ${esc(x)}</div>` : ''}` }
     const n = NAMES[m[2]], nm = lang === 'vi' || !n ? m[3] : n[lang === 'en' ? 0 : 1] + baseTr(m[3]);
-    return `<div class="ir"><span class="in">${m[1]} × [${m[2]}] ${esc(nm)} — ${m[4]} ₫</span><span class="ib"><button data-iq="${o.id}:${m[2]}@${Math.round(+m[4].replace(/\./g, '') / +m[1])}:-1" aria-label="−">−</button><button data-iq="${o.id}:${m[2]}@${Math.round(+m[4].replace(/\./g, '') / +m[1])}:1" aria-label="+">+</button><button class="x" data-iq="${o.id}:${m[2]}@${Math.round(+m[4].replace(/\./g, '') / +m[1])}:x" aria-label="${t('editRm')}">✕</button></span></div>` }).join('');
+    const rq = (m[3].match(/ · Yêu cầu: (.+)$/) || [])[1], rx = rq && noteTr(o, rq);
+    return `<div class="ir"><span class="in">${m[1]} × [${m[2]}] ${esc(nm)} — ${m[4]} ₫${rx ? `<b class="rtr">🌐 ${esc(rx)}</b>` : ''}</span><span class="ib"><button data-iq="${o.id}:${m[2]}@${Math.round(+m[4].replace(/\./g, '') / +m[1])}:-1" aria-label="−">−</button><button data-iq="${o.id}:${m[2]}@${Math.round(+m[4].replace(/\./g, '') / +m[1])}:1" aria-label="+">+</button><button class="x" data-iq="${o.id}:${m[2]}@${Math.round(+m[4].replace(/\./g, '') / +m[1])}:x" aria-label="${t('editRm')}">✕</button></span></div>` }).join('');
   return `<div class="ibody">${rows}<select class="iadd" data-iadd="${o.id}">${dishOptions()}</select></div>`;
 }
 let busy = false;
