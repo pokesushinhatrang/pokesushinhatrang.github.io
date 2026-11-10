@@ -680,6 +680,7 @@ const D={
  thanks_p:["Bạn thấy ngon không? Đánh giá quán trên Google Maps chỉ mất 30 giây và giúp quán rất nhiều.", "Enjoyed it? Rating us on Google Maps takes 30 seconds and helps us a lot.", "Понравилось? Оценка в Google Maps займёт 30 секунд и очень нам поможет."],
  rate_toast:["Cảm ơn bạn!", "Thank you!", "Спасибо!"],
  cat_set:["Set sushi", "Sushi sets", "Суши-сеты"],
+ cat_ssm:["Sashimi", "Sashimi", "Сашими"],
  cat_hot:["Cuộn chiên", "Hot rolls", "Горячие роллы"],
  cat_age:["Món chiên", "Fried dishes", "Жареное"],
  cat_drink:["Đồ uống", "Drinks", "Напитки"],
@@ -709,6 +710,28 @@ const MENU=[
    en:['LOVE YOU set (for sharing)', 'Big platter for two or three: salmon sashimi, salmon, eel and avocado rolls, torched rolls.'],
    ru:['Сет LOVE YOU (на компанию)', 'Большой сет на двоих-троих: сашими из лосося, роллы с лососем, угрём и авокадо, запечённые роллы.'],
    vd:'Sashimi cá hồi, cuộn cá hồi, lươn, bơ, cuộn nướng.'},   // ⚠ verify contents / persons
+
+  /* ---------- Sashimi sets (menu page «刺身 Sashimi Set», 10 Nov 2026; temporary photos cut from that page) ---------- */
+  {id:'18', cat:'ssm', vi:'Set 3 loại Sashimi', price:165000, img:'d18',
+   en:['Sashimi set, 3 kinds', 'Fresh raw fish sliced thin: salmon, tuna and a third fish of the day, on ice with shiso leaf, wasabi and pickled ginger.'],
+   ru:['Сашими-сет, 3 вида', 'Тонко нарезанная свежая сырая рыба: лосось, тунец и третья рыба дня, на льду с листом шисо, васаби и маринованным имбирём.'],
+   vd:'Cá hồi, cá ngừ và một loại cá trong ngày, wasabi, gừng hồng.'},   // ⚠ verify the third fish
+  {id:'19', cat:'ssm', vi:'Set cá hồi Sashimi', price:449000, img:'d19',
+   en:['Salmon sashimi set', 'A big ring of fresh salmon slices around lightly torched salmon belly, with edible flowers. For salmon lovers, good for two or three.'],
+   ru:['Сашими-сет из лосося', 'Большое кольцо из ломтиков свежего лосося вокруг слегка обожжённой лососёвой брюшки, украшено съедобными цветами. Для любителей лосося, на двоих-троих.'],
+   vd:'Vòng cá hồi tươi thái lát, bụng cá hồi khò, hoa trang trí.'},   // ⚠ verify piece count
+  {id:'20', cat:'ssm', vi:'Set 5 loại Sashimi nhỏ (15 miếng)', price:269000, img:'d20',
+   en:['Sashimi set, 5 kinds, small (15 pcs)', '15 slices of five kinds of fresh fish and seafood, served on a red wooden boat with ice, shiso and wasabi.'],
+   ru:['Сашими-сет, 5 видов, малый (15 шт.)', '15 ломтиков пяти видов свежей рыбы и морепродуктов, подаётся в красной деревянной лодке со льдом, шисо и васаби.'],
+   vd:'15 miếng, 5 loại cá và hải sản, thuyền gỗ đỏ.'},
+  {id:'21', cat:'ssm', vi:'Set Sashimi 6 loại', price:299000, img:'d21',
+   en:['Sashimi set, 6 kinds', 'Six kinds of fresh fish and seafood sashimi on a red wooden boat with ice, shiso, wasabi and flying fish roe.'],
+   ru:['Сашими-сет, 6 видов', 'Шесть видов сашими из свежей рыбы и морепродуктов в красной деревянной лодке со льдом, шисо, васаби и икрой летучей рыбы.'],
+   vd:'6 loại cá và hải sản, thuyền gỗ đỏ, trứng cá chuồn.'},   // ⚠ verify piece count
+  {id:'22', cat:'ssm', vi:'Set Sashimi đặc biệt (30 miếng)', price:449000, img:'d22',
+   en:['Chef’s special sashimi set (30 pcs)', '30 slices of the chef’s choice of the freshest fish of the day: salmon, tuna, mackerel and more, on a big red boat. The selection changes daily.'],
+   ru:['Сашими-сет от шефа (30 шт.)', '30 ломтиков самой свежей рыбы дня на выбор шефа: лосось, тунец, скумбрия и другое, в большой красной лодке. Состав меняется каждый день.'],
+   vd:'30 miếng, cá tươi nhất trong ngày do bếp trưởng chọn, thay đổi theo ngày.'},
 
   /* ---------- Hot rolls ---------- */
   {id:'181', cat:'hot', vi:'Cuộn cá ngừ & phô mai chiên', price:79000, img:'d181',
@@ -817,7 +840,7 @@ const MENU=[
 ];
 let POPULAR=[];
 const catList=()=>POPULAR.length?['pop',...CATS]:CATS;
-const CATS=['set', 'hot', 'age', 'drink'];
+const CATS=['set', 'ssm', 'hot', 'age', 'drink'];
 /* stop-list: dishes that ran out today (demo: set by hand; for clients this comes from the café's Google Sheet) */
 const SOLD_OUT=[];   /* ids of dishes that ran out today */
 const cart={};
