@@ -1108,7 +1108,7 @@ async function loadSheet(){
     rows.forEach(r=>{
       const id=String(r[0]||'').trim().replace(/\.0+$/,''), m=MENU.find(x=>x.id===id); if(!m)return;
       const p=parseInt(String(r[2]||'').replace(/\D/g,''),10);
-      if(p>=1000&&p!==m.price){m.price=p;changed=true}
+      if(p>=1000&&p!==m.price&&!PRICES[id]){m.price=p;changed=true}
       if(String(r[3]||'').trim())so.push(id);
     });
     SOLD_SHEET=so;
@@ -1117,7 +1117,7 @@ async function loadSheet(){
   }catch(e){}
 }
 /* sold out = staff screen stop-list + (old) sheet column D */
-var SOLD_SHEET=[],SOLD_STAFF=[];
+var SOLD_SHEET=[],SOLD_STAFF=[],PRICES={};
 function applySold(){
   const so=[...new Set([...SOLD_STAFF,...SOLD_SHEET])].sort();let changed=false;
   if(so.join()!==SOLD_OUT.slice().sort().join()){SOLD_OUT.length=0;SOLD_OUT.push(...so);changed=true}
@@ -1130,8 +1130,10 @@ async function loadPopular(){
     const r=await fetch(CONFIG.orderEndpoint.replace(/\/$/,'')+'/popular?venue='+CONFIG.venue,{cache:'no-store'});
     if(!r.ok)return; const d=await r.json(); const ids=(d.ids||[]).filter(id=>MENU.some(m=>m.id===id));
     SOLD_STAFF=(d.soldout||[]).filter(id=>MENU.some(m=>m.id===id));
+    PRICES=d.prices||{}; let priceChanged=false;
+    MENU.forEach(m=>{const p=+PRICES[m.id];if(p>=1000&&p!==m.price){m.price=p;priceChanged=true}});
     const soldChanged=applySold(), popChanged=ids.join()!==POPULAR.join();
-    if(!soldChanged&&!popChanged)return; POPULAR=ids; renderCats(); renderList(); renderBar(); saveSent();
+    if(!soldChanged&&!popChanged&&!priceChanged)return; POPULAR=ids; renderCats(); renderList(); renderBar(); saveSent();
     if(!document.getElementById('sheetBg').hidden)renderSheet();
   }catch(e){}
 }
