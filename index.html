@@ -862,7 +862,7 @@ function itemHTML(m){
   const q=cart[m.id]||0;
   const usd=lang==='vi'?'':` <span class="usd">≈ $${(m.price/26000).toFixed(1)}</span>`;
   const so=SOLD_OUT.includes(m.id);
-  return `<article class="it${so?' so':''}">${m.img?`<img class="ph" src="img/${m.img}.webp" alt="" loading="lazy">`:`<div class="ph ph0" aria-hidden="true">${m.id}</div>`}
+  return `<article class="it${so?' so':''}">${(m.img||(window.__PH||{})[m.id])?`<img class="ph" src="${photoSrc(m)}" alt="" loading="lazy">`:`<div class="ph ph0" aria-hidden="true">${m.id}</div>`}
    <div style="min-width:0"><div class="n"><span class="no">${m.id}</span> ${name(m)}</div>${lang!=='vi'?`<div class="o">${m.vi}</div>`:''}<div class="d">${desc(m)}</div>
    <div class="row"><span class="p mono">${fmt(m.price)}${m.unit?' '+T('per_piece'):''}${usd}</span>
    ${so?`<span class="sold">${T('sold_out')}</span>`:`<span class="qty">${q?`<button class="minus" data-id="${m.id}" data-d="-1" aria-label="−">−</button><span class="q mono">${q}</span>`:''}<button data-id="${m.id}" data-d="1" aria-label="${T('add')}">+</button></span>`}</div></div></article>`;
@@ -1133,6 +1133,8 @@ function applySold(){
   return changed;
 }
 setTimeout(loadSheet,0);
+/* photos the staff replaced on the staff screen are served by the orders server */
+function photoSrc(m){const v=(window.__PH||{})[m.id];return v?CONFIG.orderEndpoint.replace(/\/$/,'')+'/photo?venue='+CONFIG.venue+'&id='+m.id+'&v='+v:'img/'+m.img+'.webp'}
 async function loadPopular(){
   try{
     const r=await fetch(CONFIG.orderEndpoint.replace(/\/$/,'')+'/popular?venue='+CONFIG.venue,{cache:'no-store'});
@@ -1140,6 +1142,7 @@ async function loadPopular(){
     SOLD_STAFF=(d.soldout||[]).filter(id=>MENU.some(m=>m.id===id));
     NOTICE=d.notice||{}; renderNotice();
     PRICES=d.prices||{}; let priceChanged=false;
+    if(JSON.stringify(d.photos||{})!==JSON.stringify(window.__PH||{})){window.__PH=d.photos||{};priceChanged=true}
     MENU.forEach(m=>{const p=+PRICES[m.id];if(p>=1000&&p!==m.price){m.price=p;priceChanged=true}});
     const soldChanged=applySold(), popChanged=ids.join()!==POPULAR.join();
     if(!soldChanged&&!popChanged&&!priceChanged)return; POPULAR=ids; renderCats(); renderList(); renderBar(); saveSent();
