@@ -59,7 +59,7 @@ button{font:inherit;cursor:pointer}
 .ib{display:flex;gap:4px;flex:none}
 .ib button{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--bg);font-size:16px;font-weight:800;line-height:1}
 .ib button.x{border-color:#F0CFCF;background:#FDF1F1;color:#B33A2E;font-size:13px}
-.il{padding:2px 0}
+.il{padding:2px 0}.il.trn{font-weight:800;color:var(--ink);padding-left:12px}
 .iadd{margin-top:8px;width:100%;font:inherit;font-size:14px;padding:8px;border:1px dashed var(--line);border-radius:10px;background:var(--bg);color:var(--muted)}
 .o .ed{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 12px;font-size:14px;font-weight:700;color:var(--ink)}
 .o .edited{font-size:12px;font-weight:800;color:#8a5a1c;background:var(--amber-soft);border-radius:999px;padding:3px 9px}
@@ -350,6 +350,21 @@ const kindOf = o => o.kind === 'closed' ? 'closed' : o.text.startsWith('GỌI TH
 const ago = ms => { const m = Math.max(0, Math.round((Date.now() - ms) / 60000)); return m < 1 ? t('now') : m < 60 ? t('min')(m) : t('hour')(Math.floor(m / 60)) };
 const hhmm = ms => { const d = new Date(ms); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') };
 const esc = s => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+/* guest comments are translated automatically into the screen language (free MyMemory service; cached on this device) */
+const TRN = new Map((() => { try { return JSON.parse(store.get('trn') || '[]') } catch (e) { return [] } })()), TRN_WAIT = new Set();
+const guestLang = o => ({ Nga: 'ru', Anh: 'en', 'Việt': 'vi' })[(o.text.match(/^Khách nói tiếng (\S+)$/m) || [])[1]] || '';
+const unent = x => { const d = document.createElement('textarea'); d.innerHTML = x; return d.value };
+function noteTr(o, note, tl = lang) {
+  const src = guestLang(o); if (!src || src === tl || !note.trim()) return '';
+  const k = src + '|' + tl + '|' + note; if (TRN.has(k)) return TRN.get(k);
+  if (!TRN_WAIT.has(k)) { TRN_WAIT.add(k);
+    fetch('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(note.slice(0, 450)) + '&langpair=' + src + '|' + tl)
+      .then(r => r.json()).then(d => { const x = unent(String((d && d.responseData && d.responseData.translatedText) || '')).trim();
+        if (d && +d.responseStatus === 200 && x && x.toLowerCase() !== note.trim().toLowerCase()) {
+          TRN.set(k, x); store.set('trn', JSON.stringify([...TRN].slice(-200))); render() } })
+      .catch(() => {}); }
+  return '';
+}
 function body(o) {
   let lines = o.text.split('\n').slice(1);
   if (lang !== 'vi') lines = lines.map(l => {
@@ -358,7 +373,7 @@ function body(o) {
     for (const [re, to] of LINE[lang]) if (re.test(l)) return l.replace(re, to);
     return l;
   });
-  return lines.join('\n');
+  return lines.map((l, i) => { const n = (o.text.split('\n')[i + 1] || '').match(/^Ghi chú: (.+)$/), x = n && noteTr(o, n[1]); return x ? l + '\n   🌐 ' + x : l }).join('\n');
 }
 
 function render(freshIds = []) {
@@ -487,7 +502,7 @@ function itemsFor(bill) {          /* the dishes of the guest's (or the whole ta
 }
 function receiptHTML(o) {
   const d = new Date(o.created), when = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} ${hhmm(o.created)}`;
-  const tl = o.text.split('\n'), rest = tl.slice(1).filter(l => !/^Khách nói/.test(l));
+  const tl = o.text.split('\n'), rest = tl.slice(1).filter(l => !/^Khách nói/.test(l)).flatMap(l => { const n = l.match(/^Ghi chú: (.+)$/), x = n && noteTr(o, n[1], 'vi'); return x ? [l, '🌐 ' + x] : [l] });
   let body = '';
   if (o.kind === 'bill' && o.calc) {
     const c = o.calc;
@@ -598,7 +613,7 @@ $('editSave').onclick = async () => {
 function inlineBody(o) {
   const tr = l => { if (lang === 'vi') return l; for (const [re, to] of LINE[lang]) if (re.test(l)) return l.replace(re, to); return l };
   const rows = o.text.split('\n').slice(1).map(l => { const m = l.match(LINE_RE);
-    if (!m) return `<div class="il">${esc(tr(l))}</div>`;
+    if (!m) { const n = l.match(/^Ghi chú: (.+)$/), x = n && noteTr(o, n[1]); return `<div class="il">${esc(tr(l))}</div>${x ? `<div class="il trn">🌐 ${esc(x)}</div>` : ''}` }
     const n = NAMES[m[2]], nm = lang === 'vi' || !n ? m[3] : n[lang === 'en' ? 0 : 1];
     return `<div class="ir"><span class="in">${m[1]} × [${m[2]}] ${esc(nm)} — ${m[4]} ₫</span><span class="ib"><button data-iq="${o.id}:${m[2]}:-1" aria-label="−">−</button><button data-iq="${o.id}:${m[2]}:1" aria-label="+">+</button><button class="x" data-iq="${o.id}:${m[2]}:x" aria-label="${t('editRm')}">✕</button></span></div>` }).join('');
   return `<div class="ibody">${rows}<select class="iadd" data-iadd="${o.id}">${dishOptions()}</select></div>`;
