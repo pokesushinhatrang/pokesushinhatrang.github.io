@@ -468,6 +468,9 @@ body.has-ostrip #menuApp .toast{bottom:calc(150px + env(safe-area-inset-bottom,0
 #menuApp .notice b{font-weight:800}
 #menuApp .bpick{position:fixed;inset:0;z-index:30;background:color-mix(in srgb,var(--ink) 45%,transparent);display:flex;align-items:flex-end;justify-content:center}
 #menuApp .bpick[hidden]{display:none}
+#menuApp .sheet.done-bill>*:not(.top):not(#billPay){display:none!important}
+#menuApp .sheet.done-bill #billPay>*:not(#thanks){display:none!important}
+#menuApp .sheet.done-bill .top h3{visibility:hidden}
 #menuApp .kitchen{display:none}   /* the Vietnamese ticket preview is not needed by guests */
 #menuApp .lines li>span:first-child{min-width:0}
 #menuApp .dnb{display:block;margin-top:4px;font:inherit;font-size:13px;font-weight:600;color:var(--muted);background:none;border:1px dashed var(--line);border-radius:999px;padding:3px 10px;text-align:left}
@@ -1756,7 +1759,7 @@ gmapBtn.addEventListener('click',e=>{track('review_click',{table:table||'-'});if
 document.getElementById('callW').addEventListener('click',()=>{thanks.hidden=true});
 document.getElementById('paym').addEventListener('click',e=>{const b=e.target.closest('button[data-pm]');if(!b)return;pm=b.dataset.pm;renderSheet();saveSent()});
 const wbg=document.getElementById('waiterBg');
-function billOnly(on){document.getElementById('reasons').hidden=on;wbg.querySelector('p.q').hidden=on;const h=document.getElementById('waiterTitle');h.dataset.mt=on?'r_bill':'waiter_h';h.textContent=T(h.dataset.mt);document.getElementById('wHint').textContent=''}
+function billOnly(on){document.querySelector('#waiterBg .sheet').classList.remove('done-bill');document.getElementById('reasons').hidden=on;wbg.querySelector('p.q').hidden=on;const h=document.getElementById('waiterTitle');h.dataset.mt=on?'r_bill':'waiter_h';h.textContent=T(h.dataset.mt);document.getElementById('wHint').textContent=''}
 document.getElementById('callW').addEventListener('click',()=>{billOnly(false);reason='';thanks.hidden=true;document.getElementById('wHint').textContent='';renderWaiter();wbg.hidden=false;document.getElementById('closeWaiter').focus()});
 document.getElementById('closeWaiter').addEventListener('click',()=>wbg.hidden=true);
 wbg.addEventListener('click',e=>{if(e.target===wbg)wbg.hidden=true});
@@ -1784,7 +1787,8 @@ function closeTable(){
   track('table_closed',{total:closedBill,tip:tipAmt(),tip_pct:tipPct,pay:pm==='cash'?'cash':'vietqr',table:table||'-'});
   sent=[];Object.keys(cart).forEach(k=>delete cart[k]);splitMode='none';assign=[];saveSent();renderList();renderBar();
   document.getElementById('wHint').textContent=T('bill_sent');
-  thanks.hidden=false;thanks.scrollIntoView({block:'nearest',behavior:'smooth'});
+  thanks.hidden=false;
+  const ws=document.querySelector('#waiterBg .sheet');ws.classList.add('done-bill');ws.scrollTop=0;
 }
 document.getElementById('sendDirect').addEventListener('click',async e=>{
   const b=e.currentTarget, h=document.getElementById('sendHint'); if(b.disabled||!count())return;
