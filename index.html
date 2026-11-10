@@ -644,7 +644,6 @@ const D={
  waiter_q:["Bạn cần gì?","What do you need?","Что нужно?"],
  r_come:["Mời nhân viên đến bàn","Please come to my table","Подойти к столу"],
  r_bill:["Tính tiền","Bring the bill","Принести счёт"],
- r_water:["Thêm nước đá / khăn giấy","Ice water / napkins","Вода со льдом / салфетки"],
  staff_gets:["Nhân viên nhận được","Staff receive","Персонал получит"],
  pay_method:["Cách thanh toán","How will you pay?","Как будете платить?"],
  cash:["Tiền mặt","Cash","Наличными"],
@@ -693,6 +692,7 @@ const D={
  pay_save:["Lưu ảnh mã và mở trong ứng dụng ngân hàng, hoặc chuyển khoản theo số tài khoản.", "Save the code and open it in your banking app, or transfer to the account number.", "Сохраните код и откройте в банковском приложении или переведите по номеру счёта."],
  cat_pop:["⭐ Phổ biến", "⭐ Popular", "⭐ Популярное"],
  note:["Ghi chú cho cả đơn", "Comment for the whole order", "Комментарий к общему заказу"],
+ r_water:["Dụng cụ ăn / khăn giấy", "Cutlery / napkins", "Приборы / салфетки"],
  tip_h:["Tiền tip cho nhân viên (không bắt buộc)", "Tip for the staff (optional)", "Чаевые персоналу (не является обязательным условием)"],
  thanks_p:["Bạn thấy ngon không? Đánh giá quán trên Google Maps chỉ mất 30 giây và giúp quán rất nhiều.", "Enjoyed it? Rating us on Google Maps takes 30 seconds and helps us a lot.", "Понравилось? Оценка в Google Maps займёт 30 секунд и очень нам поможет."],
  rate_toast:["Cảm ơn bạn!", "Thank you!", "Спасибо!"],
@@ -1659,7 +1659,7 @@ function renderSplit(){
 const tipAmt=()=>Math.round(billTotal()*tipPct/100/1000)*1000;
 function waiterText(){
   const langName={vi:'tiếng Việt',en:'tiếng Anh',ru:'tiếng Nga'}[lang];
-  const what={come:'GỌI PHỤC VỤ',bill:'TÍNH TIỀN',water:'XIN THÊM NƯỚC ĐÁ / KHĂN GIẤY'}[reason]||'GỌI PHỤC VỤ';
+  const what={come:'GỌI PHỤC VỤ',bill:'TÍNH TIỀN',water:'XIN THÊM DỤNG CỤ ĂN / KHĂN GIẤY'}[reason]||'GỌI PHỤC VỤ';
   const tipLine0=reason!=='bill'||!tipPct?'':(billTotal()?`\nTiền tip: ${fmt(tipAmt(),'vi')} (${tipPct}%)\nTổng cộng: ${fmt(billTotal()+tipAmt(),'vi')}`:`\nTiền tip: ${tipPct}%`);
   const tipLine=tipLine0+splitText();
   return `${what} · Bàn ${table||'?'}${guestName?` · ${guestName}`:''}${reason==='bill'&&billTotal()?`\nTổng: ${fmt(billTotal(),'vi')}`:''}${tipLine}${reason==='bill'?`\nThanh toán: ${pm==='cash'?'Tiền mặt':'Chuyển khoản VietQR'}`:''}\nKhách nói ${langName}`;
@@ -1697,7 +1697,9 @@ let directFailed=false;
 const directOn=()=>!!CONFIG.orderEndpoint&&!directFailed&&!/claude\.ai$|claudeusercontent\.com$/.test(location.hostname);
 async function sendDirect(text,kind){
   try{
-    const r=await fetch(CONFIG.orderEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,kind,table:table||'',lang,venue:CONFIG.venue})});
+    const post=t=>fetch(CONFIG.orderEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t,kind,table:table||'',lang,venue:CONFIG.venue})});
+    let r=await post(text);
+    if(r.status===400&&text.startsWith('XIN THÊM DỤNG CỤ ĂN'))r=await post(text.replace('XIN THÊM DỤNG CỤ ĂN / KHĂN GIẤY','XIN THÊM NƯỚC ĐÁ / KHĂN GIẤY'));
     return r.ok;
   }catch(e){return false}
 }
