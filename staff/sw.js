@@ -10,6 +10,10 @@ async function config() {
 self.addEventListener('push', e => e.waitUntil((async () => {
   let title = 'SUSHI GO · Có đơn mới', body = 'Mở màn hình đơn hàng', tag = 'sg';
   const cfg = await config();
+  if (!cfg || !cfg.code) {   // logged out on this phone: stop getting pushes
+    try { const sub = await self.registration.pushManager.getSubscription(); if (sub) await sub.unsubscribe() } catch (err) {}
+    return;
+  }
   if (cfg && cfg.code) {
     try {
       const r = await fetch(`${cfg.api}/staff/latest?venue=${cfg.venue}`, { headers: { 'X-Staff-Key': cfg.code }, cache: 'no-store' });

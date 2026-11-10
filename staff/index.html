@@ -444,7 +444,13 @@ async function poll() {
 function setStatus(c, key) { status = [c, key]; $('dot').className = 'dot ' + c; $('stText').textContent = t(key) }
 
 function show(id) { ['login', 'start', 'board'].forEach(x => $(x).hidden = x !== id); $('soundBtn').hidden = $('logoutBtn').hidden = id === 'login' }
-function logout(msg) { clearInterval(timer); timer = null; code = ''; store.del('code'); show('login'); $('loginErr').textContent = msg || ''; setStatus('', 'off') }
+function logout(msg) { clearInterval(timer); timer = null; code = ''; store.del('code'); show('login'); $('loginErr').textContent = msg || ''; setStatus('', 'off'); stopPush() }
+/* after «Log out» this phone gets no notifications: the push subscription is cancelled and the saved code is removed */
+async function stopPush() {
+  store.del('push'); $('pushBtn').textContent = t('push');
+  try { if ('caches' in window) await caches.delete('sg-config') } catch (e) {}
+  try { if ('serviceWorker' in navigator) for (const reg of await navigator.serviceWorker.getRegistrations()) { const sub = reg.pushManager && await reg.pushManager.getSubscription(); if (sub) await sub.unsubscribe() } } catch (e) {}
+}
 
 function setLang(l) {
   lang = L[l] ? l : 'vi'; store.set('lang', lang); document.documentElement.lang = lang;
@@ -938,7 +944,7 @@ $('ntCancel').onclick = () => { $('ntBg').hidden = true };
 $('ntBg').addEventListener('click', ev => { if (ev.target === $('ntBg')) $('ntBg').hidden = true });
 
 setLang(lang);
-if (code) { show('start'); saveSwConfig() } else show('login');
+if (code) { show('start'); saveSwConfig() } else { show('login'); stopPush() }
 setInterval(() => { if (timer) render() }, 30000);
 </script>
 </body>
