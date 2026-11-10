@@ -685,6 +685,7 @@ const D={
  cat_nig:["Nigiri & Gunkan", "Nigiri & gunkan", "Нигири и гунканы"],
  cat_roll:["Cuộn sushi", "Sushi rolls", "Роллы"],
  cat_hot:["Cuộn chiên", "Hot rolls", "Горячие роллы"],
+ cat_sal:["Salad", "Salads", "Салаты"],
  cat_age:["Món chiên", "Fried dishes", "Жареное"],
  cat_drink:["Đồ uống", "Drinks", "Напитки"],
 };
@@ -699,7 +700,7 @@ const ICON={
  fish:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16c4-6 10-8 16-6 3 1 5 3 7 6-2 3-4 5-7 6-6 2-12 0-16-6z"/><path d="M6 16l-3-5M6 16l-3 5"/><circle cx="23" cy="14.5" r="1.3" fill="currentColor"/></svg>',
  crab:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><ellipse cx="16" cy="19" rx="8" ry="6"/><path d="M8 17l-4-3M8 21l-4 2M24 17l4-3M24 21l4 2M11 13l-3-6M21 13l3-6"/></svg>'
 };
-const IMGV={"d10": "52efe0f9", "d11": "978e4b28", "d12": "e7273fc0", "d13": "30b27e16", "d14": "1446b738", "d15": "29f66d05", "d16": "c0357a00", "d17": "0f87eb02", "d170": "f50653a2", "d18": "e5817ae8", "d180": "0f438634", "d181": "94984a7e", "d182": "d5208821", "d183": "da481454", "d184": "3b01019c", "d185": "edba128e", "d186": "a20aa473", "d187": "1badcb44", "d19": "9f5806cd", "d20": "f94c2fe5", "d200": "0f75c608", "d202": "1ab0f3d1", "d207": "2cb9385f", "d208": "769a3015", "d21": "8108b086", "d210": "a943506b", "d22": "3048be24", "d32": "3c840480", "d33": "2506588e", "d34": "9d0364af", "d35": "9e72601e", "d36": "89c1beae", "d37": "839d1ea1", "d38": "ad71e8e0", "d39": "8ddd849e", "d40": "5f22025c", "d41": "d1d522c8", "d42": "b93ca088", "d43": "91d3084c", "d44": "7ca1de35", "d45": "b2ccba79", "d46": "158c345a", "d47": "a9963afb", "d48": "d94c4e30", "d49": "9775f207", "d50": "56887285", "d51": "c34d3efe", "d52": "ac59e4e9", "d53": "2c0ac19c", "d54": "eab18dd9", "d55": "7f5644ff", "d56": "965f24e4", "d57": "467516ff", "d58": "c860682f", "d59": "8bb2137d", "d60": "a3e6f60b", "d61": "a87b8091", "d62": "d72b8b27", "d81": "6cc40a24", "d82": "ed0c97b3", "d83": "598272e2", "d84": "908daff8", "d85": "315ca908", "d86": "65f37c75", "d87": "5f1e8d5c", "d9": "b5d30888", "dr_beer": "110c074f", "dr_coco": "97f03e8b", "dr_heineken": "cf836dae", "dr_soft": "ed093acc", "dr_water": "e8fe1b27"};
+const IMGV={"d10": "52efe0f9", "d11": "978e4b28", "d12": "e7273fc0", "d13": "30b27e16", "d14": "1446b738", "d15": "29f66d05", "d16": "c0357a00", "d17": "0f87eb02", "d170": "f50653a2", "d18": "e5817ae8", "d180": "0f438634", "d181": "94984a7e", "d182": "d5208821", "d183": "da481454", "d184": "3b01019c", "d185": "edba128e", "d186": "a20aa473", "d187": "1badcb44", "d19": "9f5806cd", "d20": "f94c2fe5", "d200": "0f75c608", "d202": "1ab0f3d1", "d203": "c85f69e8", "d207": "2cb9385f", "d208": "769a3015", "d21": "8108b086", "d210": "a943506b", "d22": "3048be24", "d23": "fd16a7e2", "d24": "ecae5dbc", "d25": "9ed78e07", "d26": "5c07b662", "d27": "92588960", "d28": "0eddbb1c", "d29": "851b6e96", "d30": "2b4026e8", "d31": "aceaa956", "d32": "3c840480", "d33": "2506588e", "d34": "9d0364af", "d35": "9e72601e", "d36": "89c1beae", "d37": "839d1ea1", "d38": "ad71e8e0", "d39": "8ddd849e", "d40": "5f22025c", "d41": "d1d522c8", "d42": "b93ca088", "d43": "91d3084c", "d44": "7ca1de35", "d45": "b2ccba79", "d46": "158c345a", "d47": "a9963afb", "d48": "d94c4e30", "d49": "9775f207", "d50": "56887285", "d51": "c34d3efe", "d52": "ac59e4e9", "d53": "2c0ac19c", "d54": "eab18dd9", "d55": "7f5644ff", "d56": "965f24e4", "d57": "467516ff", "d58": "c860682f", "d59": "8bb2137d", "d60": "a3e6f60b", "d61": "a87b8091", "d62": "d72b8b27", "d81": "6cc40a24", "d82": "ed0c97b3", "d83": "598272e2", "d84": "908daff8", "d85": "315ca908", "d86": "65f37c75", "d87": "5f1e8d5c", "d9": "b5d30888", "dr_beer": "110c074f", "dr_coco": "97f03e8b", "dr_heineken": "cf836dae", "dr_soft": "ed093acc", "dr_water": "e8fe1b27"};
 const MENU=[
   /* ---------- Sushi sets ---------- */
   {id:'186', cat:'set', vi:'Set Sushi C (8 miếng)', price:169000, img:'d186',
@@ -950,6 +951,48 @@ const MENU=[
    ru:['Фирменный горячий футомаки с морепродуктами', 'Большой жареный ролл с морепродуктами, сверху сливочно-острый соус и тобико (икра летучей рыбы).'],
    vd:'Futomaki chiên, hải sản, sốt cay, trứng cá.'},
 
+  /* ---------- Salads (menu page «サラダ物 Salad», 10 Nov 2026; temporary photos cut from that page) ---------- */
+  {id:'23', cat:'sal', vi:'Salad hải sản bốn mùa', price:129000, img:'d23',
+   en:['Four seasons seafood salad', 'Fresh lettuce, cherry tomatoes and sweet corn with raw salmon, tuna, mackerel and crab stick, with a light Japanese dressing.'],
+   ru:['Салат «Четыре сезона» с морепродуктами', 'Свежий салат, черри и сладкая кукуруза с сырым лососем, тунцом, скумбрией и крабовой палочкой, под лёгкой японской заправкой.'],
+   vd:'Rau xà lách, cà chua, bắp, cá hồi, cá ngừ, cá thu, thanh cua, sốt Nhật.'},
+  {id:'24', cat:'sal', vi:'Salad rong biển trộn', price:79000, img:'d24',
+   en:['Mixed seaweed salad', 'Several kinds of seaweed with greens, flying fish roe and a sesame dressing.'],
+   ru:['Салат из водорослей ассорти', 'Несколько видов водорослей с зеленью, икрой летучей рыбы и кунжутной заправкой.'],
+   vd:'Rong biển các loại, rau, trứng cá chuồn, sốt mè.'},
+  {id:'25', cat:'sal', vi:'Salad thanh cua', price:68000, img:'d25',
+   en:['Crab stick salad (kani)', 'Crab sticks with shredded vegetables, greens and cherry tomatoes, with a creamy dressing.'],
+   ru:['Салат с крабовыми палочками (кани)', 'Крабовые палочки с овощной соломкой, зеленью и черри, со сливочной заправкой.'],
+   vd:'Thanh cua, rau củ thái sợi, cà chua, sốt kem.'},
+  {id:'26', cat:'sal', vi:'Salad cá ngừ mayo', price:75000, img:'d26',
+   en:['Tuna mayo salad', 'Tuna with Japanese mayonnaise on lettuce and tomatoes, topped with flying fish roe.'],
+   ru:['Салат с тунцом и майонезом', 'Тунец с японским майонезом на листьях салата и помидорах, сверху икра летучей рыбы.'],
+   vd:'Cá ngừ trộn mayo, xà lách, cà chua, trứng cá chuồn.'},
+  {id:'203', cat:'sal', vi:'Salad ức vịt xông khói', price:99000, img:'d203',
+   en:['Smoked duck breast salad', 'Slices of smoked duck breast with fresh greens, carrot and a sweet-sour sauce.'],
+   ru:['Салат с копчёной утиной грудкой', 'Ломтики копчёной утиной грудки со свежей зеленью, морковью и кисло-сладким соусом.'],
+   vd:'Ức vịt xông khói, rau xanh, cà rốt, sốt chua ngọt.'},
+  {id:'28', cat:'sal', vi:'Salad cua lột chiên giòn', price:139000, img:'d28',
+   en:['Crispy soft-shell crab salad', 'Whole soft-shell crab fried crispy in tempura, on mixed greens with flying fish roe and dressing.'],
+   ru:['Салат с хрустящим крабом в мягком панцире', 'Целый краб в мягком панцире, хрустящий в темпуре, на миксе салатов с икрой летучей рыбы и заправкой.'],
+   vd:'Cua lột chiên giòn tempura, rau trộn, trứng cá chuồn, sốt.'},
+  {id:'29', cat:'sal', vi:'Salad da cá hồi', price:79000, img:'d29',
+   en:['Salmon skin salad', 'Crispy fried salmon skin with lettuce, cherry tomatoes and a sweet soy dressing.'],
+   ru:['Салат с хрустящей кожей лосося', 'Хрустящая жареная кожа лосося с листьями салата, черри и сладкой соевой заправкой.'],
+   vd:'Da cá hồi chiên giòn, xà lách, cà chua, sốt tương ngọt.'},
+  {id:'30', cat:'sal', vi:'Salad cá hồi bơ', price:129000, img:'d30',
+   en:['Salmon & avocado salad', 'Cubes of raw salmon and avocado with cabbage, cherry tomatoes, sweet corn and edamame.'],
+   ru:['Салат с лососем и авокадо', 'Кубики сырого лосося и авокадо с капустой, черри, сладкой кукурузой и эдамаме.'],
+   vd:'Cá hồi sống và bơ cắt hạt lựu, bắp cải, cà chua, bắp, đậu nành.'},
+  {id:'31', cat:'sal', vi:'Salad cá hồi khò tái', price:128000, img:'d31',
+   en:['Salmon tataki salad', 'Slices of salmon seared on the outside and raw inside, with a sweet soy sauce and fresh vegetables.'],
+   ru:['Салат с татаки из лосося', 'Ломтики лосося, обжаренного снаружи и сырого внутри, со сладким соевым соусом и свежими овощами.'],
+   vd:'Cá hồi khò tái thái lát, sốt tương ngọt, rau củ tươi.'},
+  {id:'27', cat:'sal', vi:'Salad cá ngừ khò tái', price:109000, img:'d27',
+   en:['Tuna tataki salad', 'Slices of tuna seared on the outside and raw inside, with a sweet soy sauce and fresh vegetables.'],
+   ru:['Салат с татаки из тунца', 'Ломтики тунца, обжаренного снаружи и сырого внутри, со сладким соевым соусом и свежими овощами.'],
+   vd:'Cá ngừ khò tái thái lát, sốt tương ngọt, rau củ tươi.'},
+
   /* ---------- Age mono (fried) ---------- */
   {id:'81', cat:'age', vi:'Tôm chiên tempura (5 con)', price:95000, img:'d81',
    en:['Ebi tempura, 5 shrimp', 'Five large shrimp in light, crispy tempura batter with tentsuyu dipping sauce.'],
@@ -1035,7 +1078,7 @@ const MENU=[
 ];
 let POPULAR=[];
 const catList=()=>POPULAR.length?['pop',...CATS]:CATS;
-const CATS=['set', 'ssm', 'sas', 'nig', 'roll', 'hot', 'age', 'drink'];
+const CATS=['set', 'ssm', 'sas', 'nig', 'roll', 'hot', 'sal', 'age', 'drink'];
 /* stop-list: dishes that ran out today (demo: set by hand; for clients this comes from the café's Google Sheet) */
 const SOLD_OUT=[];   /* ids of dishes that ran out today */
 const cart={};
