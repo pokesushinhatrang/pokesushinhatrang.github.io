@@ -532,7 +532,7 @@ body.view-only #menuApp .qty,body.view-only #menuApp .bar,body.view-only #menuAp
     <div class="f"><label for="guestName" data-mt="name_label"></label><input id="guestName" maxlength="24" autocomplete="given-name"><small class="tipsum" data-mt="own_phone"></small></div>
     <div class="f"><label for="table" data-mt="table"></label><input id="table" inputmode="numeric" maxlength="4"></div>
     <div class="f"><label for="note" data-mt="note"></label><textarea id="note"></textarea></div>
-    <div class="f"><span class="lbl" data-mt="pay_method"></span>
+    <div class="f" hidden><span class="lbl" data-mt="pay_method"></span>
       <div class="paym" id="paym"><button data-pm="qr">VietQR</button><button data-pm="cash" data-mt="cash"></button></div></div>
     <div class="send">
       <button class="direct" id="sendDirect" data-mt="send_direct" hidden></button>
@@ -1595,7 +1595,7 @@ function kitchenText(){
   const langName={vi:'tiếng Việt',en:'tiếng Anh',ru:'tiếng Nga'}[lang];
   const lines=rows(cart).map(r=>`${r.q} × [${r.m.id}] ${r.m.vi}${baseName(r.k,'vi')?' · Đế: '+baseName(r.k,'vi'):''}${cleanNote(NOTES[r.k])?' · Yêu cầu: '+cleanNote(NOTES[r.k]):''} — ${fmt(r.q*r.m.price,'vi')}`).join('\n');
   const note=document.getElementById('note').value.trim();
-  return `${sent.length?`GỌI THÊM (lần ${sent.length+1})`:'ĐƠN MỚI'} · Bàn ${table||'?'}${guestName?` · ${guestName}`:''}\n${lines}\nTổng: ${fmt(total(),'vi')}\nThanh toán: ${pm==='cash'?'Tiền mặt':'Chuyển khoản VietQR'}${note?`\nGhi chú: ${note}`:''}\nKhách nói ${langName}`;
+  return `${sent.length?`GỌI THÊM (lần ${sent.length+1})`:'ĐƠN MỚI'} · Bàn ${table||'?'}${guestName?` · ${guestName}`:''}\n${lines}\nTổng: ${fmt(total(),'vi')}${note?`\nGhi chú: ${note}`:''}\nKhách nói ${langName}`;
 }
 function renderSheet(){
   const si=sentItems(), n=count();
