@@ -568,7 +568,7 @@ function receiptHTML(o) {
 hr{border:0;border-top:1px dashed #000;margin:2mm 0} table{width:100%;border-collapse:collapse} td{padding:.6mm 0;vertical-align:top} .r{text-align:right;white-space:nowrap;padding-left:2mm}
 .row{display:flex;justify-content:space-between;gap:2mm;padding:.5mm 0} .row span:last-child{white-space:nowrap;text-align:right} .big{font-weight:800;font-size:14px} small{color:#444}
 </style></head><body><div class="c"><h1>Poke Sushi Nha Trang</h1><div>SUSHI GO</div><h2>${head}</h2><div class="tb">Bàn ${esc(o.tbl || '?')}${guestOf(o) ? ' · ' + esc(guestOf(o)) : ''}</div><div>${when}${o.id < 1e9 ? ' · #' + o.id : ''}</div></div><hr>${body}<hr>
-<div class="c">${['bill', 'closed'].includes(o.kind) ? 'Cảm ơn quý khách! · Thank you!<br>Wi-Fi: pokesushinhatrang · xincamon' : 'Bếp / Kitchen'}</div></body></html>`;
+<div class="c">${['bill', 'closed'].includes(o.kind) ? '<small style="display:block;font-size:10px;margin-bottom:1.5mm">Phiếu tạm tính — không phải hóa đơn GTGT<br>Provisional bill — not a tax invoice</small>Cảm ơn quý khách! · Thank you!<br>Wi-Fi: pokesushinhatrang · xincamon' : 'Bếp / Kitchen'}</div></body></html>`;
 }
 let printQueue = Promise.resolve();
 function printOrder(o) {
