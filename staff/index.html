@@ -358,7 +358,7 @@ function itemsFor(bill) {          /* all orders of this table (and guest) since
   const prev = all.filter(o => o.kind === 'bill' && o.id < bill.id && guestOf(o) === guestOf(bill)).pop();
   const lines = {};
   all.filter(o => o.kind === 'order' && o.id < bill.id && (!prev || o.id > prev.id) && (!guestOf(bill) || guestOf(o) === guestOf(bill)))
-    .forEach(o => o.text.split('\n').forEach(l => { const m = l.match(/^(\d+) × \[(\d+)\] (.+?) — ([\d.]+) ₫$/);
+    .forEach(o => o.text.split('\n').forEach(l => { const m = l.match(/^(\d+) × \[(\d+)\] (.+?) — ([\d.]+)\s₫$/);
       if (m) { const k = '#' + m[2]; lines[k] = lines[k] || { q: 0, name: m[3], sum: 0 }; lines[k].q += +m[1]; lines[k].sum += +m[4].replace(/\./g, '') } }));
   return Object.entries(lines).map(([k, v]) => [k.slice(1), v]);
 }
@@ -406,7 +406,7 @@ $('list').addEventListener('click', e => { const b = e.target.closest('[data-pri
 
 /* ---------- edit an order (quantities, remove, add dishes, staff note) ---------- */
 let editing = null;
-const LINE_RE = /^(\d+) × \[(\w+)\] (.+?) — ([\d.]+) ₫$/;
+const LINE_RE = /^(\d+) × \[(\w+)\] (.+?) — ([\d.]+)\s₫$/;
 function parseOrder(o) {
   const lines = o.text.split('\n'), items = [], other = [];
   let note = '';
