@@ -667,6 +667,7 @@ const D={
  send_fail:["Không gửi được. Hãy gọi nhân viên và đưa màn hình này.", "Couldn't send. Please call a waiter and show this screen.", "Не получилось отправить. Позовите официанта и покажите этот экран."],
  pay_qr_staff:["Nhân viên sẽ mang mã VietQR đến bàn.", "The waiter will bring the VietQR code to your table.", "Официант принесёт QR-код VietQR к столу."],
  pay_save:["Lưu ảnh mã và mở trong ứng dụng ngân hàng, hoặc chuyển khoản theo số tài khoản.", "Save the code and open it in your banking app, or transfer to the account number.", "Сохраните код и откройте в банковском приложении или переведите по номеру счёта."],
+ cat_pop:["⭐ Phổ biến", "⭐ Popular", "⭐ Популярное"],
  tip_h:["Tiền tip cho nhân viên (không bắt buộc)", "Tip for the staff (optional)", "Чаевые персоналу (не является обязательным условием)"],
  thanks_p:["Bạn thấy ngon không? Đánh giá quán trên Google Maps chỉ mất 30 giây và giúp quán rất nhiều.", "Enjoyed it? Rating us on Google Maps takes 30 seconds and helps us a lot.", "Понравилось? Оценка в Google Maps займёт 30 секунд и очень нам поможет."],
  rate_toast:["Cảm ơn bạn!", "Thank you!", "Спасибо!"],
@@ -806,6 +807,8 @@ const MENU=[
    ru:['Кокосовая вода, банка', 'Натуральная кокосовая вода, охлаждённая.'],
    vd:'Nước dừa lon, ướp lạnh.'},   // ⚠ can or fresh coconut?
 ];
+let POPULAR=[];
+const catList=()=>POPULAR.length?['pop',...CATS]:CATS;
 const CATS=['set', 'hot', 'age', 'drink'];
 /* stop-list: dishes that ran out today (demo: set by hand; for clients this comes from the café's Google Sheet) */
 const SOLD_OUT=[];   /* ids of dishes that ran out today */
@@ -845,7 +848,7 @@ function plural(n){
 }
 
 function renderCats(){
-  document.getElementById('cats').innerHTML=CATS.map((c,i)=>`<button data-cat="${c}" aria-pressed="${i===0}">${T('cat_'+c)}</button>`).join('');
+  document.getElementById('cats').innerHTML=catList().map((c,i)=>`<button data-cat="${c}" aria-pressed="${i===0}">${T('cat_'+c)}</button>`).join('');
 }
 function itemHTML(m){
   const q=cart[m.id]||0;
@@ -857,7 +860,7 @@ function itemHTML(m){
    ${so?`<span class="sold">${T('sold_out')}</span>`:`<span class="qty">${q?`<button class="minus" data-id="${m.id}" data-d="-1" aria-label="−">−</button><span class="q mono">${q}</span>`:''}<button data-id="${m.id}" data-d="1" aria-label="${T('add')}">+</button></span>`}</div></div></article>`;
 }
 function renderList(){
-  document.getElementById('list').innerHTML=CATS.map(c=>`<section class="sect" id="s-${c}"><h2>${T('cat_'+c)}</h2><div class="items">${MENU.filter(m=>m.cat===c).map(itemHTML).join('')}</div></section>`).join('');
+  document.getElementById('list').innerHTML=catList().map(c=>`<section class="sect" id="s-${c}"><h2>${T('cat_'+c)}</h2><div class="items">${(c==='pop'?POPULAR.map(id=>MENU.find(m=>m.id===id)).filter(Boolean):MENU.filter(m=>m.cat===c)).map(itemHTML).join('')}</div></section>`).join('');
 }
 function renderBar(){
   const n=count(), b=document.getElementById('openCart');
@@ -1002,7 +1005,7 @@ document.getElementById('list').addEventListener('click',e=>{
   const b=e.target.closest('button[data-id]');if(!b)return;
   const id=b.dataset.id;cart[id]=(cart[id]||0)+(+b.dataset.d);if(cart[id]<=0)delete cart[id];
   if(+b.dataset.d>0)track('add_dish',{dish:MENU.find(m=>m.id===id).vi,lang});
-  b.closest('.it').outerHTML=itemHTML(MENU.find(m=>m.id===id));renderBar();saveSent();
+  renderList();renderBar();saveSent();
 });
 document.getElementById('cats').addEventListener('click',e=>{
   const b=e.target.closest('button[data-cat]');if(!b)return;
@@ -1113,7 +1116,15 @@ async function loadSheet(){
     if(changed){renderList();renderBar();saveSent();if(!document.getElementById('sheetBg').hidden)renderSheet()}
   }catch(e){}
 }
-setTimeout(loadSheet,0);setInterval(loadSheet,60000);
+setTimeout(loadSheet,0);
+async function loadPopular(){
+  try{
+    const r=await fetch(CONFIG.orderEndpoint.replace(/\/$/,'')+'/popular?venue='+CONFIG.venue,{cache:'no-store'});
+    if(!r.ok)return; const d=await r.json(); const ids=(d.ids||[]).filter(id=>MENU.some(m=>m.id===id));
+    if(ids.join()===POPULAR.join())return; POPULAR=ids; renderCats(); renderList();
+  }catch(e){}
+}
+setTimeout(loadPopular,0);setInterval(loadPopular,300000);setInterval(loadSheet,60000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadSheet()});
 
 /* ---- active category follows the scroll ---- */
@@ -1121,9 +1132,9 @@ var spyLock=0;
 function spy(){
   if(Date.now()<spyLock)return;
   const bar=document.getElementById('cats'), edge=bar.getBoundingClientRect().bottom+12;
-  let cur=CATS[0];
-  CATS.forEach(c=>{const s=document.getElementById('s-'+c);if(s&&s.getBoundingClientRect().top<=edge)cur=c});
-  if(innerHeight+scrollY>=document.documentElement.scrollHeight-4)cur=CATS[CATS.length-1];
+  const CL=catList();let cur=CL[0];
+  CL.forEach(c=>{const s=document.getElementById('s-'+c);if(s&&s.getBoundingClientRect().top<=edge)cur=c});
+  if(innerHeight+scrollY>=document.documentElement.scrollHeight-4)cur=CL[CL.length-1];
   const b=bar.querySelector(`button[data-cat="${cur}"]`);
   if(!b||b.getAttribute('aria-pressed')==='true')return;
   bar.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));
