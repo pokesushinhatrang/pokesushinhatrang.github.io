@@ -1150,8 +1150,22 @@ async function loadPopular(){
   }catch(e){}
 }
 var NOTICE={};
+/* a notice without this language: show another one and translate it automatically (cached on the phone) */
+const NT_TR=(()=>{try{return JSON.parse(localStorage.getItem('sushigo_nt')||'{}')}catch(e){return{}}})(), NT_WAIT={};
+function ntTranslate(text,src,tl){
+  const k=src+'|'+tl+'|'+text; if(NT_TR[k])return NT_TR[k]; if(NT_WAIT[k])return ''; NT_WAIT[k]=1;
+  const parts=text.split(/(\*\*[^*\n]+?\*\*)/);
+  Promise.all(parts.map(async p=>{const m=p.match(/^\*\*([^*]+)\*\*$/),core=m?m[1]:p;if(!core.trim())return p;
+    const lead=core.match(/^\s*/)[0],tail=core.match(/\s*$/)[0];
+    const d=await (await fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(core.trim().slice(0,450))+'&langpair='+src+'|'+tl)).json();
+    const t=document.createElement('textarea');t.innerHTML=String((d&&d.responseData&&d.responseData.translatedText)||'');const x=t.value.trim();
+    if(+d.responseStatus!==200||!x)throw 0; return m?'**'+x+'**':lead+x+tail}))
+   .then(o=>{NT_TR[k]=o.join('');try{localStorage.setItem('sushigo_nt',JSON.stringify(NT_TR))}catch(e){}renderNotice()}).catch(()=>{});
+  return '';
+}
 function renderNotice(){
-  const el=document.getElementById('notice'), tx=(NOTICE[lang]||NOTICE.en||NOTICE.vi||NOTICE.ru||'').trim();
+  const el=document.getElementById('notice'), src=['vi','en','ru'].find(l=>(NOTICE[l]||'').trim());
+  let tx=(NOTICE[lang]||'').trim(); if(!tx&&src){tx=ntTranslate(NOTICE[src].trim(),src,lang)||(NOTICE.en||NOTICE.vi||NOTICE.ru||'').trim()}
   el.hidden=!tx; el.innerHTML=tx.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])).replace(/\*\*([^*\n]+?)\*\*/g,'<b>$1</b>');
 }
 document.querySelector('#menuApp .lang').addEventListener('click',()=>setTimeout(renderNotice,0));
