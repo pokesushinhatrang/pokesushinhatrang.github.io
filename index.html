@@ -1849,17 +1849,28 @@ function applySold(){
   return changed;
 }
 setTimeout(loadSheet,0);
-const TC_T={vi:'Bàn đã được đóng. Cảm ơn bạn đã ghé quán!',en:'Your table is closed. Thank you for visiting!',ru:'Стол закрыт. Спасибо, что были у нас!'};
+const TC_T={vi:['Bàn đã được đóng. Cảm ơn bạn đã ghé quán!','Bàn đã được mở lại, đơn của bạn vẫn còn.'],en:['Your table is closed. Thank you for visiting!','Your table is open again, your order is back.'],ru:['Стол закрыт. Спасибо, что были у нас!','Стол снова открыт, ваш заказ на месте.']};
+/* the orders of a closed table are kept aside for 3 hours: if the staff reopen the table, they come back */
+let STASH=(()=>{try{return JSON.parse(localStorage.getItem('sushigo_closed')||'null')}catch(e){return null}})();
+function saveStash(){try{STASH?localStorage.setItem('sushigo_closed',JSON.stringify(STASH)):localStorage.removeItem('sushigo_closed')}catch(e){}}
+function tcMsg(i){const el=document.getElementById('toast');el.textContent=(TC_T[lang]||TC_T.en)[i];el.hidden=false;clearTimeout(tt);tt=setTimeout(()=>el.hidden=true,8000)}
 async function checkClosed(){
-  if(!sent.length||!table||VIEW_ONLY)return;
+  if(!table||VIEW_ONLY)return;
+  if(STASH&&(STASH.table!==table||Date.now()-STASH.t>3*3600e3)){STASH=null;saveStash()}
+  if(!sent.length&&!STASH)return;
   try{
     const r=await fetch(CONFIG.orderEndpoint.replace(/\/$/,'')+'/table?venue='+CONFIG.venue+'&tbl='+encodeURIComponent(table),{cache:'no-store'});
-    if(!r.ok)return; const d=await r.json(), skew=d.now-Date.now(), last=Math.max(...sent.map(o=>o.at));
-    const me=(guestName||'').trim();
-    if((d.closes||[]).some(c=>(c.guest||'')===me&&c.at-skew>last)){
+    if(!r.ok)return; const d=await r.json(), closes=d.closes||[], skew=d.now-Date.now(), me=(guestName||'').trim();
+    if(STASH&&!closes.some(c=>c.at===STASH.closeAt)){
+      sent=[...STASH.sent,...sent];STASH=null;saveStash();saveSent();renderBar();tcMsg(1);return;
+    }
+    if(!sent.length)return;
+    const last=Math.max(...sent.map(o=>o.at)), c=closes.find(c=>(c.guest||'')===me&&c.at-skew>last);
+    if(c){
+      STASH={sent:[...(STASH?STASH.sent:[]),...sent],closeAt:c.at,t:Date.now(),table};saveStash();
       closedBill=0;sent=[];saveSent();renderBar();
       ['histBg','waiterBg'].forEach(id=>{const el=document.getElementById(id);if(el)el.hidden=true});
-      const el=document.getElementById('toast');el.textContent=TC_T[lang]||TC_T.en;el.hidden=false;clearTimeout(tt);tt=setTimeout(()=>el.hidden=true,8000);
+      tcMsg(0);
     }
   }catch(e){}
 }
