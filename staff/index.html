@@ -53,6 +53,14 @@ button{font:inherit;cursor:pointer}
 .o .who{font-size:16px;font-weight:800}
 .o pre{margin:8px 0 0;font:inherit;font-size:16px;line-height:1.5;white-space:pre-wrap}
 .o .acts{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.ibody{margin-top:8px;font-size:16px;line-height:1.45}
+.ir{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px dashed var(--line)}
+.ir .in{min-width:0}
+.ib{display:flex;gap:4px;flex:none}
+.ib button{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--bg);font-size:16px;font-weight:800;line-height:1}
+.ib button.x{border-color:#F0CFCF;background:#FDF1F1;color:#B33A2E;font-size:13px}
+.il{padding:2px 0}
+.iadd{margin-top:8px;width:100%;font:inherit;font-size:14px;padding:8px;border:1px dashed var(--line);border-radius:10px;background:var(--bg);color:var(--muted)}
 .o .ed{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 12px;font-size:14px;font-weight:700;color:var(--ink)}
 .o .edited{font-size:12px;font-weight:800;color:#8a5a1c;background:var(--amber-soft);border-radius:999px;padding:3px 9px}
 .mbg{position:fixed;inset:0;z-index:20;background:rgba(51,36,26,.45);display:flex;align-items:flex-end;justify-content:center}
@@ -150,7 +158,7 @@ const L = {
    emptyNew:'Chưa có đơn mới. Đơn sẽ hiện ở đây kèm âm thanh.', emptyAll:'Chưa có đơn trong 12 giờ qua.',
    autoHint:'Màn hình tự cập nhật mỗi vài giây. Đơn mới có âm thanh và nhấp nháy.',
    soundOn:'🔔 Âm thanh: bật', soundOff:'🔕 Âm thanh: tắt', changeCode:'Đổi mã', confirmOut:'Đăng xuất và nhập mã khác?',
-   editRm:'Xóa món', editBack:'Hoàn tác', editBtn:'✏️ Sửa', edited:'✏️ đã sửa', editT:'Sửa đơn · Bàn ', editSub:'Đổi số lượng, bấm ✕ để xóa món hoặc thêm món. Mọi máy sẽ thấy đơn mới.', editAdd:'+ Thêm', editNote:'Ghi chú của nhân viên (ví dụ: hết cá hồi, đổi sang cá ngừ)', editTotal:'Tổng mới', editHint:'Khách đã thanh toán trước? Báo khách số tiền chênh lệch.', editCancel:'Hủy', editSave:'Lưu thay đổi', editPick:'Chọn món…', editFail:'Không lưu được. Thử lại.', printBtn:'🖨 In', autoOn:'🖨 Tự động in hóa đơn: bật', autoOff:'🖨 Tự động in hóa đơn: tắt', testPrint:'🧪 In thử', ack:'Đã nhận ✓', acked:'✓ Đã nhận', sendFail:'Không gửi được. Thử lại.', table:'Bàn',
+   addDish:'+ Thêm món…', lastDish:'Đây là món cuối cùng của đơn. Xóa?', editRm:'Xóa món', editBack:'Hoàn tác', editBtn:'✏️ Sửa', edited:'✏️ đã sửa', editT:'Sửa đơn · Bàn ', editSub:'Đổi số lượng, bấm ✕ để xóa món hoặc thêm món. Mọi máy sẽ thấy đơn mới.', editAdd:'+ Thêm', editNote:'Ghi chú của nhân viên (ví dụ: hết cá hồi, đổi sang cá ngừ)', editTotal:'Tổng mới', editHint:'Khách đã thanh toán trước? Báo khách số tiền chênh lệch.', editCancel:'Hủy', editSave:'Lưu thay đổi', editPick:'Chọn món…', editFail:'Không lưu được. Thử lại.', printBtn:'🖨 In', autoOn:'🖨 Tự động in hóa đơn: bật', autoOff:'🖨 Tự động in hóa đơn: tắt', testPrint:'🧪 In thử', ack:'Đã nhận ✓', acked:'✓ Đã nhận', sendFail:'Không gửi được. Thử lại.', table:'Bàn',
    now:'vừa xong', min:m=>`${m} phút trước`, hour:h=>`${h} giờ trước`,
    tag:{order:'🧾 ĐƠN MỚI', add:'➕ GỌI THÊM', waiter:'🔔 GỌI PHỤC VỤ', water:'💧 NƯỚC ĐÁ / KHĂN GIẤY', bill:'💳 TÍNH TIỀN'},
    noSupport:'Trình duyệt này không hỗ trợ thông báo. Dùng Chrome trên Android.', iosFirst:'iPhone: trước tiên thêm trang vào Màn hình chính (xem hướng dẫn).',
@@ -165,7 +173,7 @@ const L = {
    emptyNew:'No new orders yet. They appear here with a sound.', emptyAll:'No orders in the last 12 hours.',
    autoHint:'The screen updates every few seconds. New orders beep and flash.',
    soundOn:'🔔 Sound: on', soundOff:'🔕 Sound: off', changeCode:'Change code', confirmOut:'Log out and enter another code?',
-   editRm:'Remove dish', editBack:'Undo', editBtn:'✏️ Edit', edited:'✏️ edited', editT:'Edit order · Table ', editSub:'Change quantities, tap ✕ to remove a dish, or add dishes. Every screen sees the new order.', editAdd:'+ Add', editNote:'Staff note (e.g. out of salmon, swapped for tuna)', editTotal:'New total', editHint:'If the guest has already paid, tell them the difference.', editCancel:'Cancel', editSave:'Save changes', editPick:'Choose a dish…', editFail:'Could not save. Try again.', printBtn:'🖨 Print', autoOn:'🖨 Auto-print bills: on', autoOff:'🖨 Auto-print bills: off', testPrint:'🧪 Test print', ack:'Taken ✓', acked:'✓ Taken', sendFail:'Could not send. Try again.', table:'Table',
+   addDish:'+ Add a dish…', lastDish:'This is the last dish in the order. Remove it?', editRm:'Remove dish', editBack:'Undo', editBtn:'✏️ Edit', edited:'✏️ edited', editT:'Edit order · Table ', editSub:'Change quantities, tap ✕ to remove a dish, or add dishes. Every screen sees the new order.', editAdd:'+ Add', editNote:'Staff note (e.g. out of salmon, swapped for tuna)', editTotal:'New total', editHint:'If the guest has already paid, tell them the difference.', editCancel:'Cancel', editSave:'Save changes', editPick:'Choose a dish…', editFail:'Could not save. Try again.', printBtn:'🖨 Print', autoOn:'🖨 Auto-print bills: on', autoOff:'🖨 Auto-print bills: off', testPrint:'🧪 Test print', ack:'Taken ✓', acked:'✓ Taken', sendFail:'Could not send. Try again.', table:'Table',
    now:'just now', min:m=>`${m} min ago`, hour:h=>`${h} h ago`,
    tag:{order:'🧾 NEW ORDER', add:'➕ ADD-ON', waiter:'🔔 CALL WAITER', water:'💧 ICE WATER / NAPKINS', bill:'💳 BILL'},
    noSupport:'This browser has no notifications. Use Chrome on Android.', iosFirst:'iPhone: first add this page to the Home Screen (see the tip below).',
@@ -180,7 +188,7 @@ const L = {
    emptyNew:'Новых заказов пока нет. Они появятся здесь со звуком.', emptyAll:'За последние 12 часов заказов нет.',
    autoHint:'Экран обновляется каждые несколько секунд. Новые заказы — со звуком и миганием.',
    soundOn:'🔔 Звук: вкл', soundOff:'🔕 Звук: выкл', changeCode:'Сменить код', confirmOut:'Выйти и ввести другой код?',
-   editRm:'Убрать блюдо', editBack:'Вернуть', editBtn:'✏️ Изменить', edited:'✏️ изменён', editT:'Изменить заказ · Стол ', editSub:'Поменяйте количество, нажмите ✕, чтобы убрать блюдо, или добавьте блюдо. Все экраны увидят новый заказ.', editAdd:'+ Добавить', editNote:'Комментарий персонала (например: нет лосося, заменили на тунца)', editTotal:'Новая сумма', editHint:'Если гость уже оплатил — сообщите ему разницу.', editCancel:'Отмена', editSave:'Сохранить', editPick:'Выберите блюдо…', editFail:'Не удалось сохранить. Попробуйте ещё раз.', printBtn:'🖨 Печать', autoOn:'🖨 Автопечать счетов: вкл', autoOff:'🖨 Автопечать счетов: выкл', testPrint:'🧪 Тестовая печать', ack:'Принято ✓', acked:'✓ Принято', sendFail:'Не удалось отправить. Попробуйте ещё раз.', table:'Стол',
+   addDish:'+ Добавить блюдо…', lastDish:'Это последнее блюдо в заказе. Убрать?', editRm:'Убрать блюдо', editBack:'Вернуть', editBtn:'✏️ Изменить', edited:'✏️ изменён', editT:'Изменить заказ · Стол ', editSub:'Поменяйте количество, нажмите ✕, чтобы убрать блюдо, или добавьте блюдо. Все экраны увидят новый заказ.', editAdd:'+ Добавить', editNote:'Комментарий персонала (например: нет лосося, заменили на тунца)', editTotal:'Новая сумма', editHint:'Если гость уже оплатил — сообщите ему разницу.', editCancel:'Отмена', editSave:'Сохранить', editPick:'Выберите блюдо…', editFail:'Не удалось сохранить. Попробуйте ещё раз.', printBtn:'🖨 Печать', autoOn:'🖨 Автопечать счетов: вкл', autoOff:'🖨 Автопечать счетов: выкл', testPrint:'🧪 Тестовая печать', ack:'Принято ✓', acked:'✓ Принято', sendFail:'Не удалось отправить. Попробуйте ещё раз.', table:'Стол',
    now:'только что', min:m=>`${m} мин назад`, hour:h=>`${h} ч назад`,
    tag:{order:'🧾 НОВЫЙ ЗАКАЗ', add:'➕ ДОЗАКАЗ', waiter:'🔔 ЗОВУТ ОФИЦИАНТА', water:'💧 ВОДА / САЛФЕТКИ', bill:'💳 СЧЁТ'},
    noSupport:'Этот браузер не поддерживает уведомления. Используйте Chrome на Android.', iosFirst:'iPhone: сначала добавьте страницу на экран Домой (подсказка ниже).',
@@ -248,7 +256,7 @@ function render(freshIds = []) {
     const k = kindOf(o);
     return `<article class="o k-${k}${o.status === 'done' ? ' done' : ''}${freshIds.includes(o.id) ? ' new' : ''}" data-id="${o.id}">
       <div><div class="h"><span class="tb">${t('table')} ${esc(o.tbl || '?')}</span>${(o.text.split('\n')[0].match(/ · Bàn [^ ]+ · (.+)$/) || [])[1] ? `<span class="who">👤 ${esc(o.text.split('\n')[0].match(/ · Bàn [^ ]+ · (.+)$/)[1])}</span>` : ''}<span class="tag">${t('tag')[k]}</span>${o.edited_at ? `<span class="edited">${t('edited')}</span>` : ''}<span class="tm">${hhmm(o.created)} · ${ago(o.created)}</span></div>
-      <pre>${esc(body(o))}</pre></div>
+      ${['order','add'].includes(k) && o.status === 'new' ? inlineBody(o) : `<pre>${esc(body(o))}</pre>`}</div>
       <div class="acts"><button class="ok" data-ack="${o.id}" ${o.status === 'done' ? 'disabled' : ''}>${o.status === 'done' ? t('acked') : t('ack')}</button>${['order','add'].includes(k) ? `<button class="ed" data-edit="${o.id}">${t('editBtn')}</button>` : ''}${['order','add','bill'].includes(k) ? `<button class="pr" data-print="${o.id}">${t('printBtn')}</button>` : ''}</div></article>`;
   }).join('') : `<div class="empty">${filter === 'new' ? t('emptyNew') : t('emptyAll')}</div>`;
 }
@@ -399,14 +407,25 @@ $('list').addEventListener('click', e => { const b = e.target.closest('[data-pri
 /* ---------- edit an order (quantities, remove, add dishes, staff note) ---------- */
 let editing = null;
 const LINE_RE = /^(\d+) × \[(\w+)\] (.+?) — ([\d.]+) ₫$/;
-function openEdit(o) {
+function parseOrder(o) {
   const lines = o.text.split('\n'), items = [], other = [];
   let note = '';
   lines.slice(1).forEach(l => { const m = l.match(LINE_RE);
     if (m) { const q = +m[1], sum = +m[4].replace(/\./g, ''); items.push({ id: m[2], vi: m[3], q, unit: Math.round(sum / q) }) }
     else if (/^✏️ Nhân viên: /.test(l)) note = l.replace(/^✏️ Nhân viên: /, '');
     else if (!/^Tổng: /.test(l)) other.push(l) });
-  editing = { o, head: lines[0], items, other };
+  return { o, head: lines[0], items, other, note };
+}
+function buildText(e, note) {
+  const keep = e.items.filter(it => it.q > 0), sum = keep.reduce((a, it) => a + it.q * it.unit, 0);
+  const pay = e.other.filter(l => /^Thanh toán: /.test(l)), rest = e.other.filter(l => !/^Thanh toán: /.test(l));
+  return [e.head, ...keep.map(it => `${it.q} × [${it.id}] ${it.vi} — ${money(it.q * it.unit)}`), `Tổng: ${money(sum)}`, ...pay,
+    ...rest.filter(l => /^Ghi chú: /.test(l)), ...(note ? [`✏️ Nhân viên: ${note}`] : []), ...rest.filter(l => !/^Ghi chú: /.test(l))].join('\n');
+}
+async function saveOrder(o, text) { const r = await api('/staff/edit', { id: o.id, text }); o.text = text; o.edited_at = r.now; render() }
+const dishOptions = () => `<option value="">${t('addDish')}</option>` + Object.entries(NAMES).map(([id, n]) => `<option value="${id}">[${id}] ${esc(lang === 'vi' ? n[2] : n[lang === 'en' ? 0 : 1])} — ${money(n[3])}</option>`).join('');
+function openEdit(o) {
+  editing = parseOrder(o); const note = editing.note;
   $('editTitle').textContent = t('editT') + (o.tbl || '?');
   $('editNote').value = note;
   $('editAddSel').innerHTML = `<option value="">${t('editPick')}</option>` + Object.entries(NAMES).map(([id, n]) => `<option value="${id}">[${id}] ${esc(lang === 'vi' ? n[2] : n[lang === 'en' ? 0 : 1])} — ${money(n[3])}</option>`).join('');
@@ -428,16 +447,31 @@ $('editAddBtn').onclick = () => { const id = $('editAddSel').value; if (!id) ret
 $('editCancel').onclick = () => { $('editBg').hidden = true; editing = null };
 $('editBg').addEventListener('click', ev => { if (ev.target === $('editBg')) $('editCancel').click() });
 $('editSave').onclick = async () => {
-  const e = editing, keep = e.items.filter(it => it.q > 0), sum = keep.reduce((a, it) => a + it.q * it.unit, 0);
-  const pay = e.other.filter(l => /^Thanh toán: /.test(l)), rest = e.other.filter(l => !/^Thanh toán: /.test(l));
-  const note = $('editNote').value.replace(/\s+/g, ' ').trim();
-  const text = [e.head, ...keep.map(it => `${it.q} × [${it.id}] ${it.vi} — ${money(it.q * it.unit)}`), `Tổng: ${money(sum)}`, ...pay,
-    ...rest.filter(l => /^Ghi chú: /.test(l)), ...(note ? [`✏️ Nhân viên: ${note}`] : []), ...rest.filter(l => !/^Ghi chú: /.test(l))].join('\n');
+  const e = editing, text = buildText(e, $('editNote').value.replace(/\s+/g, ' ').trim());
   const b = $('editSave'); b.disabled = true;
-  try { const r = await api('/staff/edit', { id: e.o.id, text }); e.o.text = text; e.o.edited_at = r.now; $('editBg').hidden = true; editing = null; render() }
+  try { await saveOrder(e.o, text); $('editBg').hidden = true; editing = null }
   catch (err) { alert(err.message === 'code' ? t('wrongCode') : t('editFail')) }
   b.disabled = false;
 };
+/* inline editing right on the order card: − / + / ✕ per dish and «add a dish» */
+function inlineBody(o) {
+  const tr = l => { if (lang === 'vi') return l; for (const [re, to] of LINE[lang]) if (re.test(l)) return l.replace(re, to); return l };
+  const rows = o.text.split('\n').slice(1).map(l => { const m = l.match(LINE_RE);
+    if (!m) return `<div class="il">${esc(tr(l))}</div>`;
+    const n = NAMES[m[2]], nm = lang === 'vi' || !n ? m[3] : n[lang === 'en' ? 0 : 1];
+    return `<div class="ir"><span class="in">${m[1]} × [${m[2]}] ${esc(nm)} — ${m[4]} ₫</span><span class="ib"><button data-iq="${o.id}:${m[2]}:-1" aria-label="−">−</button><button data-iq="${o.id}:${m[2]}:1" aria-label="+">+</button><button class="x" data-iq="${o.id}:${m[2]}:x" aria-label="${t('editRm')}">✕</button></span></div>` }).join('');
+  return `<div class="ibody">${rows}<select class="iadd" data-iadd="${o.id}">${dishOptions()}</select></div>`;
+}
+let busy = false;
+$('list').addEventListener('click', async ev => { const b = ev.target.closest('[data-iq]'); if (!b || busy) return;
+  const [oid, id, d] = b.dataset.iq.split(':'), o = orders.get(+oid), e = parseOrder(o), it = e.items.find(x => x.id === id); if (!it) return;
+  if (d === 'x') { if (e.items.filter(x => x.q).length === 1 && !confirm(t('lastDish'))) return; it.q = 0 } else it.q = Math.max(0, Math.min(99, it.q + +d));
+  busy = true; try { await saveOrder(o, buildText(e, e.note)) } catch (err) { alert(t('editFail')) } busy = false });
+$('list').addEventListener('change', async ev => { const s = ev.target.closest('[data-iadd]'); if (!s || !s.value || busy) return;
+  const o = orders.get(+s.dataset.iadd), e = parseOrder(o), id = s.value, n = NAMES[id], ex = e.items.find(x => x.id === id);
+  if (ex) ex.q++; else e.items.push({ id, vi: n[2], q: 1, unit: n[3] });
+  busy = true; try { await saveOrder(o, buildText(e, e.note)) } catch (err) { alert(t('editFail')); s.value = '' } busy = false });
+
 $('list').addEventListener('click', ev => { const b = ev.target.closest('[data-edit]'); if (b) openEdit(orders.get(Number(b.dataset.edit))) });
 
 setLang(lang);
