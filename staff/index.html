@@ -116,6 +116,32 @@ button{font:inherit;cursor:pointer}
 .modal textarea{width:100%;font:inherit;font-size:15px;min-height:64px;margin-top:6px;padding:10px;border:1px solid var(--line);border-radius:10px}
 .etot{display:flex;justify-content:space-between;font-size:18px;font-weight:800;margin-top:14px}
 .ehint{font-size:13px;color:var(--muted);margin-top:6px}
+.tbtabs{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px}
+.tbtabs button{position:relative;font:inherit;text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:8px 12px;display:flex;flex-direction:column;min-width:96px}
+.tbtabs button b{font-size:16px}.tbtabs button small{color:var(--muted);font-size:12px}.tbtabs button span{font-weight:700;font-size:14px}
+.tbtabs button i{position:absolute;top:-8px;right:-6px;font-style:normal}
+.tbtabs button[aria-pressed="true"]{border-color:var(--pink);background:var(--pink-soft)}
+.tbhead{font-size:15px;color:var(--muted);padding-bottom:6px;border-bottom:1px solid var(--line)}.tbhead b{color:var(--ink);font-size:18px}
+.tbhead .ask{display:inline-block;margin-left:8px;color:var(--green);font-weight:800}
+.trow{display:grid;grid-template-columns:1fr auto auto auto auto;gap:8px;align-items:center;padding:9px 0;border-bottom:1px dashed var(--line)}
+.trow .nm{font-weight:700;line-height:1.3}.trow .nm small{display:block;font-weight:400;color:var(--muted)}
+.trow .qty{display:flex;align-items:center;gap:6px}
+.trow .qty button{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--bg);font-size:20px;font-weight:800}
+.trow .qty b{min-width:18px;text-align:center;font-size:17px}
+.modal label.up{margin:0;font-weight:400}.up small{display:block;font-size:11px;color:var(--muted)}
+.up input{width:86px;font:inherit;font-size:15px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;text-align:right}
+.trow .sum{font-weight:800;white-space:nowrap;min-width:84px;text-align:right}
+.trow .rm{width:36px;height:36px;border-radius:50%;border:1px solid #F0CFCF;background:#FDF1F1;color:#B33A2E;font-size:16px;font-weight:800}
+.tbtot{margin-top:12px;border-top:1px solid var(--line);padding-top:8px}
+.trw{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;font-size:16px}
+.trw.tbig{font-size:19px;font-weight:800}.trw.tbig input{width:150px;font:inherit;font-weight:800;text-align:right;padding:8px 10px;border:2px solid var(--pink);border-radius:10px}
+.trw.disc{flex-wrap:wrap}.pcts{display:flex;gap:6px;flex-wrap:wrap;align-items:center;flex:1}
+.pcts button{font:inherit;font-size:14px;font-weight:700;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 10px}
+.pcts button[aria-pressed="true"]{border-color:var(--pink);background:var(--pink-soft)}
+.modal .pcts label{margin:0;display:flex;align-items:center;gap:4px}.pcts input{width:56px;font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px;text-align:right}
+#tbDiscSum{font-weight:800;color:#B33A2E;white-space:nowrap}
+@media (max-width:560px){.trow{grid-template-columns:auto auto 1fr auto;row-gap:6px}.trow .nm{grid-column:1/-1}.up input{width:80px}.trow .sum{min-width:0}.trw.disc>span:first-child{width:100%}}
+.o.k-closed{border-left-color:var(--line)}.k-closed .tag{background:var(--bg);color:var(--muted)}
 .mact{display:flex;gap:10px;margin-top:16px}.mact .save{flex:1;background:var(--green);border-color:var(--green);color:#fff}
 .o .pr{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 12px;font-size:14px;font-weight:700;color:var(--ink)}
 .chip.on{background:var(--green);border-color:var(--green);color:#fff}
@@ -199,13 +225,25 @@ button{font:inherit;cursor:pointer}
   <div id="popRows"></div>
   <div class="mact"><button id="popCancel" data-t="editCancel"></button><button class="save" id="popSave" data-t="editSave"></button></div>
 </div></div>
-<div class="mbg" id="tbBg" hidden><div class="modal" role="dialog" aria-modal="true">
+<div class="mbg" id="tbBg" hidden><div class="modal tbm" role="dialog" aria-modal="true">
   <h3 data-t="tableBill"></h3><div class="sub" data-t="tbSub"></div>
-  <div class="crow"><div class="f"><label for="tbTbl" data-t="tblLabel"></label><input id="tbTbl" inputmode="numeric" maxlength="4"></div>
-    <div class="f"><label for="tbGuest" data-t="guestLabel"></label><input id="tbGuest" maxlength="24"></div></div>
-  <label data-t="payLabel"></label><div class="cpay" id="tbPay"><button data-pm="cash" data-t="payCash"></button><button data-pm="qr">VietQR</button></div>
-  <div class="etot"><span data-t="total2"></span><span id="tbSum"></span></div>
-  <div class="mact"><button id="tbCancel" data-t="editCancel"></button><button class="save" id="tbPrint" data-t="tbPrint"></button></div>
+  <div class="tbtabs" id="tbTabs"></div>
+  <div class="cempty" id="tbEmpty" data-t="tbNoTables"></div>
+  <div id="tbCard">
+    <div class="tbhead" id="tbHead"></div>
+    <div id="tbRows"></div>
+    <div class="dsearch" id="tbSearch"></div>
+    <div class="tbtot">
+      <div class="trw"><span data-t="tbSubtotal"></span><span id="tbSubSum"></span></div>
+      <div class="trw disc"><span id="tbDiscLbl"></span><span class="pcts" id="tbPcts"><button data-pct="0">0%</button><button data-pct="5">5%</button><button data-pct="10">10%</button><button data-pct="15">15%</button><button data-pct="20">20%</button><label><input id="tbPct" inputmode="numeric" maxlength="3" aria-label="%"> %</label></span><span id="tbDiscSum"></span></div>
+      <div class="trw tbig"><span data-t="tbFinal"></span><input id="tbFinal" inputmode="numeric" maxlength="10"></div>
+      <div class="ehint" data-t="tbFinalHint"></div>
+      <div id="tbTipBox"></div>
+    </div>
+    <label data-t="payLabel"></label><div class="cpay" id="tbPay"><button data-pm="cash" data-t="payCash"></button><button data-pm="qr">VietQR</button></div>
+    <div class="mact"><button id="tbPrint" data-t="tbPrint"></button><button class="save" id="tbClose" data-t="tbClose"></button></div>
+  </div>
+  <div class="mact"><button id="tbCancel" data-t="tbDone"></button></div>
 </div></div>
 <div class="mbg" id="editBg" hidden><div class="modal" role="dialog" aria-modal="true">
   <h3 id="editTitle"></h3><div class="sub" data-t="editSub"></div>
@@ -235,9 +273,9 @@ const L = {
    emptyNew:'Chưa có đơn mới. Đơn sẽ hiện ở đây kèm âm thanh.', emptyAll:'Chưa có đơn trong 12 giờ qua.',
    autoHint:'Màn hình tự cập nhật mỗi vài giây. Đơn mới có âm thanh và nhấp nháy.',
    soundOn:'🔔 Âm thanh: bật', soundOff:'🔕 Âm thanh: tắt', changeCode:'Đổi mã', confirmOut:'Đăng xuất và nhập mã khác?',
-   ntBtn:'📢 Thông báo', ntSub:'Dòng thông báo hiện dưới tên quán trong thực đơn của khách, khoảng 1 phút sau. Khách thấy ngôn ngữ của mình; ô trống sẽ dùng ngôn ngữ khác đã điền.', ntBoldHint:'Bôi đen chữ rồi bấm B để in đậm (hiện như **chữ**).', ntClear:'Xóa', ntSave:'Đăng', ntSaved:'Đã đăng. Khách thấy trong khoảng 1 phút.', ntCleared:'Đã xóa thông báo.', prBtn:'💲 Đổi giá', prSub:'Gõ giá mới (chỉ số, ví dụ 105000). Thực đơn của khách cập nhật trong khoảng 1 phút. Xóa ô để trở về giá gốc.', prWas:'Giá gốc', prSaved:'Đã lưu giá mới. Thực đơn của khách cập nhật trong khoảng 1 phút.', prBad:'Giá phải là số từ 1.000 ₫.', soBtn:'⛔ Hết món', soSub:'Đánh dấu món đã hết. Khách thấy «Hết món» và không gọi được, sau khoảng 1 phút. Bỏ dấu khi có món trở lại.', soOut:'Hết', soSaved:'Đã lưu. Thực đơn của khách cập nhật trong khoảng 1 phút.', popBtn:'⭐ Món phổ biến', popSub:'Chọn món hiện trong mục «⭐ Phổ biến» ở đầu thực đơn của khách. Bỏ chọn hết để ẩn mục này.', popSaved:'Đã lưu. Thực đơn của khách cập nhật trong vài phút.', newOrder:'+ Tạo đơn', tableBill:'💳 Hóa đơn theo bàn', tblLabel:'Số bàn', guestLabel:'Tên khách (không bắt buộc)', payLabel:'Thanh toán', payCash:'Tiền mặt', kitchenNote:'Ghi chú cho bếp', total2:'Tổng', newSave:'Gửi đơn', needTbl:'Nhập số bàn.', needDish:'Chọn ít nhất một món.', tbSub:'In hóa đơn tạm tính với tất cả các món của bàn từ lần tính tiền trước.', tbPrint:'🖨 In hóa đơn', tbNone:'Bàn này chưa có món nào.', searchPh:'Tìm món: tên hoặc số…', searchNone:'Không tìm thấy món.', addDish:'+ Thêm món…', lastDish:'Đây là món cuối cùng của đơn. Xóa?', editRm:'Xóa món', editBack:'Hoàn tác', editBtn:'✏️ Sửa', edited:'✏️ đã sửa', editT:'Sửa đơn · Bàn ', editSub:'Đổi số lượng, bấm ✕ để xóa món hoặc thêm món. Mọi máy sẽ thấy đơn mới.', editAdd:'+ Thêm', editNote:'Ghi chú của nhân viên (ví dụ: hết cá hồi, đổi sang cá ngừ)', editTotal:'Tổng mới', editHint:'Khách đã thanh toán trước? Báo khách số tiền chênh lệch.', editCancel:'Hủy', editSave:'Lưu thay đổi', editPick:'Chọn món…', editFail:'Không lưu được. Thử lại.', printBtn:'🖨 In', autoOn:'🖨 Tự động in hóa đơn: bật', autoOff:'🖨 Tự động in hóa đơn: tắt', testPrint:'🧪 In thử', ack:'Đã nhận ✓', acked:'✓ Đã nhận', sendFail:'Không gửi được. Thử lại.', table:'Bàn',
+   ntBtn:'📢 Thông báo', ntSub:'Dòng thông báo hiện dưới tên quán trong thực đơn của khách, khoảng 1 phút sau. Khách thấy ngôn ngữ của mình; ô trống sẽ dùng ngôn ngữ khác đã điền.', ntBoldHint:'Bôi đen chữ rồi bấm B để in đậm (hiện như **chữ**).', ntClear:'Xóa', ntSave:'Đăng', ntSaved:'Đã đăng. Khách thấy trong khoảng 1 phút.', ntCleared:'Đã xóa thông báo.', prBtn:'💲 Đổi giá', prSub:'Gõ giá mới (chỉ số, ví dụ 105000). Thực đơn của khách cập nhật trong khoảng 1 phút. Xóa ô để trở về giá gốc.', prWas:'Giá gốc', prSaved:'Đã lưu giá mới. Thực đơn của khách cập nhật trong khoảng 1 phút.', prBad:'Giá phải là số từ 1.000 ₫.', soBtn:'⛔ Hết món', soSub:'Đánh dấu món đã hết. Khách thấy «Hết món» và không gọi được, sau khoảng 1 phút. Bỏ dấu khi có món trở lại.', soOut:'Hết', soSaved:'Đã lưu. Thực đơn của khách cập nhật trong khoảng 1 phút.', popBtn:'⭐ Món phổ biến', popSub:'Chọn món hiện trong mục «⭐ Phổ biến» ở đầu thực đơn của khách. Bỏ chọn hết để ẩn mục này.', popSaved:'Đã lưu. Thực đơn của khách cập nhật trong vài phút.', newOrder:'+ Tạo đơn', tableBill:'💳 Hóa đơn theo bàn', tbNoTables:'Không có bàn nào đang mở.', tbOrders:n => n + ' đơn', tbSince:'từ', tbSubtotal:'Tạm tính', tbDisc:'Giảm giá', tbExtra:'Phụ thu', tbFinal:'Thành tiền', tbFinalHint:'Có thể sửa số tiền cuối cùng — phần chênh lệch ghi vào hóa đơn là giảm giá.', tbTip:'Tiền tip', tbTipTot:'Tổng cộng', tbClose:'✅ Đóng bàn', tbCloseQ:(b, s) => `Đóng bàn ${b}? Khách đã thanh toán ${s}?`, tbDone:'Xong', tbAsk:'💳 khách gọi tính tiền', tbUnit:'Đơn giá', tblLabel:'Số bàn', guestLabel:'Tên khách (không bắt buộc)', payLabel:'Thanh toán', payCash:'Tiền mặt', kitchenNote:'Ghi chú cho bếp', total2:'Tổng', newSave:'Gửi đơn', needTbl:'Nhập số bàn.', needDish:'Chọn ít nhất một món.', tbSub:'Tất cả bàn đang mở. Sửa món và giá, giảm giá, in hóa đơn và đóng bàn sau khi khách thanh toán.', tbPrint:'🖨 In hóa đơn', tbNone:'Bàn này chưa có món nào.', searchPh:'Tìm món: tên hoặc số…', searchNone:'Không tìm thấy món.', addDish:'+ Thêm món…', lastDish:'Đây là món cuối cùng của đơn. Xóa?', editRm:'Xóa món', editBack:'Hoàn tác', editBtn:'✏️ Sửa', edited:'✏️ đã sửa', editT:'Sửa đơn · Bàn ', editSub:'Đổi số lượng, bấm ✕ để xóa món hoặc thêm món. Mọi máy sẽ thấy đơn mới.', editAdd:'+ Thêm', editNote:'Ghi chú của nhân viên (ví dụ: hết cá hồi, đổi sang cá ngừ)', editTotal:'Tổng mới', editHint:'Khách đã thanh toán trước? Báo khách số tiền chênh lệch.', editCancel:'Hủy', editSave:'Lưu thay đổi', editPick:'Chọn món…', editFail:'Không lưu được. Thử lại.', printBtn:'🖨 In', autoOn:'🖨 Tự động in hóa đơn: bật', autoOff:'🖨 Tự động in hóa đơn: tắt', testPrint:'🧪 In thử', ack:'Đã nhận ✓', acked:'✓ Đã nhận', sendFail:'Không gửi được. Thử lại.', table:'Bàn',
    now:'vừa xong', min:m=>`${m} phút trước`, hour:h=>`${h} giờ trước`,
-   tag:{order:'🧾 ĐƠN MỚI', add:'➕ GỌI THÊM', waiter:'🔔 GỌI PHỤC VỤ', water:'💧 NƯỚC ĐÁ / KHĂN GIẤY', bill:'💳 TÍNH TIỀN'},
+   tag:{order:'🧾 ĐƠN MỚI', add:'➕ GỌI THÊM', waiter:'🔔 GỌI PHỤC VỤ', water:'💧 NƯỚC ĐÁ / KHĂN GIẤY', bill:'💳 TÍNH TIỀN', closed:'✅ ĐÃ ĐÓNG BÀN'},
    noSupport:'Trình duyệt này không hỗ trợ thông báo. Dùng Chrome trên Android.', iosFirst:'iPhone: trước tiên thêm trang vào Màn hình chính (xem hướng dẫn).',
    denied:'Bạn chưa cho phép thông báo. Mở cài đặt trình duyệt → Thông báo → Cho phép.', pushOk:'✓ Đã bật thông báo trên điện thoại này.' },
  en: { title:'SUSHI GO · Orders', off:'Not connected', live:'Receiving orders', lost:'Connection lost, retrying…',
@@ -250,9 +288,9 @@ const L = {
    emptyNew:'No new orders yet. They appear here with a sound.', emptyAll:'No orders in the last 12 hours.',
    autoHint:'The screen updates every few seconds. New orders beep and flash.',
    soundOn:'🔔 Sound: on', soundOff:'🔕 Sound: off', changeCode:'Change code', confirmOut:'Log out and enter another code?',
-   ntBtn:'📢 Announcement', ntSub:'A message under the café name in the guest menu, within about a minute. Guests see their language; an empty field falls back to another filled one.', ntBoldHint:'Select text and tap B to make it bold (shown as **text**).', ntClear:'Remove', ntSave:'Publish', ntSaved:'Published. Guests see it within about a minute.', ntCleared:'Announcement removed.', prBtn:'💲 Prices', prSub:'Type the new price (digits only, e.g. 105000). The guest menu updates within about a minute. Clear a field to go back to the original price.', prWas:'Original', prSaved:'Prices saved. The guest menu updates within about a minute.', prBad:'A price must be a number from 1,000 ₫.', soBtn:'⛔ Sold out', soSub:'Tick the dishes that ran out. Guests see «Sold out» and cannot order them, within about a minute. Untick when the dish is back.', soOut:'Sold out', soSaved:'Saved. The guest menu updates within about a minute.', popBtn:'⭐ Popular dishes', popSub:'Pick the dishes for the «⭐ Popular» tab at the top of the guest menu. Untick all to hide the tab.', popSaved:'Saved. The guest menu updates within a few minutes.', newOrder:'+ New order', tableBill:'💳 Table bill', tblLabel:'Table', guestLabel:'Guest name (optional)', payLabel:'Payment', payCash:'Cash', kitchenNote:'Note for the kitchen', total2:'Total', newSave:'Send order', needTbl:'Enter the table number.', needDish:'Add at least one dish.', tbSub:'Prints a provisional bill with all the table’s dishes since its last bill.', tbPrint:'🖨 Print bill', tbNone:'This table has no dishes yet.', searchPh:'Find a dish: name or number…', searchNone:'No dish found.', addDish:'+ Add a dish…', lastDish:'This is the last dish in the order. Remove it?', editRm:'Remove dish', editBack:'Undo', editBtn:'✏️ Edit', edited:'✏️ edited', editT:'Edit order · Table ', editSub:'Change quantities, tap ✕ to remove a dish, or add dishes. Every screen sees the new order.', editAdd:'+ Add', editNote:'Staff note (e.g. out of salmon, swapped for tuna)', editTotal:'New total', editHint:'If the guest has already paid, tell them the difference.', editCancel:'Cancel', editSave:'Save changes', editPick:'Choose a dish…', editFail:'Could not save. Try again.', printBtn:'🖨 Print', autoOn:'🖨 Auto-print bills: on', autoOff:'🖨 Auto-print bills: off', testPrint:'🧪 Test print', ack:'Taken ✓', acked:'✓ Taken', sendFail:'Could not send. Try again.', table:'Table',
+   ntBtn:'📢 Announcement', ntSub:'A message under the café name in the guest menu, within about a minute. Guests see their language; an empty field falls back to another filled one.', ntBoldHint:'Select text and tap B to make it bold (shown as **text**).', ntClear:'Remove', ntSave:'Publish', ntSaved:'Published. Guests see it within about a minute.', ntCleared:'Announcement removed.', prBtn:'💲 Prices', prSub:'Type the new price (digits only, e.g. 105000). The guest menu updates within about a minute. Clear a field to go back to the original price.', prWas:'Original', prSaved:'Prices saved. The guest menu updates within about a minute.', prBad:'A price must be a number from 1,000 ₫.', soBtn:'⛔ Sold out', soSub:'Tick the dishes that ran out. Guests see «Sold out» and cannot order them, within about a minute. Untick when the dish is back.', soOut:'Sold out', soSaved:'Saved. The guest menu updates within about a minute.', popBtn:'⭐ Popular dishes', popSub:'Pick the dishes for the «⭐ Popular» tab at the top of the guest menu. Untick all to hide the tab.', popSaved:'Saved. The guest menu updates within a few minutes.', newOrder:'+ New order', tableBill:'💳 Table bill', tbNoTables:'No open tables.', tbOrders:n => n + (n === 1 ? ' order' : ' orders'), tbSince:'since', tbSubtotal:'Subtotal', tbDisc:'Discount', tbExtra:'Surcharge', tbFinal:'To pay', tbFinalHint:'You can type the final amount — the difference goes on the bill as a discount.', tbTip:'Tip', tbTipTot:'Total with tip', tbClose:'✅ Close table', tbCloseQ:(b, s) => `Close table ${b}? The guest has paid ${s}?`, tbDone:'Done', tbAsk:'💳 guest asked for the bill', tbUnit:'Unit price', tblLabel:'Table', guestLabel:'Guest name (optional)', payLabel:'Payment', payCash:'Cash', kitchenNote:'Note for the kitchen', total2:'Total', newSave:'Send order', needTbl:'Enter the table number.', needDish:'Add at least one dish.', tbSub:'Every open table. Edit dishes and prices, give a discount, print the bill and close the table once the guest has paid.', tbPrint:'🖨 Print bill', tbNone:'This table has no dishes yet.', searchPh:'Find a dish: name or number…', searchNone:'No dish found.', addDish:'+ Add a dish…', lastDish:'This is the last dish in the order. Remove it?', editRm:'Remove dish', editBack:'Undo', editBtn:'✏️ Edit', edited:'✏️ edited', editT:'Edit order · Table ', editSub:'Change quantities, tap ✕ to remove a dish, or add dishes. Every screen sees the new order.', editAdd:'+ Add', editNote:'Staff note (e.g. out of salmon, swapped for tuna)', editTotal:'New total', editHint:'If the guest has already paid, tell them the difference.', editCancel:'Cancel', editSave:'Save changes', editPick:'Choose a dish…', editFail:'Could not save. Try again.', printBtn:'🖨 Print', autoOn:'🖨 Auto-print bills: on', autoOff:'🖨 Auto-print bills: off', testPrint:'🧪 Test print', ack:'Taken ✓', acked:'✓ Taken', sendFail:'Could not send. Try again.', table:'Table',
    now:'just now', min:m=>`${m} min ago`, hour:h=>`${h} h ago`,
-   tag:{order:'🧾 NEW ORDER', add:'➕ ADD-ON', waiter:'🔔 CALL WAITER', water:'💧 ICE WATER / NAPKINS', bill:'💳 BILL'},
+   tag:{order:'🧾 NEW ORDER', add:'➕ ADD-ON', waiter:'🔔 CALL WAITER', water:'💧 ICE WATER / NAPKINS', bill:'💳 BILL', closed:'✅ TABLE CLOSED'},
    noSupport:'This browser has no notifications. Use Chrome on Android.', iosFirst:'iPhone: first add this page to the Home Screen (see the tip below).',
    denied:'Notifications are not allowed. Open the browser settings → Notifications → Allow.', pushOk:'✓ Notifications are on for this phone.' },
  ru: { title:'SUSHI GO · Заказы', off:'Нет подключения', live:'Принимаем заказы', lost:'Нет связи, пробуем снова…',
@@ -265,17 +303,17 @@ const L = {
    emptyNew:'Новых заказов пока нет. Они появятся здесь со звуком.', emptyAll:'За последние 12 часов заказов нет.',
    autoHint:'Экран обновляется каждые несколько секунд. Новые заказы — со звуком и миганием.',
    soundOn:'🔔 Звук: вкл', soundOff:'🔕 Звук: выкл', changeCode:'Сменить код', confirmOut:'Выйти и ввести другой код?',
-   ntBtn:'📢 Объявление', ntSub:'Сообщение под названием заведения в меню гостя, появится примерно через минуту. Гость видит свой язык; если поле пустое — покажется другой заполненный язык.', ntBoldHint:'Выделите текст и нажмите B — он станет жирным (выглядит как **текст**).', ntClear:'Удалить', ntSave:'Опубликовать', ntSaved:'Опубликовано. Гости увидят примерно через минуту.', ntCleared:'Объявление удалено.', prBtn:'💲 Цены', prSub:'Впишите новую цену (только цифры, например 105000). Меню гостя обновится примерно через минуту. Очистите поле, чтобы вернуть исходную цену.', prWas:'Исходная', prSaved:'Цены сохранены. Меню гостя обновится примерно через минуту.', prBad:'Цена — число от 1 000 ₫.', soBtn:'⛔ Стоп-лист', soSub:'Отметьте закончившиеся блюда. Гость увидит «Нет в наличии» и не сможет заказать — примерно через минуту. Снимите отметку, когда блюдо снова есть.', soOut:'Стоп', soSaved:'Сохранено. Меню гостя обновится примерно через минуту.', popBtn:'⭐ Популярное', popSub:'Отметьте блюда для вкладки «⭐ Популярное» в начале меню гостя. Снимите все отметки, чтобы скрыть вкладку.', popSaved:'Сохранено. Меню гостя обновится в течение нескольких минут.', newOrder:'+ Создать заказ', tableBill:'💳 Счёт по столу', tblLabel:'Номер стола', guestLabel:'Имя гостя (необязательно)', payLabel:'Оплата', payCash:'Наличные', kitchenNote:'Комментарий для кухни', total2:'Итого', newSave:'Отправить заказ', needTbl:'Введите номер стола.', needDish:'Добавьте хотя бы одно блюдо.', tbSub:'Печатает предварительный счёт со всеми блюдами стола с прошлого счёта.', tbPrint:'🖨 Печать счёта', tbNone:'У этого стола ещё нет блюд.', searchPh:'Поиск блюда: название или номер…', searchNone:'Блюдо не найдено.', addDish:'+ Добавить блюдо…', lastDish:'Это последнее блюдо в заказе. Убрать?', editRm:'Убрать блюдо', editBack:'Вернуть', editBtn:'✏️ Изменить', edited:'✏️ изменён', editT:'Изменить заказ · Стол ', editSub:'Поменяйте количество, нажмите ✕, чтобы убрать блюдо, или добавьте блюдо. Все экраны увидят новый заказ.', editAdd:'+ Добавить', editNote:'Комментарий персонала (например: нет лосося, заменили на тунца)', editTotal:'Новая сумма', editHint:'Если гость уже оплатил — сообщите ему разницу.', editCancel:'Отмена', editSave:'Сохранить', editPick:'Выберите блюдо…', editFail:'Не удалось сохранить. Попробуйте ещё раз.', printBtn:'🖨 Печать', autoOn:'🖨 Автопечать счетов: вкл', autoOff:'🖨 Автопечать счетов: выкл', testPrint:'🧪 Тестовая печать', ack:'Принято ✓', acked:'✓ Принято', sendFail:'Не удалось отправить. Попробуйте ещё раз.', table:'Стол',
+   ntBtn:'📢 Объявление', ntSub:'Сообщение под названием заведения в меню гостя, появится примерно через минуту. Гость видит свой язык; если поле пустое — покажется другой заполненный язык.', ntBoldHint:'Выделите текст и нажмите B — он станет жирным (выглядит как **текст**).', ntClear:'Удалить', ntSave:'Опубликовать', ntSaved:'Опубликовано. Гости увидят примерно через минуту.', ntCleared:'Объявление удалено.', prBtn:'💲 Цены', prSub:'Впишите новую цену (только цифры, например 105000). Меню гостя обновится примерно через минуту. Очистите поле, чтобы вернуть исходную цену.', prWas:'Исходная', prSaved:'Цены сохранены. Меню гостя обновится примерно через минуту.', prBad:'Цена — число от 1 000 ₫.', soBtn:'⛔ Стоп-лист', soSub:'Отметьте закончившиеся блюда. Гость увидит «Нет в наличии» и не сможет заказать — примерно через минуту. Снимите отметку, когда блюдо снова есть.', soOut:'Стоп', soSaved:'Сохранено. Меню гостя обновится примерно через минуту.', popBtn:'⭐ Популярное', popSub:'Отметьте блюда для вкладки «⭐ Популярное» в начале меню гостя. Снимите все отметки, чтобы скрыть вкладку.', popSaved:'Сохранено. Меню гостя обновится в течение нескольких минут.', newOrder:'+ Создать заказ', tableBill:'💳 Счёт по столу', tbNoTables:'Открытых столов нет.', tbOrders:n => n + ' ' + (n % 10 === 1 && n % 100 !== 11 ? 'заказ' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'заказа' : 'заказов'), tbSince:'с', tbSubtotal:'Сумма', tbDisc:'Скидка', tbExtra:'Надбавка', tbFinal:'К оплате', tbFinalHint:'Сумму к оплате можно исправить вручную — разница попадёт в счёт как скидка.', tbTip:'Чаевые', tbTipTot:'Всего с чаевыми', tbClose:'✅ Закрыть стол', tbCloseQ:(b, s) => `Закрыть стол ${b}? Гость оплатил ${s}?`, tbDone:'Готово', tbAsk:'💳 гость просит счёт', tbUnit:'Цена за 1', tblLabel:'Номер стола', guestLabel:'Имя гостя (необязательно)', payLabel:'Оплата', payCash:'Наличные', kitchenNote:'Комментарий для кухни', total2:'Итого', newSave:'Отправить заказ', needTbl:'Введите номер стола.', needDish:'Добавьте хотя бы одно блюдо.', tbSub:'Все открытые столы. Меняйте блюда и цены, давайте скидку, печатайте счёт и закрывайте стол после оплаты.', tbPrint:'🖨 Печать счёта', tbNone:'У этого стола ещё нет блюд.', searchPh:'Поиск блюда: название или номер…', searchNone:'Блюдо не найдено.', addDish:'+ Добавить блюдо…', lastDish:'Это последнее блюдо в заказе. Убрать?', editRm:'Убрать блюдо', editBack:'Вернуть', editBtn:'✏️ Изменить', edited:'✏️ изменён', editT:'Изменить заказ · Стол ', editSub:'Поменяйте количество, нажмите ✕, чтобы убрать блюдо, или добавьте блюдо. Все экраны увидят новый заказ.', editAdd:'+ Добавить', editNote:'Комментарий персонала (например: нет лосося, заменили на тунца)', editTotal:'Новая сумма', editHint:'Если гость уже оплатил — сообщите ему разницу.', editCancel:'Отмена', editSave:'Сохранить', editPick:'Выберите блюдо…', editFail:'Не удалось сохранить. Попробуйте ещё раз.', printBtn:'🖨 Печать', autoOn:'🖨 Автопечать счетов: вкл', autoOff:'🖨 Автопечать счетов: выкл', testPrint:'🧪 Тестовая печать', ack:'Принято ✓', acked:'✓ Принято', sendFail:'Не удалось отправить. Попробуйте ещё раз.', table:'Стол',
    now:'только что', min:m=>`${m} мин назад`, hour:h=>`${h} ч назад`,
-   tag:{order:'🧾 НОВЫЙ ЗАКАЗ', add:'➕ ДОЗАКАЗ', waiter:'🔔 ЗОВУТ ОФИЦИАНТА', water:'💧 ВОДА / САЛФЕТКИ', bill:'💳 СЧЁТ'},
+   tag:{order:'🧾 НОВЫЙ ЗАКАЗ', add:'➕ ДОЗАКАЗ', waiter:'🔔 ЗОВУТ ОФИЦИАНТА', water:'💧 ВОДА / САЛФЕТКИ', bill:'💳 СЧЁТ', closed:'✅ СТОЛ ЗАКРЫТ'},
    noSupport:'Этот браузер не поддерживает уведомления. Используйте Chrome на Android.', iosFirst:'iPhone: сначала добавьте страницу на экран Домой (подсказка ниже).',
    denied:'Уведомления не разрешены. Настройки браузера → Уведомления → Разрешить.', pushOk:'✓ Уведомления на этом телефоне включены.' },
 };
 /* lines of the Vietnamese ticket, translated for EN / RU (the guest's own note stays as written) */
 const LINE = {
- en: [[/^Tổng cộng: /,'Total with tip: '],[/^Tổng: /,'Total: '],[/^Tiền tip: /,'Tip: '],[/^Thanh toán: Chuyển khoản VietQR$/,'Payment: VietQR transfer'],[/^Thanh toán: Tiền mặt$/,'Payment: cash'],
+ en: [[/^Tổng cộng: /,'Total with tip: '],[/^Tạm tính: /,'Subtotal: '],[/^Giảm giá/,'Discount'],[/^Phụ thu: /,'Surcharge: '],[/^Tổng: /,'Total: '],[/^Tiền tip: /,'Tip: '],[/^Thanh toán: Chuyển khoản VietQR$/,'Payment: VietQR transfer'],[/^Thanh toán: Tiền mặt$/,'Payment: cash'],
       [/^Ghi chú: /,'Note: '],[/^✏️ Nhân viên: /,'✏️ Staff: '],[/^✍️ Nhân viên nhập đơn$/,'✍️ Entered by staff'],[/^Khách nói tiếng Nga$/,'Guest speaks Russian'],[/^Khách nói tiếng Anh$/,'Guest speaks English'],[/^Khách nói tiếng Việt$/,'Guest speaks Vietnamese']],
- ru: [[/^Tổng cộng: /,'Всего с чаевыми: '],[/^Tổng: /,'Итого: '],[/^Tiền tip: /,'Чаевые: '],[/^Thanh toán: Chuyển khoản VietQR$/,'Оплата: перевод VietQR'],[/^Thanh toán: Tiền mặt$/,'Оплата: наличные'],
+ ru: [[/^Tổng cộng: /,'Всего с чаевыми: '],[/^Tạm tính: /,'Сумма: '],[/^Giảm giá/,'Скидка'],[/^Phụ thu: /,'Надбавка: '],[/^Tổng: /,'Итого: '],[/^Tiền tip: /,'Чаевые: '],[/^Thanh toán: Chuyển khoản VietQR$/,'Оплата: перевод VietQR'],[/^Thanh toán: Tiền mặt$/,'Оплата: наличные'],
       [/^Ghi chú: /,'Комментарий: '],[/^✏️ Nhân viên: /,'✏️ Персонал: '],[/^✍️ Nhân viên nhập đơn$/,'✍️ Внесён персоналом'],[/^Khách nói tiếng Nga$/,'Гость говорит по-русски'],[/^Khách nói tiếng Anh$/,'Гость говорит по-английски'],[/^Khách nói tiếng Việt$/,'Гость говорит по-вьетнамски']],
 };
 
@@ -308,7 +346,7 @@ function beep() {
   if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 }
 
-const kindOf = o => o.text.startsWith('GỌI THÊM') ? 'add' : o.text.startsWith('XIN THÊM') ? 'water' : o.kind === 'bill' ? 'bill' : o.kind === 'waiter' ? 'waiter' : 'order';
+const kindOf = o => o.kind === 'closed' ? 'closed' : o.text.startsWith('GỌI THÊM') ? 'add' : o.text.startsWith('XIN THÊM') ? 'water' : o.kind === 'bill' ? 'bill' : o.kind === 'waiter' ? 'waiter' : 'order';
 const ago = ms => { const m = Math.max(0, Math.round((Date.now() - ms) / 60000)); return m < 1 ? t('now') : m < 60 ? t('min')(m) : t('hour')(Math.floor(m / 60)) };
 const hhmm = ms => { const d = new Date(ms); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') };
 const esc = s => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
@@ -334,7 +372,7 @@ function render(freshIds = []) {
     return `<article class="o k-${k}${o.status === 'done' ? ' done' : ''}${freshIds.includes(o.id) ? ' new' : ''}" data-id="${o.id}">
       <div><div class="h"><span class="tb">${t('table')} ${esc(o.tbl || '?')}</span>${(o.text.split('\n')[0].match(/ · Bàn [^ ]+ · (.+)$/) || [])[1] ? `<span class="who">👤 ${esc(o.text.split('\n')[0].match(/ · Bàn [^ ]+ · (.+)$/)[1])}</span>` : ''}<span class="tag">${t('tag')[k]}</span>${o.edited_at ? `<span class="edited">${t('edited')}</span>` : ''}<span class="tm">${hhmm(o.created)} · ${ago(o.created)}</span></div>
       ${['order','add'].includes(k) && o.status === 'new' ? inlineBody(o) : `<pre>${esc(body(o))}</pre>`}</div>
-      <div class="acts"><button class="ok" data-ack="${o.id}" ${o.status === 'done' ? 'disabled' : ''}>${o.status === 'done' ? t('acked') : t('ack')}</button>${['order','add'].includes(k) ? `<button class="ed" data-edit="${o.id}">${t('editBtn')}</button>` : ''}${['order','add','bill'].includes(k) ? `<button class="pr" data-print="${o.id}">${t('printBtn')}</button>` : ''}</div></article>`;
+      <div class="acts"><button class="ok" data-ack="${o.id}" ${o.status === 'done' ? 'disabled' : ''}>${o.status === 'done' ? t('acked') : t('ack')}</button>${['order','add'].includes(k) ? `<button class="ed" data-edit="${o.id}">${t('editBtn')}</button>` : ''}${['order','add','bill','closed'].includes(k) ? `<button class="pr" data-print="${o.id}">${t('printBtn')}</button>` : ''}</div></article>`;
   }).join('') : `<div class="empty">${filter === 'new' ? t('emptyNew') : t('emptyAll')}</div>`;
 }
 
@@ -349,7 +387,7 @@ async function poll() {
     for (const [id, o] of orders) if (Date.now() - o.created > 12 * 3600e3) orders.delete(id);
     lastNow = d.now;
     setStatus('on', 'live');
-    if (added || d.done.length || ed.length || !render.once) { render(fresh); render.once = true }
+    if (added || d.done.length || ed.length || !render.once) { render(fresh); render.once = true; if (!$('tbBg').hidden && !tbBusy && !$('tbBg').contains(document.activeElement && document.activeElement.matches('input') ? document.activeElement : null)) renderTb() }
     if (fresh.length) { beep(); remind = Date.now(); if (autoPrint) fresh.map(id => orders.get(id)).filter(o => o.kind === 'bill' && !printed.has(o.id)).forEach(o => printOrder(o)) }
     else if ([...orders.values()].some(o => o.status === 'new') && Date.now() - remind > 45000) { beep(); remind = Date.now() }
   } catch (e) {
@@ -430,20 +468,32 @@ let autoPrint = store.get('autoprint') === '1';
 const printed = new Set(JSON.parse(store.get('printed') || '[]'));
 const money = n => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' ₫';
 const guestOf = o => ((o.text.split('\n')[0].match(/ · Bàn [^ ]+ · (.+)$/) || [])[1] || '');
-function itemsFor(bill) {          /* all orders of this table (and guest) since the previous bill */
-  const all = [...orders.values()].filter(o => o.tbl === bill.tbl).sort((a, b) => a.id - b.id);
-  const prev = all.filter(o => o.kind === 'bill' && o.id < bill.id && guestOf(o) === guestOf(bill)).pop();
+/* a table's «session»: everything since the table was last closed (or since a 3-hour pause) */
+function sessionOrders(tbl, guest, before = Infinity) {
+  let out = [];
+  [...orders.values()].filter(o => o.tbl === tbl && o.id < before && guestOf(o) === guest).sort((a, b) => a.id - b.id).forEach(o => {
+    if (o.kind === 'closed') { out = []; return }
+    if (out.length && o.created - out[out.length - 1].created > 3 * 3600e3) out = [];
+    out.push(o) });
+  return out;
+}
+function itemsFor(bill) {          /* the dishes of the guest's (or the whole table's) open orders */
+  const guests = guestOf(bill) ? [guestOf(bill)] : [...new Set([...orders.values()].filter(o => o.tbl === bill.tbl).map(guestOf))];
   const lines = {};
-  all.filter(o => o.kind === 'order' && o.id < bill.id && (!prev || o.id > prev.id) && (!guestOf(bill) || guestOf(o) === guestOf(bill)))
+  guests.flatMap(g => sessionOrders(bill.tbl, g, bill.id)).filter(o => o.kind === 'order')
     .forEach(o => o.text.split('\n').forEach(l => { const m = l.match(/^(\d+) × \[(\d+)\] (.+?) — ([\d.]+)\s₫$/);
       if (m) { const k = '#' + m[2]; lines[k] = lines[k] || { q: 0, name: m[3], sum: 0 }; lines[k].q += +m[1]; lines[k].sum += +m[4].replace(/\./g, '') } }));
-  return Object.entries(lines).map(([k, v]) => [k.slice(1), v]);
+  return Object.entries(lines).filter(([, v]) => v.q).map(([k, v]) => [k.slice(1), v]);
 }
 function receiptHTML(o) {
   const d = new Date(o.created), when = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} ${hhmm(o.created)}`;
   const tl = o.text.split('\n'), rest = tl.slice(1).filter(l => !/^Khách nói/.test(l));
   let body = '';
-  if (o.kind === 'bill') {
+  if (o.kind === 'bill' && o.calc) {
+    const c = o.calc;
+    body = `<table>${c.lines.map(l => `<tr><td>${l.q} × ${esc(l.vi)}<small> [${l.id}]</small></td><td class="r">${money(l.sum)}</td></tr>`).join('')}</table><hr>`
+      + calcLines(c).map(l => { const [a, ...b] = l.split(': '); return `<div class="row${/^Tổng/.test(l) ? ' big' : ''}"><span>${esc(a)}</span><span>${esc(b.join(': '))}</span></div>` }).join('');
+  } else if (o.kind === 'bill') {
     const it = itemsFor(o);
     if (it.length) {   /* recompute totals from the dishes, so staff edits are on the bill */
       const sum = it.reduce((a, [, x]) => a + x.sum, 0), pm = (o.text.match(/Tiền tip: .*?\((\d+)%\)/) || [])[1];
@@ -458,14 +508,14 @@ function receiptHTML(o) {
     body = rest.map(l => { const m = l.match(/^(\d+ × )\[(\d+)\] (.+?) — (.+)$/);
       return m ? `<div class="row"><span><b>${m[1]}</b>${esc(m[3])}<small> [${m[2]}]</small></span><span>${esc(m[4])}</span></div>` : `<div class="row ${/^Tổng/.test(l) ? 'big' : ''}"><span>${esc(l)}</span></div>` }).join('');
   }
-  const head = { order: tl[0].startsWith('GỌI THÊM') ? 'GỌI THÊM' : 'PHIẾU GỌI MÓN', bill: 'HÓA ĐƠN TẠM TÍNH' }[o.kind] || tl[0].split(' · ')[0];
+  const head = { order: tl[0].startsWith('GỌI THÊM') ? 'GỌI THÊM' : 'PHIẾU GỌI MÓN', bill: 'HÓA ĐƠN TẠM TÍNH', closed: 'HÓA ĐƠN' }[o.kind] || tl[0].split(' · ')[0];
   return `<!doctype html><html><head><meta charset="utf-8"><style>
 @page{size:80mm auto;margin:0} *{box-sizing:border-box} body{width:72mm;margin:0 auto;padding:3mm 0 6mm;font:12px/1.35 "Be Vietnam Pro",Arial,sans-serif;color:#000}
 .c{text-align:center} h1{font-size:16px;margin:0} h2{font-size:14px;margin:2mm 0 0;letter-spacing:.04em} .tb{font-size:22px;font-weight:800;margin:1mm 0}
 hr{border:0;border-top:1px dashed #000;margin:2mm 0} table{width:100%;border-collapse:collapse} td{padding:.6mm 0;vertical-align:top} .r{text-align:right;white-space:nowrap;padding-left:2mm}
 .row{display:flex;justify-content:space-between;gap:2mm;padding:.5mm 0} .row span:last-child{white-space:nowrap;text-align:right} .big{font-weight:800;font-size:14px} small{color:#444}
 </style></head><body><div class="c"><h1>Poke Sushi Nha Trang</h1><div>SUSHI GO</div><h2>${head}</h2><div class="tb">Bàn ${esc(o.tbl || '?')}${guestOf(o) ? ' · ' + esc(guestOf(o)) : ''}</div><div>${when}${o.id < 1e9 ? ' · #' + o.id : ''}</div></div><hr>${body}<hr>
-<div class="c">${o.kind === 'bill' ? 'Cảm ơn quý khách! · Thank you!<br>Wi-Fi: pokesushinhatrang · xincamon' : 'Bếp / Kitchen'}</div></body></html>`;
+<div class="c">${['bill', 'closed'].includes(o.kind) ? 'Cảm ơn quý khách! · Thank you!<br>Wi-Fi: pokesushinhatrang · xincamon' : 'Bếp / Kitchen'}</div></body></html>`;
 }
 let printQueue = Promise.resolve();
 function printOrder(o) {
@@ -567,9 +617,7 @@ $('list').addEventListener('click', ev => { const b = ev.target.closest('[data-e
 
 /* ---------- waiter enters an order by hand ---------- */
 let draft = null;
-const tableOrders = (tbl, guest) => { const all = [...orders.values()].filter(o => o.tbl === tbl).sort((a, b) => a.id - b.id);
-  const prev = all.filter(o => o.kind === 'bill' && guestOf(o) === (guest || '')).pop();
-  return all.filter(o => o.kind === 'order' && (!prev || o.id > prev.id) && (!guest || guestOf(o) === guest)) };
+const tableOrders = (tbl, guest) => sessionOrders(tbl, guest).filter(o => o.kind === 'order');
 function payButtons(box, pm) { box.querySelectorAll('[data-pm]').forEach(b => b.setAttribute('aria-pressed', b.dataset.pm === pm)) }
 function renderNew() {
   const nm = it => { const n = NAMES[it.id]; return lang === 'vi' || !n ? it.vi : n[lang === 'en' ? 0 : 1] };
@@ -601,18 +649,101 @@ $('newSave').onclick = async () => {
   b.disabled = false;
 };
 
-/* ---------- print a bill for a table (orders taken by a waiter have no «Bring the bill» from the guest) ---------- */
-let tbPm = 'cash';
-function tbBill() { const tbl = $('tbTbl').value.replace(/\D/g, ''), guest = $('tbGuest').value.replace(/\s+/g, ' ').trim();
-  return { id: Number.MAX_SAFE_INTEGER, kind: 'bill', tbl, created: Date.now(), text: `TÍNH TIỀN · Bàn ${tbl}${guest ? ' · ' + guest : ''}\nThanh toán: ${tbPm === 'cash' ? 'Tiền mặt' : 'Chuyển khoản VietQR'}` } }
-function renderTb() { const it = itemsFor(tbBill()); $('tbSum').textContent = money(it.reduce((a, [, x]) => a + x.sum, 0)); payButtons($('tbPay'), tbPm) }
-$('tblBillBtn').onclick = () => { $('tbTbl').value = ''; $('tbGuest').value = ''; tbPm = 'cash'; renderTb(); $('tbBg').hidden = false; $('tbTbl').focus() };
-['tbTbl', 'tbGuest'].forEach(id => $(id).addEventListener('input', renderTb));
-$('tbPay').onclick = ev => { const b = ev.target.closest('[data-pm]'); if (b) { tbPm = b.dataset.pm; renderTb() } };
+/* ---------- table bills: every open table, edit dishes / prices, discount, print, close ---------- */
+const tbState = new Map();      /* per table: { pct, final, pm } — set on this device */
+let tbSel = '', tbBusy = false;
+const gKey = (tbl, guest) => tbl + '|' + guest;
+function activeTables() {
+  const keys = new Set([...orders.values()].filter(o => o.kind === 'order' && o.tbl && o.tbl !== '?').map(o => gKey(o.tbl, guestOf(o))));
+  return [...keys].map(k => { const [tbl, guest] = k.split('|'); return { key: k, tbl, guest, ses: sessionOrders(tbl, guest) } })
+    .filter(g => g.ses.some(o => o.kind === 'order')).sort((a, b) => (+a.tbl - +b.tbl) || a.guest.localeCompare(b.guest));
+}
+function tableCalc(g) {
+  const ords = g.ses.filter(o => o.kind === 'order'), lines = [];
+  ords.forEach(o => parseOrder(o).items.forEach(it => { if (!it.q) return; let l = lines.find(x => x.id === it.id);
+    if (!l) lines.push(l = { id: it.id, vi: it.vi, q: 0, sum: 0 }); l.q += it.q; l.sum += it.q * it.unit }));
+  lines.forEach(l => l.unit = Math.round(l.sum / l.q));
+  const st = tbState.get(g.key) || {}, sub = lines.reduce((a, l) => a + l.sum, 0);
+  const bills = g.ses.filter(o => o.kind === 'bill'), lastBill = bills[bills.length - 1];
+  const tipPct = +(((lastBill && lastBill.text.match(/Tiền tip: .*?\((\d+)%\)/)) || [])[1] || 0);
+  const payLine = [...g.ses].reverse().map(o => (o.text.match(/^Thanh toán: (.+)$/m) || [])[1]).find(Boolean);
+  const pm = st.pm || (payLine && /VietQR/.test(payLine) ? 'qr' : 'cash');
+  const pct = st.final == null ? (st.pct || 0) : null;
+  const final = st.final != null ? st.final : sub - Math.round(sub * pct / 100 / 1000) * 1000;
+  const tip = tipPct ? Math.round(final * tipPct / 100 / 1000) * 1000 : 0;
+  return { lines, sub, pct, disc: sub - final, final, tipPct, tip, total: final + tip, pm, asked: !!lastBill, ords };
+}
+function calcLines(c) {          /* Vietnamese lines for the bill / the closed-table record */
+  return [...(c.disc ? [`Tạm tính: ${money(c.sub)}`, c.disc > 0 ? `Giảm giá${c.pct ? ` (${c.pct}%)` : ''}: −${money(c.disc)}` : `Phụ thu: +${money(-c.disc)}`] : []),
+    `Tổng: ${money(c.final)}`, ...(c.tipPct ? [`Tiền tip: ${money(c.tip)} (${c.tipPct}%)`, `Tổng cộng: ${money(c.total)}`] : []),
+    `Thanh toán: ${c.pm === 'cash' ? 'Tiền mặt' : 'Chuyển khoản VietQR'}`];
+}
+function renderTb() {
+  const groups = activeTables();
+  if (!groups.find(g => g.key === tbSel)) tbSel = groups.length ? groups[0].key : '';
+  $('tbEmpty').hidden = !!groups.length; $('tbCard').hidden = !groups.length;
+  $('tbTabs').innerHTML = groups.map(g => `<button data-tg="${esc(g.key)}" aria-pressed="${g.key === tbSel}"><b>${t('table')} ${esc(g.tbl)}</b>${g.guest ? `<small>👤 ${esc(g.guest)}</small>` : ''}<span>${money(tableCalc(g).total)}</span>${tableCalc(g).asked ? '<i>💳</i>' : ''}</button>`).join('');
+  const g = groups.find(x => x.key === tbSel); if (!g) return;
+  const c = tableCalc(g), nm = l => { const n = NAMES[l.id]; return lang === 'vi' || !n ? l.vi : n[lang === 'en' ? 0 : 1] };
+  $('tbHead').innerHTML = `<b>${t('table')} ${esc(g.tbl)}</b>${g.guest ? ` · 👤 ${esc(g.guest)}` : ''} · ${t('tbOrders')(c.ords.length)} · ${t('tbSince')} ${hhmm(c.ords[0].created)}${c.asked ? `<span class="ask">${t('tbAsk')}</span>` : ''}`;
+  $('tbRows').innerHTML = c.lines.length ? c.lines.map(l => `<div class="trow"><div class="nm">[${l.id}] ${esc(nm(l))}${lang !== 'vi' ? `<small>${esc(l.vi)}</small>` : ''}</div>
+    <div class="qty"><button data-tq="${l.id}:-1" aria-label="−">−</button><b>${l.q}</b><button data-tq="${l.id}:1" aria-label="+">+</button></div>
+    <label class="up"><small>${t('tbUnit')}</small><input data-up="${l.id}" inputmode="numeric" value="${l.unit}" aria-label="${t('tbUnit')}"></label>
+    <div class="sum">${money(l.sum)}</div><button class="rm" data-tq="${l.id}:x" aria-label="${t('editRm')}">✕</button></div>`).join('') : `<div class="cempty">${t('tbNone')}</div>`;
+  $('tbSubSum').textContent = money(c.sub);
+  const f = document.activeElement;
+  if (f !== $('tbPct')) $('tbPct').value = c.pct == null ? '' : (c.pct || '');
+  if (f !== $('tbFinal')) $('tbFinal').value = c.final;
+  $('tbDiscSum').textContent = c.disc > 0 ? '−' + money(c.disc) : c.disc < 0 ? '+' + money(-c.disc) : '';
+  $('tbDiscLbl').textContent = c.disc < 0 ? t('tbExtra') : t('tbDisc');
+  $('tbPcts').querySelectorAll('[data-pct]').forEach(b => b.setAttribute('aria-pressed', c.pct === +b.dataset.pct));
+  $('tbTipBox').innerHTML = c.tipPct ? `<div class="trw"><span>${t('tbTip')} (${c.tipPct}%)</span><span>${money(c.tip)}</span></div><div class="trw tbig"><span>${t('tbTipTot')}</span><span>${money(c.total)}</span></div>` : '';
+  payButtons($('tbPay'), c.pm);
+}
+const tbGroup = () => activeTables().find(g => g.key === tbSel);
+const tbSet = patch => { tbState.set(tbSel, Object.assign({}, tbState.get(tbSel), patch)); renderTb() };
+async function tbApply(change) {           /* change(parsed orders) edits them; the changed orders are saved */
+  const g = tbGroup(); if (!g || tbBusy) return;
+  const ps = g.ses.filter(o => o.kind === 'order').map(parseOrder), before = ps.map(e => buildText(e, e.note));
+  change(ps);
+  tbBusy = true;
+  try { for (let i = 0; i < ps.length; i++) { const txt = buildText(ps[i], ps[i].note); if (txt !== before[i]) await saveOrder(ps[i].o, txt) } }
+  catch (err) { alert(err.message === 'code' ? t('wrongCode') : t('editFail')) }
+  tbBusy = false; renderTb();
+}
+function tbAdd(id) { const n = NAMES[id]; tbApply(ps => { const last = ps[ps.length - 1], ex = last.items.find(x => x.id === id);
+  if (ex) ex.q++; else last.items.push({ id, vi: n[2], q: 1, unit: n[3] }) }) }
+$('tbRows').addEventListener('click', ev => { const b = ev.target.closest('[data-tq]'); if (!b) return; const [id, d] = b.dataset.tq.split(':');
+  tbApply(ps => { const has = ps.filter(e => e.items.some(x => x.id === id && x.q > 0));
+    if (d === 'x') has.forEach(e => e.items.forEach(x => { if (x.id === id) x.q = 0 }));
+    else { const e = has[has.length - 1], it = e && e.items.find(x => x.id === id && x.q > 0); if (it) it.q = Math.max(0, Math.min(99, it.q + +d)) } }) });
+$('tbRows').addEventListener('change', ev => { const inp = ev.target.closest('[data-up]'); if (!inp) return;
+  const v = +inp.value.replace(/\D/g, ''); if (v < 1000) { alert(t('prBad')); return renderTb() }
+  tbApply(ps => ps.forEach(e => e.items.forEach(x => { if (x.id === inp.dataset.up) x.unit = v }))) });
+$('tbRows').addEventListener('keydown', ev => { if (ev.key === 'Enter' && ev.target.matches('[data-up]')) ev.target.blur() });
+$('tbTabs').onclick = ev => { const b = ev.target.closest('[data-tg]'); if (b) { tbSel = b.dataset.tg; renderTb() } };
+$('tbPcts').onclick = ev => { const b = ev.target.closest('[data-pct]'); if (b) tbSet({ pct: +b.dataset.pct, final: null }) };
+$('tbPct').addEventListener('input', () => { const v = Math.min(100, +$('tbPct').value.replace(/\D/g, '') || 0); tbSet({ pct: v, final: null }) });
+$('tbFinal').addEventListener('input', () => { const raw = $('tbFinal').value.replace(/\D/g, ''); tbSet(raw === '' ? { final: null, pct: 0 } : { final: +raw }) });
+$('tbFinal').addEventListener('blur', renderTb); $('tbPct').addEventListener('blur', renderTb);
+$('tbPay').onclick = ev => { const b = ev.target.closest('[data-pm]'); if (b) tbSet({ pm: b.dataset.pm }) };
+function tbBill(g, c) { return { id: Date.now(), kind: 'bill', tbl: g.tbl, created: Date.now(), calc: c, text: `TÍNH TIỀN · Bàn ${g.tbl}${g.guest ? ' · ' + g.guest : ''}` } }
+$('tbPrint').onclick = () => { const g = tbGroup(); if (!g) return; const c = tableCalc(g); if (!c.lines.length) return alert(t('tbNone')); printOrder(tbBill(g, c)) };
+$('tbClose').onclick = async () => {
+  const g = tbGroup(); if (!g) return; const c = tableCalc(g);
+  if (!confirm(t('tbCloseQ')(g.tbl + (g.guest ? ' · ' + g.guest : ''), money(c.total)))) return;
+  const text = [`ĐÃ ĐÓNG BÀN · Bàn ${g.tbl}${g.guest ? ' · ' + g.guest : ''}`, ...c.lines.map(l => `${l.q} × [${l.id}] ${l.vi} — ${money(l.sum)}`), ...calcLines(c)].join('\n');
+  const b = $('tbClose'); b.disabled = true;
+  try { const r = await api('/staff/close', { text, ids: g.ses.filter(o => o.status === 'new').map(o => o.id) });
+    g.ses.forEach(o => { if (o.status === 'new') o.status = 'done' }); tbState.delete(g.key);
+    orders.set(r.id, { id: r.id, kind: 'closed', tbl: g.tbl, text, created: r.now, status: 'done', done_at: r.now }); maxId = Math.max(maxId, r.id);
+    render(); renderTb() }
+  catch (err) { alert(err.message === 'code' ? t('wrongCode') : t('editFail')) }
+  b.disabled = false;
+};
+$('tblBillBtn').onclick = () => { mountSearch($('tbSearch'), tbAdd); renderTb(); $('tbBg').hidden = false };
 $('tbCancel').onclick = () => { $('tbBg').hidden = true };
 $('tbBg').addEventListener('click', ev => { if (ev.target === $('tbBg')) $('tbBg').hidden = true });
-$('tbPrint').onclick = () => { const bill = tbBill(); if (!bill.tbl) return alert(t('needTbl')); if (!itemsFor(bill).length) return alert(t('tbNone'));
-  bill.id = Date.now(); printOrder(bill); $('tbBg').hidden = true };
 
 /* ---------- «Popular» tab of the guest menu ---------- */
 $('popBtn').onclick = async () => {
