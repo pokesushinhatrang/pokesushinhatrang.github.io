@@ -1111,20 +1111,32 @@ async function loadSheet(){
       if(p>=1000&&p!==m.price){m.price=p;changed=true}
       if(String(r[3]||'').trim())so.push(id);
     });
-    if(so.join()!==SOLD_OUT.join()){SOLD_OUT.length=0;SOLD_OUT.push(...so);changed=true}
-    SOLD_OUT.forEach(id=>{if(cart[id]){delete cart[id];changed=true}});
+    SOLD_SHEET=so;
+    if(applySold())changed=true;
     if(changed){renderList();renderBar();saveSent();if(!document.getElementById('sheetBg').hidden)renderSheet()}
   }catch(e){}
+}
+/* sold out = staff screen stop-list + (old) sheet column D */
+var SOLD_SHEET=[],SOLD_STAFF=[];
+function applySold(){
+  const so=[...new Set([...SOLD_STAFF,...SOLD_SHEET])].sort();let changed=false;
+  if(so.join()!==SOLD_OUT.slice().sort().join()){SOLD_OUT.length=0;SOLD_OUT.push(...so);changed=true}
+  SOLD_OUT.forEach(id=>{if(cart[id]){delete cart[id];changed=true}});
+  return changed;
 }
 setTimeout(loadSheet,0);
 async function loadPopular(){
   try{
     const r=await fetch(CONFIG.orderEndpoint.replace(/\/$/,'')+'/popular?venue='+CONFIG.venue,{cache:'no-store'});
     if(!r.ok)return; const d=await r.json(); const ids=(d.ids||[]).filter(id=>MENU.some(m=>m.id===id));
-    if(ids.join()===POPULAR.join())return; POPULAR=ids; renderCats(); renderList();
+    SOLD_STAFF=(d.soldout||[]).filter(id=>MENU.some(m=>m.id===id));
+    const soldChanged=applySold(), popChanged=ids.join()!==POPULAR.join();
+    if(!soldChanged&&!popChanged)return; POPULAR=ids; renderCats(); renderList(); renderBar(); saveSent();
+    if(!document.getElementById('sheetBg').hidden)renderSheet();
   }catch(e){}
 }
-setTimeout(loadPopular,0);setInterval(loadPopular,300000);setInterval(loadSheet,60000);
+setTimeout(loadPopular,0);setInterval(loadPopular,60000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadPopular()});setInterval(loadSheet,60000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadSheet()});
 
 /* ---- active category follows the scroll ---- */
