@@ -465,6 +465,7 @@ body.has-ostrip #menuApp .toast{bottom:calc(150px + env(safe-area-inset-bottom,0
 #menuApp .it .no{font-family:var(--f-mono);font-size:12px;font-weight:500;color:var(--primary);background:var(--primary-soft);border-radius:6px;padding:1px 6px;margin-right:2px;vertical-align:2px}
 #menuApp footer a{color:inherit}
 #menuApp .notice{position:relative;z-index:1;margin:2px 0 10px;padding:12px 14px 12px 42px;border-radius:14px;background:var(--primary-soft);border:1px solid var(--line);color:var(--ink);font-size:15px;line-height:1.45;white-space:pre-line}
+#menuApp .notice b{font-weight:800}
 #menuApp .notice::before{content:"📢";position:absolute;left:13px;top:11px;font-size:18px}
 #menuApp .it .ph0{display:grid;place-items:center;font-family:var(--f-display);font-size:26px;color:var(--primary);background:var(--primary-soft) ;}
 #menuApp .wrap::before{top:44px;width:130px;height:170px}
@@ -1144,7 +1145,7 @@ async function loadPopular(){
 var NOTICE={};
 function renderNotice(){
   const el=document.getElementById('notice'), tx=(NOTICE[lang]||NOTICE.en||NOTICE.vi||NOTICE.ru||'').trim();
-  el.hidden=!tx; el.textContent=tx;
+  el.hidden=!tx; el.innerHTML=tx.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])).replace(/\*\*([^*\n]+?)\*\*/g,'<b>$1</b>');
 }
 document.querySelector('#menuApp .lang').addEventListener('click',()=>setTimeout(renderNotice,0));
 setTimeout(loadPopular,0);setInterval(loadPopular,60000);
