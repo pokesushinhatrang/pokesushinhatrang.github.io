@@ -65,7 +65,13 @@ button{font:inherit;cursor:pointer}
 .o .edited{font-size:12px;font-weight:800;color:#8a5a1c;background:var(--amber-soft);border-radius:999px;padding:3px 9px}
 .newbar{display:flex;gap:10px;margin:2px 0 14px;flex-wrap:wrap}
 .newb{flex:1;min-width:200px;border:0;border-radius:14px;padding:15px;font-size:17px;font-weight:800;background:var(--pink);color:#fff}
-.billb{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:15px 18px;font-size:16px;font-weight:800}
+.billb{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:15px 18px;font-size:16px;font-weight:800;color:var(--ink);font-family:inherit}
+@media (max-width:640px){
+  .newbar{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .newb{grid-column:1/-1;min-width:0;padding:14px;font-size:17px}
+  .bar h2{width:100%}.bar .sp{display:none}
+  .billb{min-width:0;padding:12px 8px;font-size:15px;line-height:1.25;display:flex;align-items:center;justify-content:center;gap:6px;text-align:center}
+}
 .crow{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
 .crow .f{flex:1;min-width:140px}
 .crow input{width:100%;font:inherit;font-size:18px;padding:10px;border:1px solid var(--line);border-radius:10px;margin-top:6px}
