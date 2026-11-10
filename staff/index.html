@@ -162,7 +162,9 @@ button{font:inherit;cursor:pointer}
 .o .pr{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 12px;font-size:14px;font-weight:700;color:var(--ink)}
 .chip.on{background:var(--green);border-color:var(--green);color:#fff}
 .o .ok{border:0;border-radius:12px;padding:14px 16px;font-size:16px;font-weight:800;background:var(--green);color:#fff;white-space:nowrap}
-.o.done{opacity:.55;border-left-color:var(--line)!important}
+.o.done{border-left-color:var(--line)!important;background:#FBF7F1}
+.o.done>div:first-child{opacity:.55}   /* only the text is dimmed: Print / Reopen stay clearly tappable */
+.o.done .acts .pr{background:var(--surface);color:var(--ink);border-color:#D9C9B6}
 .o.done .ok{background:var(--line);color:var(--muted)}
 .o.done pre{max-height:3em;overflow:hidden}
 .empty{color:var(--muted);text-align:center;padding:40px 10px}
