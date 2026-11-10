@@ -468,6 +468,7 @@ body.has-ostrip #menuApp .toast{bottom:calc(150px + env(safe-area-inset-bottom,0
 #menuApp .notice b{font-weight:800}
 #menuApp .bpick{position:fixed;inset:0;z-index:30;background:color-mix(in srgb,var(--ink) 45%,transparent);display:flex;align-items:flex-end;justify-content:center}
 #menuApp .bpick[hidden]{display:none}
+#menuApp .kitchen{display:none}   /* the Vietnamese ticket preview is not needed by guests */
 #menuApp .lines li>span:first-child{min-width:0}
 #menuApp .dnb{display:block;margin-top:4px;font:inherit;font-size:13px;font-weight:600;color:var(--muted);background:none;border:1px dashed var(--line);border-radius:999px;padding:3px 10px;text-align:left}
 #menuApp .dnb.has{color:var(--ink);border-style:solid;background:var(--bg);white-space:normal}
@@ -1848,6 +1849,24 @@ function applySold(){
   return changed;
 }
 setTimeout(loadSheet,0);
+const TC_T={vi:'Bàn đã được đóng. Cảm ơn bạn đã ghé quán!',en:'Your table is closed. Thank you for visiting!',ru:'Стол закрыт. Спасибо, что были у нас!'};
+async function checkClosed(){
+  if(!sent.length||!table||VIEW_ONLY)return;
+  try{
+    const r=await fetch(CONFIG.orderEndpoint.replace(/\/$/,'')+'/table?venue='+CONFIG.venue+'&tbl='+encodeURIComponent(table),{cache:'no-store'});
+    if(!r.ok)return; const d=await r.json(), skew=d.now-Date.now(), last=Math.max(...sent.map(o=>o.at));
+    const me=(guestName||'').trim();
+    if((d.closes||[]).some(c=>(c.guest||'')===me&&c.at-skew>last)){
+      closedBill=0;sent=[];saveSent();renderBar();
+      ['histBg','waiterBg'].forEach(id=>{const el=document.getElementById(id);if(el)el.hidden=true});
+      const el=document.getElementById('toast');el.textContent=TC_T[lang]||TC_T.en;el.hidden=false;clearTimeout(tt);tt=setTimeout(()=>el.hidden=true,8000);
+    }
+  }catch(e){}
+}
+setInterval(checkClosed,30000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkClosed()});
+setTimeout(checkClosed,3000);
+
 /* photos the staff replaced on the staff screen are served by the orders server */
 function photoSrc(m){const v=(window.__PH||{})[m.id];return v?CONFIG.orderEndpoint.replace(/\/$/,'')+'/photo?venue='+CONFIG.venue+'&id='+m.id+'&v='+v:'img/'+m.img+'.webp?v='+(IMGV[m.img]||'')}
 async function loadPopular(){
