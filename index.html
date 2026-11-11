@@ -1857,6 +1857,19 @@ function applySold(){
   return changed;
 }
 setTimeout(loadSheet,0);
+const MENU_BASE=JSON.parse(JSON.stringify(MENU));let MENU_OVR='';
+function applyMenu(o){
+  const k=JSON.stringify(o||{});if(k===MENU_OVR)return false;MENU_OVR=k;o=o||{};
+  const hid=new Set(o.hidden||[]),ed=o.edits||{},list=[];
+  const fix=(m,e)=>{if(!e)return m;if(e.vi)m.vi=e.vi;if(e.vd!=null)m.vd=e.vd;
+    ['en','ru'].forEach(l=>{if(Array.isArray(e[l])){m[l]=[e[l][0]||m[l][0],e[l][1]!=null&&e[l][1]!==''?e[l][1]:m[l][1]]}});
+    if(e.cat&&CATS.includes(e.cat))m.cat=e.cat;if(+e.price>=1000)m.price=+e.price;return m};
+  MENU_BASE.forEach(b=>{if(!hid.has(b.id))list.push(fix(JSON.parse(JSON.stringify(b)),ed[b.id]))});
+  (o.added||[]).forEach(a=>{if(hid.has(a.id)||list.some(m=>m.id===a.id)||!CATS.includes(a.cat))return;
+    list.push({id:a.id,cat:a.cat,vi:a.vi,vd:a.vd||'',price:+a.price||0,en:[(a.en||[])[0]||a.vi,(a.en||[])[1]||''],ru:[(a.ru||[])[0]||a.vi,(a.ru||[])[1]||'']})});
+  MENU.length=0;MENU.push(...list);return true;
+}
+
 const TC_T={vi:['Bàn đã được đóng. Cảm ơn bạn đã ghé quán!','Bàn đã được mở lại, đơn của bạn vẫn còn.'],en:['Your table is closed. Thank you for visiting!','Your table is open again, your order is back.'],ru:['Стол закрыт. Спасибо, что были у нас!','Стол снова открыт, ваш заказ на месте.']};
 /* the orders of a closed table are kept aside for 3 hours: if the staff reopen the table, they come back */
 let STASH=(()=>{try{return JSON.parse(localStorage.getItem('sushigo_closed')||'null')}catch(e){return null}})();
@@ -1891,10 +1904,10 @@ function photoSrc(m){const v=(window.__PH||{})[m.id];return v?CONFIG.orderEndpoi
 async function loadPopular(){
   try{
     const r=await fetch(CONFIG.orderEndpoint.replace(/\/$/,'')+'/popular?venue='+CONFIG.venue,{cache:'no-store'});
-    if(!r.ok)return; const d=await r.json(); const ids=(d.ids||[]).filter(id=>MENU.some(m=>m.id===id));
+    if(!r.ok)return; const d=await r.json(); const menuChanged=applyMenu(d.menu); const ids=(d.ids||[]).filter(id=>MENU.some(m=>m.id===id));
     SOLD_STAFF=(d.soldout||[]).filter(id=>MENU.some(m=>m.id===id));
     NOTICE=d.notice||{}; renderNotice();
-    PRICES=d.prices||{}; let priceChanged=false;
+    PRICES=d.prices||{}; let priceChanged=menuChanged;
     if(JSON.stringify(d.photos||{})!==JSON.stringify(window.__PH||{})){window.__PH=d.photos||{};priceChanged=true}
     MENU.forEach(m=>{const p=+PRICES[m.id];if(p>=1000&&p!==m.price){m.price=p;priceChanged=true}});
     const soldChanged=applySold(), popChanged=ids.join()!==POPULAR.join();
