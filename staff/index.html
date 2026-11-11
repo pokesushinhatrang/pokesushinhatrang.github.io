@@ -567,14 +567,27 @@ function itemsFor(bill) {          /* the dishes of the guest's (or the whole ta
       if (m) { const k = '#' + m[2] + '@' + Math.round(+m[4].replace(/\./g, '') / +m[1]); lines[k] = lines[k] || { q: 0, name: m[3], sum: 0 }; lines[k].q += +m[1]; lines[k].sum += +m[4].replace(/\./g, '') } }));
   return Object.entries(lines).filter(([, v]) => v.q).map(([k, v]) => [k.slice(1).split('@')[0], v]);
 }
+/* guest bills also show the guest's language (from «Khách nói tiếng …» in the orders) */
+const RL = { en: { 'Tạm tính': 'Subtotal', 'Giảm giá': 'Discount', 'Phụ thu': 'Surcharge', 'Thuế': 'Tax', 'Tổng': 'Total', 'Tiền tip': 'Tip', 'Tổng cộng': 'Total with tip', 'Thanh toán': 'Payment', 'Tiền mặt': 'Cash', 'Chuyển khoản VietQR': 'VietQR transfer', head: 'Provisional bill', thanks: 'Thank you!' },
+  ru: { 'Tạm tính': 'Сумма', 'Giảm giá': 'Скидка', 'Phụ thu': 'Надбавка', 'Thuế': 'Налог', 'Tổng': 'Итого', 'Tiền tip': 'Чаевые', 'Tổng cộng': 'Всего с чаевыми', 'Thanh toán': 'Оплата', 'Tiền mặt': 'Наличные', 'Chuyển khoản VietQR': 'Перевод VietQR', head: 'Предварительный счёт', thanks: 'Спасибо!' } };
+const glOf = o => { const g = guestLang(o) || (o.calc && o.calc.ords.map(guestLang).find(Boolean)) || [...orders.values()].filter(x => x.tbl === o.tbl && x.id < o.id && guestOf(x) === guestOf(o) && guestLang(x)).sort((a, b) => b.id - a.id).map(guestLang)[0] || ''; return RL[g] ? g : '' };
+const dishIn = (id, vi, gl) => { const f = MENU_FULL.m[id], n = NAMES[id] || (f ? [f[3], f[5]] : null); if (!gl || !n) return '';
+  const b = (String(vi).match(/ · Đế: (.+?)(?= · Yêu cầu: |$)/) || [])[1], bt = b && BASE_TR[b.trim()]; return n[gl === 'en' ? 0 : 1] + (bt ? ' · ' + bt[gl === 'en' ? 0 : 1] : '') };
+function billRow(l, gl, big) {
+  const [a, ...r] = l.split(': '), v = r.join(': '), k = a.replace(/\s*\(.*\)$/, ''), sfx = (a.match(/\s*\(.*\)$/) || [''])[0];
+  const at = gl && RL[gl][k] ? RL[gl][k] + sfx : '', vt = gl && RL[gl][v] ? RL[gl][v] : '';
+  return `<div class="row${big ? ' big' : ''}"><span>${esc(a)}${at ? `<br><small>${esc(at)}</small>` : ''}</span><span>${esc(v)}${vt ? `<br><small>${esc(vt)}</small>` : ''}</span></div>`;
+}
+const dishTd = (q, vi, id, sum, gl) => { const dn = dishIn(id, vi, gl); return `<tr><td>${q} × ${esc(vi)}<small> [${id}]</small>${dn ? `<br><small>${esc(dn)}</small>` : ''}</td><td class="r">${money(sum)}</td></tr>` };
 function receiptHTML(o) {
+  const gl = ['bill', 'closed'].includes(o.kind) ? glOf(o) : '';
   const d = new Date(o.created), when = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} ${hhmm(o.created)}`;
   const tl = o.text.split('\n'), rest = tl.slice(1).filter(l => !/^Khách nói/.test(l)).flatMap(l => { const n = l.match(/^Ghi chú: (.+)$/), x = n && noteTr(o, n[1], 'vi'); return x ? [l, '🌐 ' + x] : [l] });
   let body = '';
   if (o.kind === 'bill' && o.calc) {
     const c = o.calc;
-    body = `<table>${c.lines.map(l => `<tr><td>${l.q} × ${esc(l.vi)}<small> [${l.id}]</small></td><td class="r">${money(l.sum)}</td></tr>`).join('')}</table><hr>`
-      + calcLines(c).map(l => { const [a, ...b] = l.split(': '); return `<div class="row${/^Tổng/.test(l) ? ' big' : ''}"><span>${esc(a)}</span><span>${esc(b.join(': '))}</span></div>` }).join('');
+    body = `<table>${c.lines.map(l => dishTd(l.q, l.vi, l.id, l.sum, gl)).join('')}</table><hr>`
+      + calcLines(c).map(l => billRow(l, gl, /^Tổng/.test(l))).join('');
   } else if (o.kind === 'bill') {
     const it = itemsFor(o);
     if (it.length) {   /* recompute totals from the dishes, so staff edits are on the bill */
@@ -583,9 +596,12 @@ function receiptHTML(o) {
       rest.splice(0, rest.length, ...rest.filter(l => !/^(Tổng cộng|Tổng|Tiền tip):/.test(l)));
       rest.unshift(`Tổng: ${money(sum)}`, ...(pm ? [`Tiền tip: ${money(tip)} (${pm}%)`, `Tổng cộng: ${money(sum + tip)}`] : []));
     }
-    body = (it.length ? `<table>${it.map(([id, x]) => `<tr><td>${x.q} × ${esc(x.name)}<small> [${id}]</small></td><td class="r">${money(x.sum)}</td></tr>`).join('')}</table><hr>` : '')
-      + rest.map(l => { const m = l.match(/^(Tổng cộng|Tổng|Tiền tip)( \(\d+%\))?: (.+)$/) || l.match(/^(Tiền tip): (.+?)( \(\d+%\))$/);
-          return /^Tổng cộng|^Tổng:/.test(l) ? `<div class="row big"><span>${esc(l.split(': ')[0])}</span><span>${esc(l.split(': ')[1])}</span></div>` : `<div class="row"><span>${esc(l.split(': ')[0])}</span><span>${esc(l.split(': ').slice(1).join(': '))}</span></div>` }).join('');
+    body = (it.length ? `<table>${it.map(([id, x]) => dishTd(x.q, x.name, id, x.sum, gl)).join('')}</table><hr>` : '')
+      + rest.map(l => billRow(l, gl, /^Tổng cộng|^Tổng:/.test(l))).join('');
+  } else if (o.kind === 'closed') {
+    const ds = [], ot = [];
+    rest.forEach(l => { const m = l.match(/^(\d+) × \[(\d+)\] (.+?) — ([\d.]+)\s₫$/); if (m) ds.push(dishTd(m[1], m[3], m[2], +m[4].replace(/\./g, ''), gl)); else ot.push(billRow(l, gl, /^Tổng/.test(l))) });
+    body = (ds.length ? `<table>${ds.join('')}</table><hr>` : '') + ot.join('');
   } else {
     body = rest.map(l => { const m = l.match(/^(\d+ × )\[(\d+)\] (.+?) — (.+)$/);
       const rq = m && (m[3].match(/ · Yêu cầu: (.+)$/) || [])[1], rv = rq && noteTr(o, rq, 'vi');
@@ -597,8 +613,8 @@ function receiptHTML(o) {
 .c{text-align:center} h1{font-size:16px;margin:0} h2{font-size:14px;margin:2mm 0 0;letter-spacing:.04em} .tb{font-size:22px;font-weight:800;margin:1mm 0}
 hr{border:0;border-top:1px dashed #000;margin:2mm 0} table{width:100%;border-collapse:collapse} td{padding:.6mm 0;vertical-align:top} .r{text-align:right;white-space:nowrap;padding-left:2mm}
 .row{display:flex;justify-content:space-between;gap:2mm;padding:.5mm 0} .row span:last-child{white-space:nowrap;text-align:right} .big{font-weight:800;font-size:14px} small{color:#444}
-</style></head><body><div class="c"><h1>Poke Sushi Nha Trang</h1><div>SUSHI GO</div><h2>${head}</h2><div class="tb">Bàn ${esc(o.tbl || '?')}${guestOf(o) ? ' · ' + esc(guestOf(o)) : ''}</div><div>${when}${o.id < 1e9 ? ' · #' + o.id : ''}</div></div><hr>${body}<hr>
-<div class="c">${['bill', 'closed'].includes(o.kind) ? '<small style="display:block;font-size:10px;margin-bottom:1.5mm">Phiếu tạm tính — không phải hóa đơn GTGT<br>Provisional bill — not a tax invoice</small>Cảm ơn quý khách! · Thank you!<br>Wi-Fi: pokesushinhatrang · xincamon' : 'Bếp / Kitchen'}</div></body></html>`;
+</style></head><body><div class="c"><h1>Poke Sushi Nha Trang</h1><div>SUSHI GO</div><h2>${head}</h2>${gl ? `<div style="font-size:11px">${RL[gl].head}</div>` : ''}<div class="tb">Bàn ${esc(o.tbl || '?')}${guestOf(o) ? ' · ' + esc(guestOf(o)) : ''}</div><div>${when}${o.id < 1e9 ? ' · #' + o.id : ''}</div></div><hr>${body}<hr>
+<div class="c">${['bill', 'closed'].includes(o.kind) ? '<small style="display:block;font-size:10px;margin-bottom:1.5mm">Phiếu tạm tính — không phải hóa đơn GTGT<br>Provisional bill — not a tax invoice</small>Cảm ơn quý khách! · Thank you!' + (gl === 'ru' ? ' · Спасибо!' : '') + '<br>Wi-Fi: pokesushinhatrang · xincamon' : 'Bếp / Kitchen'}</div></body></html>`;
 }
 let printQueue = Promise.resolve();
 function printOrder(o) {
