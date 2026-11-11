@@ -288,7 +288,7 @@ button{font:inherit;cursor:pointer}
     <div class="tbtot">
       <div class="trw"><span data-t="tbSubtotal"></span><span id="tbSubSum"></span></div>
       <div class="trw disc"><span id="tbDiscLbl"></span><span class="pcts" id="tbPcts"><button data-pct="0">0%</button><button data-pct="5">5%</button><button data-pct="10">10%</button><button data-pct="15">15%</button><button data-pct="20">20%</button><label><input id="tbPct" inputmode="numeric" maxlength="3" aria-label="%"> %</label></span><span id="tbDiscSum"></span></div>
-      <div class="trw disc"><span data-t="tbTax"></span><span class="pcts" id="tbTaxes"><button data-tax="0">0%</button><button data-tax="3">3%</button><button data-tax="5">5%</button><button data-tax="8">8%</button><button data-tax="10">10%</button><button data-tax="15">15%</button><button data-tax="20">20%</button><label><input id="tbTaxIn" inputmode="decimal" maxlength="4" aria-label="%"> %</label></span><span id="tbTaxSum"></span></div>
+      <div class="trw disc"><span data-t="tbTax"></span><span class="pcts" id="tbTaxes"><button data-tax="0">0%</button><button data-tax="3">3%</button><button data-tax="4.5">4,5%</button><button data-tax="5">5%</button><button data-tax="8">8%</button><button data-tax="10">10%</button><button data-tax="15">15%</button><button data-tax="20">20%</button><label><input id="tbTaxIn" inputmode="decimal" maxlength="4" aria-label="%"> %</label></span><span id="tbTaxSum"></span></div>
       <div class="trw tbig"><span data-t="tbFinal"></span><input id="tbFinal" inputmode="numeric" maxlength="10"></div>
       <div class="ehint" data-t="tbFinalHint"></div>
       <div id="tbTipBox"></div>
@@ -758,6 +758,7 @@ function activeTables() {
   return [...keys].map(k => { const [tbl, guest] = k.split('|'); return { key: k, tbl, guest, ses: sessionOrders(tbl, guest) } })
     .filter(g => g.ses.some(o => o.kind === 'order')).sort((a, b) => (+a.tbl - +b.tbl) || a.guest.localeCompare(b.guest));
 }
+const CARD_TAX = 4.5;
 function tableCalc(g) {
   const ords = g.ses.filter(o => o.kind === 'order'), lines = [];
   ords.forEach(o => parseOrder(o).items.forEach(it => { if (!it.q) return; let l = lines.find(x => x.id === it.id && x.unit === it.unit && x.vi === it.vi);
@@ -769,7 +770,7 @@ function tableCalc(g) {
   const payLine = [...g.ses].reverse().map(o => (o.text.match(/^Thanh toán: (.+)$/m) || [])[1]).find(Boolean);
   const pm = st.pm || (payLine && /VietQR/.test(payLine) ? 'qr' : payLine && /Thẻ/.test(payLine) ? 'card' : 'cash');
   const pct = st.final == null ? (st.pct || 0) : null;
-  const tax = st.tax || 0;      /* tax %: added on top of the price after the discount */
+  const tax = st.tax != null ? st.tax : (pm === 'card' ? CARD_TAX : 0);      /* tax %: added after the discount; card payment → 4.5% unless set by hand */
   let after, taxAmt, final;
   if (st.final != null) { final = st.final; after = Math.round(final / (1 + tax / 100)); taxAmt = final - after }
   else { after = sub - Math.round(sub * pct / 100 / 1000) * 1000; taxAmt = Math.round(after * tax / 100 / 1000) * 1000; final = after + taxAmt }
@@ -807,7 +808,7 @@ function renderTb() {
   $('tbDiscLbl').textContent = c.disc < 0 ? t('tbExtra') : t('tbDisc');
   $('tbPcts').querySelectorAll('[data-pct]').forEach(b => b.setAttribute('aria-pressed', c.pct === +b.dataset.pct));
   $('tbTaxes').querySelectorAll('[data-tax]').forEach(b => b.setAttribute('aria-pressed', c.tax === +b.dataset.tax));
-  if (f !== $('tbTaxIn')) $('tbTaxIn').value = c.tax && ![3, 5, 8, 10, 15, 20].includes(c.tax) ? c.tax : '';
+  if (f !== $('tbTaxIn')) $('tbTaxIn').value = c.tax && ![3, 4.5, 5, 8, 10, 15, 20].includes(c.tax) ? c.tax : '';
   $('tbTaxSum').textContent = c.taxAmt ? '+' + money(c.taxAmt) : '';
   $('tbTipBox').innerHTML = c.tipPct ? `<div class="trw"><span>${t('tbTip')} (${c.tipPct}%)</span><span>${money(c.tip)}</span></div><div class="trw tbig"><span>${t('tbTipTot')}</span><span>${money(c.total)}</span></div>` : '';
   payButtons($('tbPay'), c.pm);
@@ -841,7 +842,7 @@ $('tbTaxIn').addEventListener('blur', renderTb);
 $('tbPct').addEventListener('input', () => { const v = Math.min(100, +$('tbPct').value.replace(/\D/g, '') || 0); tbSet({ pct: v, final: null }) });
 $('tbFinal').addEventListener('input', () => { const raw = $('tbFinal').value.replace(/\D/g, ''); tbSet(raw === '' ? { final: null, pct: 0 } : { final: +raw }) });
 $('tbFinal').addEventListener('blur', renderTb); $('tbPct').addEventListener('blur', renderTb);
-$('tbPay').onclick = ev => { const b = ev.target.closest('[data-pm]'); if (b) tbSet({ pm: b.dataset.pm }) };
+$('tbPay').onclick = ev => { const b = ev.target.closest('[data-pm]'); if (b) tbSet({ pm: b.dataset.pm, tax: null, final: null }) };
 function tbBill(g, c) { return { id: Date.now(), kind: 'bill', tbl: g.tbl, created: Date.now(), calc: c, text: `TÍNH TIỀN · Bàn ${g.tbl}${g.guest ? ' · ' + g.guest : ''}` } }
 $('tbPrint').onclick = () => { const g = tbGroup(); if (!g) return; const c = tableCalc(g); if (!c.lines.length) return alert(t('tbNone')); printOrder(tbBill(g, c)) };
 $('tbClose').onclick = async () => {
