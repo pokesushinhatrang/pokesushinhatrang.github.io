@@ -388,10 +388,12 @@ function noteTr(o, note, tl = lang) {
     fetch('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(note.slice(0, 450)) + '&langpair=' + src + '|' + tl)
       .then(r => r.json()).then(d => { const x = unent(String((d && d.responseData && d.responseData.translatedText) || '')).trim();
         if (d && +d.responseStatus === 200 && x && x.toLowerCase() !== note.trim().toLowerCase()) {
-          TRN.set(k, x); store.set('trn', JSON.stringify([...TRN].slice(-200))); render() } })
+          TRN.set(k, x); store.set('trn', JSON.stringify([...TRN].slice(-200))); render(); if (typeof renderTb === 'function' && !$('tbBg').hidden && !(document.activeElement && document.activeElement.closest && document.activeElement.closest('#tbBg input'))) renderTb(); if (typeof renderEdit === 'function' && editing && !$('editBg').hidden) renderEdit() } })
       .catch(() => {}); }
   return '';
 }
+/* translated guest request of a dish line («… · Yêu cầu: …») in the screen language */
+const reqTr = (o, vi) => { const rq = (String(vi).match(/ · Yêu cầu: (.+)$/) || [])[1], x = rq && o && noteTr(o, rq); return x ? `<b class="rtr">🌐 ${esc(x)}</b>` : '' };
 /* poke base chosen by the guest: «… · Đế: gạo lứt» → shown in the screen language */
 const BASE_TR = { 'cơm sushi': ['sushi rice + salad', 'рис для суши + салат'], 'gạo lứt': ['brown rice + salad', 'бурый рис + салат'], 'toàn salad': ['salad only', 'только салат'] };
 const baseTr = vi => { const rq = (String(vi).match(/ · Yêu cầu: (.+)$/) || [])[1]; return baseOnly(String(vi).replace(/ · Yêu cầu: .+$/, '')) + (rq ? ' · ✏️ ' + rq : '') };
@@ -627,7 +629,7 @@ function openEdit(o) {
 }
 function renderEdit() {
   const e = editing, nm = it => { const n = NAMES[it.id]; return lang === 'vi' || !n ? it.vi : n[lang === 'en' ? 0 : 1] + baseTr(it.vi) };
-  $('editRows').innerHTML = e.items.map((it, i) => `<div class="erow${it.q ? '' : ' zero'}"><div class="nm">[${it.id}] ${esc(nm(it))}${lang !== 'vi' ? `<small>${esc(it.vi)}</small>` : ''}</div>
+  $('editRows').innerHTML = e.items.map((it, i) => `<div class="erow${it.q ? '' : ' zero'}"><div class="nm">[${it.id}] ${esc(nm(it))}${reqTr(e.o, it.vi)}${lang !== 'vi' ? `<small>${esc(it.vi)}</small>` : ''}</div>
     <div class="qty"><button data-q="${i}" data-d="-1" aria-label="−">−</button><b>${it.q}</b><button data-q="${i}" data-d="1" aria-label="+">+</button></div><div class="sum">${money(it.q * it.unit)}</div><button class="rm" data-rm="${i}" aria-label="${it.q ? t('editRm') : t('editBack')}">${it.q ? '✕' : '↺'}</button></div>`).join('');
   $('editSum').textContent = money(e.items.reduce((a, it) => a + it.q * it.unit, 0));
 }
@@ -715,7 +717,7 @@ function activeTables() {
 function tableCalc(g) {
   const ords = g.ses.filter(o => o.kind === 'order'), lines = [];
   ords.forEach(o => parseOrder(o).items.forEach(it => { if (!it.q) return; let l = lines.find(x => x.id === it.id && x.unit === it.unit && x.vi === it.vi);
-    if (!l) lines.push(l = { id: it.id, vi: it.vi, unit: it.unit, q: 0, sum: 0 }); l.q += it.q; l.sum += it.q * it.unit }));
+    if (!l) lines.push(l = { id: it.id, vi: it.vi, unit: it.unit, q: 0, sum: 0, o }); l.q += it.q; l.sum += it.q * it.unit }));
   lines.sort((a, b) => (+a.id - +b.id) || (b.unit - a.unit));
   const st = tbState.get(g.key) || {}, sub = lines.reduce((a, l) => a + l.sum, 0);
   const bills = g.ses.filter(o => o.kind === 'bill'), lastBill = bills[bills.length - 1];
@@ -744,7 +746,7 @@ function renderTb() {
     const staff = /^✏️/.test(l), txt = l.replace(/^(Ghi chú|✏️ Nhân viên): /, ''), x = staff ? '' : noteTr(o, txt);
     return `<div class="tbn"><b>${staff ? '✏️ ' + t('staffNote') : '💬 ' + t('kitchenNote')} · ${hhmm(o.created)}</b>${esc(txt)}${x ? `<span>🌐 ${esc(x)}</span>` : ''}</div>` }));
   $('tbNotes').innerHTML = notes.join(''); $('tbNotes').hidden = !notes.length;
-  $('tbRows').innerHTML = c.lines.length ? c.lines.map(l => `<div class="trow"><div class="nm">[${l.id}] ${esc(nm(l))}${lang !== 'vi' ? `<small>${esc(l.vi)}</small>` : ''}${NAMES[l.id] && NAMES[l.id][3] !== l.unit ? `<small class="chg">✏️ ${t('tbChanged')} · ${t('prWas')}: ${money(NAMES[l.id][3])}</small>` : ''}</div>
+  $('tbRows').innerHTML = c.lines.length ? c.lines.map(l => `<div class="trow"><div class="nm">[${l.id}] ${esc(nm(l))}${reqTr(l.o, l.vi)}${lang !== 'vi' ? `<small>${esc(l.vi)}</small>` : ''}${NAMES[l.id] && NAMES[l.id][3] !== l.unit ? `<small class="chg">✏️ ${t('tbChanged')} · ${t('prWas')}: ${money(NAMES[l.id][3])}</small>` : ''}</div>
     <div class="qty"><button data-tq="${l.id}@${l.unit}:-1" aria-label="−">−</button><b>${l.q}</b><button data-tq="${l.id}@${l.unit}:1" aria-label="+">+</button></div>
     <label class="up"><small>${t('tbUnit')}</small><input data-up="${l.id}@${l.unit}" inputmode="numeric" value="${l.unit}" aria-label="${t('tbUnit')}"></label>
     <div class="sum">${money(l.sum)}</div><button class="rm" data-tq="${l.id}@${l.unit}:x" aria-label="${t('editRm')}">✕</button></div>`).join('') : `<div class="cempty">${t('tbNone')}</div>`;
