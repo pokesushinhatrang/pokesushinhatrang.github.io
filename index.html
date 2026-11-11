@@ -563,7 +563,7 @@ body.view-only #menuApp .qty,body.view-only #menuApp .bar,body.view-only #menuAp
     <p class="q" data-mt="waiter_q"></p>
     <div class="reasons" id="reasons"><button data-r="come" data-mt="r_come"></button><button data-r="bill" data-mt="r_bill"></button><button data-r="water" data-mt="r_water"></button></div>
     <div class="f" id="wPayWrap" hidden><span class="lbl" data-mt="pay_method"></span>
-      <div class="paym" id="wPaym"><button data-pm="qr">VietQR</button><button data-pm="cash" data-mt="cash"></button></div></div>
+      <div class="paym" id="wPaym"><button data-pm="qr">VietQR</button><button data-pm="cash" data-mt="cash"></button><button data-pm="card" data-mt="card"></button></div></div>
     <div class="f" id="tipWrap" hidden><span class="lbl" data-mt="tip_h"></span>
       <div class="tips" id="tips"><button data-tip="0" data-mt="tip_none"></button><button data-tip="5">5%</button><button data-tip="10">10%</button><button data-tip="15">15%</button></div>
       <small class="tipsum" id="tipSum"></small></div>
@@ -583,6 +583,7 @@ body.view-only #menuApp .qty,body.view-only #menuApp .bar,body.view-only #menuAp
     <div class="kitchen"><b data-mt="staff_gets"></b><pre id="waiterText"></pre></div>
     <div id="billPay" hidden>
     <p class="cashnote" id="cashNote" data-mt="cash_note" hidden></p>
+    <p class="cashnote" id="cardNote" data-mt="card_note" hidden></p>
     <div class="pay" id="payQr"><img id="vqr" alt="VietQR" hidden>
       <div><b data-mt="pay"></b><div class="mono" id="payAmt"></div><small id="payInfo"></small></div></div>
     <button class="paid" id="paidBtn" data-mt="paid" hidden></button>
@@ -696,6 +697,8 @@ const D={
  cat_pop:["⭐ Phổ biến", "⭐ Popular", "⭐ Популярное"],
  note:["Ghi chú cho cả đơn", "Comment for the whole order", "Комментарий к общему заказу"],
  r_water:["Dụng cụ ăn / khăn giấy", "Cutlery / napkins", "Приборы / салфетки"],
+ card:["Thẻ", "Card", "Картой"],
+ card_note:["Nhân viên sẽ mang máy quẹt thẻ đến bàn.", "The waiter will bring the card terminal to your table.", "Официант принесёт терминал для оплаты картой к столу."],
  tip_h:["Tiền tip cho nhân viên (không bắt buộc)", "Tip for the staff (optional)", "Чаевые персоналу (не является обязательным условием)"],
  thanks_p:["Bạn thấy ngon không? Đánh giá quán trên Google Maps chỉ mất 30 giây và giúp quán rất nhiều.", "Enjoyed it? Rating us on Google Maps takes 30 seconds and helps us a lot.", "Понравилось? Оценка в Google Maps займёт 30 секунд и очень нам поможет."],
  rate_toast:["Cảm ơn bạn!", "Thank you!", "Спасибо!"],
@@ -1665,7 +1668,7 @@ function waiterText(){
   const what={come:'GỌI PHỤC VỤ',bill:'TÍNH TIỀN',water:'XIN THÊM DỤNG CỤ ĂN / KHĂN GIẤY'}[reason]||'GỌI PHỤC VỤ';
   const tipLine0=reason!=='bill'||!tipPct?'':(billTotal()?`\nTiền tip: ${fmt(tipAmt(),'vi')} (${tipPct}%)\nTổng cộng: ${fmt(billTotal()+tipAmt(),'vi')}`:`\nTiền tip: ${tipPct}%`);
   const tipLine=tipLine0+splitText();
-  return `${what} · Bàn ${table||'?'}${guestName?` · ${guestName}`:''}${reason==='bill'&&billTotal()?`\nTổng: ${fmt(billTotal(),'vi')}`:''}${tipLine}${reason==='bill'?`\nThanh toán: ${pm==='cash'?'Tiền mặt':'Chuyển khoản VietQR'}`:''}\nKhách nói ${langName}`;
+  return `${what} · Bàn ${table||'?'}${guestName?` · ${guestName}`:''}${reason==='bill'&&billTotal()?`\nTổng: ${fmt(billTotal(),'vi')}`:''}${tipLine}${reason==='bill'?`\nThanh toán: ${pm==='cash'?'Tiền mặt':pm==='card'?'Thẻ ngân hàng':'Chuyển khoản VietQR'}`:''}\nKhách nói ${langName}`;
 }
 function renderWaiter(){
   document.querySelectorAll('#reasons button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.r===reason));
@@ -1673,7 +1676,7 @@ function renderWaiter(){
   document.querySelectorAll('#wPaym button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.pm===pm));
   document.getElementById('billPay').hidden=reason!=='bill';
   document.getElementById('payQr').hidden=pm!=='qr';
-  document.getElementById('cashNote').hidden=pm!=='cash';
+  document.getElementById('cashNote').hidden=pm!=='cash';document.getElementById('cardNote').hidden=pm!=='card';
   document.getElementById('payAmt').textContent=billTotal()>0?fmt(billTotal()+tipAmt()):T('amount_staff');
   const vq=CONFIG.vietqr||{}, vimg=document.getElementById('vqr'), info=document.getElementById('payInfo');
   if(vq.bank&&vq.account){
