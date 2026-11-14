@@ -662,8 +662,9 @@ function escposImage(c) {          /* ESC @, image in bands of 255 rows (GS v 0)
   out.push(0x1b, 0x64, 4, 0x1d, 0x56, 66, 0);
   let s = ''; const u = new Uint8Array(out); for (let i = 0; i < u.length; i += 8192) s += String.fromCharCode.apply(null, u.subarray(i, i + 8192)); return btoa(s);
 }
-function rawbtStatus(ok) { const b = $('rawbtBtn'); if (b && rawbt) b.textContent = t('rawbtOn') + (ok ? ' ✓' : ' · ' + (window.fully && fully.startIntent ? 'Fully ✓' : t('rawbtNoSrv'))) }
-function rawbtSend(b64) {          /* RawBT server on the tablet (ws://localhost:40213); if it is off, open RawBT by link */
+function rawbtStatus(ok) { const b = $('rawbtBtn'); if (b && rawbt) b.textContent = t('rawbtOn') + (ok ? ' ✓' : ' · ' + (window.cafeupApp ? 'App ✓' : window.fully && fully.startIntent ? 'Fully ✓' : t('rawbtNoSrv'))) }
+function rawbtSend(b64) {
+  if (window.cafeupApp) { rawbtStatus(false); cafeupApp.print('intent:base64,' + b64 + '#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;'); return Promise.resolve() }   /* SUSHI GO staff app: straight to RawBT */          /* RawBT server on the tablet (ws://localhost:40213); if it is off, open RawBT by link */
   return new Promise(res => {
     let done = false; const fin = ok => { if (!done) { done = true; res(ok) } };
     try { const ws = new WebSocket('ws://127.0.0.1:40213/'); ws.binaryType = 'arraybuffer'; ws.onopen = () => { ws.send(Uint8Array.from(atob(b64), ch => ch.charCodeAt(0)));   /* RawBT server takes raw ESC/POS bytes */ setTimeout(() => { ws.close(); fin(true) }, 300) }; ws.onerror = () => fin(false); setTimeout(() => fin(false), 2500) } catch (e) { fin(false) }
