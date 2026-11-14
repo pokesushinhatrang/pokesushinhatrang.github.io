@@ -428,11 +428,19 @@ const esc = s => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&g
 const TRN = new Map((() => { try { return JSON.parse(store.get('trn') || '[]') } catch (e) { return [] } })()), TRN_WAIT = new Set();
 const guestLang = o => ({ Nga: 'ru', Anh: 'en', 'Việt': 'vi' })[(o.text.match(/^Khách nói tiếng (\S+)$/m) || [])[1]] || '';
 const unent = x => { const d = document.createElement('textarea'); d.innerHTML = x; return d.value };
+const TRN_P = {};
+/* before printing: wait (max 5 s) for the Vietnamese translation of the guest's comments, so the kitchen ticket has it */
+function trReady(o) {
+  const notes = []; String(o.text || '').split('\n').forEach(l => { const n = l.match(/^Ghi chú: (.+)$/) || l.match(/ · Yêu cầu: (.+?) — [\d.]+\s₫$/); if (n) notes.push(n[1]) });
+  notes.forEach(n => noteTr(o, n, 'vi'));
+  const ps = notes.map(n => TRN_P[guestLang(o) + '|vi|' + n]).filter(Boolean);
+  return ps.length ? Promise.race([Promise.all(ps.map(p => p.catch(() => {}))), new Promise(r => setTimeout(r, 5000))]) : Promise.resolve();
+}
 function noteTr(o, note, tl = lang) {
   const src = guestLang(o); if (!src || src === tl || !note.trim()) return '';
   const k = src + '|' + tl + '|' + note; if (TRN.has(k)) return TRN.get(k);
   if (!TRN_WAIT.has(k)) { TRN_WAIT.add(k);
-    fetch('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(note.slice(0, 450)) + '&langpair=' + src + '|' + tl)
+    TRN_P[k] = fetch('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(note.slice(0, 450)) + '&langpair=' + src + '|' + tl)
       .then(r => r.json()).then(d => { const x = unent(String((d && d.responseData && d.responseData.translatedText) || '')).trim();
         if (d && +d.responseStatus === 200 && x && x.toLowerCase() !== note.trim().toLowerCase()) {
           TRN.set(k, x); store.set('trn', JSON.stringify([...TRN].slice(-200))); render(); if (typeof renderTb === 'function' && !$('tbBg').hidden && !(document.activeElement && document.activeElement.closest && document.activeElement.closest('#tbBg input'))) renderTb(); if (typeof renderEdit === 'function' && editing && !$('editBg').hidden) renderEdit() } })
@@ -682,8 +690,8 @@ function rawbtSend(b64) {
 async function autoAck(o) { if (o.status !== 'new') return; try { const r = await api('/staff/ack', { id: o.id }); o.status = 'done'; o.done_at = r.now || Date.now(); render() } catch (e) {} }
 function printOrder(o) {
   printed.add(o.id); store.set('printed', JSON.stringify([...printed].slice(-200)));
-  if (rawbt) { printQueue = printQueue.then(async () => { try { await rawbtSend(escposImage(await receiptCanvas(receiptHTML(o)))) } catch (e) { alert(t('rawbtFail')) } }); return }
-  printQueue = printQueue.then(() => new Promise(done => {
+  if (rawbt) { printQueue = printQueue.then(async () => { try { await trReady(o); await rawbtSend(escposImage(await receiptCanvas(receiptHTML(o)))) } catch (e) { alert(t('rawbtFail')) } }); return }
+  printQueue = printQueue.then(() => trReady(o)).then(() => new Promise(done => {
     const f = document.createElement('iframe'); f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0';
     document.body.appendChild(f); f.contentDocument.open(); f.contentDocument.write(receiptHTML(o)); f.contentDocument.close();
     setTimeout(() => { try { f.contentWindow.focus(); f.contentWindow.print() } catch (e) {} setTimeout(() => { f.remove(); done() }, 1500) }, 400);
