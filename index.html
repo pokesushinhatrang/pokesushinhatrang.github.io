@@ -470,7 +470,7 @@ body.has-ostrip #menuApp .toast{bottom:calc(150px + env(safe-area-inset-bottom,0
 #menuApp .bpick[hidden]{display:none}
 #menuApp .sheet.done-bill>*:not(.top):not(#billPay){display:none!important}
 #menuApp .sheet.done-bill #billPay>*:not(#thanks){display:none!important}
-#menuApp .sheet.done-bill.pay-qr #billPay>#payQr{display:grid!important}
+#menuApp #payQr{display:none!important}   /* the VietQR comes printed on the bill */
 #menuApp .sheet.done-bill .top h3{visibility:hidden}
 #menuApp .kitchen{display:none}   /* the Vietnamese ticket preview is not needed by guests */
 #menuApp .lines li>span:first-child{min-width:0}
