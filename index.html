@@ -477,6 +477,13 @@ body.has-ostrip #menuApp .toast{bottom:calc(150px + env(safe-area-inset-bottom,0
 #menuApp .dnb{display:block;margin-top:4px;font:inherit;font-size:13px;font-weight:600;color:var(--muted);background:none;border:1px dashed var(--line);border-radius:999px;padding:3px 10px;text-align:left}
 #menuApp .dnb.has{color:var(--ink);border-style:solid;background:var(--bg);white-space:normal}
 #menuApp .dnote input{width:100%;margin-top:6px;font:inherit;font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+#menuApp .stick{position:sticky;top:0;z-index:7;background:var(--bg);margin-inline:-16px;padding-inline:16px;padding-top:env(safe-area-inset-top,0px);box-shadow:0 6px 10px -10px rgba(80,50,30,.35)}
+#menuApp .stick header{padding-block:10px 6px}
+#menuApp .stick .notice{margin-block:0 4px}
+#menuApp .stick .cats{position:static;box-shadow:none;margin-inline:0;padding-inline:0;padding-top:8px}
+#menuApp .cq{display:inline-flex;gap:6px;margin-top:6px;align-items:center}
+#menuApp .cq button{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--bg);font:inherit;font-size:17px;font-weight:700;line-height:1;color:var(--ink);padding:0}
+#menuApp .cq button.del{width:auto;padding:0 10px;border-radius:999px;font-size:13px;color:#B23A48}
 #menuApp .lines li.dnh{display:block;font-size:12px;color:var(--muted)}
 #menuApp .dnote input::placeholder{font-size:13px;color:var(--muted);opacity:.8}
 #menuApp .bpbox{width:100%;max-width:520px;background:var(--surface);border-radius:22px 22px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom))}
@@ -501,6 +508,7 @@ body.view-only #menuApp .qty,body.view-only #menuApp .bar,body.view-only #menuAp
 <body>
 <div id="menuApp">
 <div class="wrap">
+<div class="stick">
   <header>
     <div>
       <h1 data-mt="cafe_name"></h1>
@@ -513,6 +521,7 @@ body.view-only #menuApp .qty,body.view-only #menuApp .bar,body.view-only #menuAp
   </header>
   <div class="notice" id="notice" hidden></div>
   <nav class="cats" id="cats"></nav>
+</div>
   <main id="list"></main>
   <footer><span data-mt="foot"></span> · <a href="https://milanovajina.github.io/cafeup/" target="_blank" rel="noopener">CafeUp</a></footer>
 </div>
@@ -1603,6 +1612,7 @@ function noteRow(r){
   return n?`<button class="dnb has" data-nk="${escH(k)}">✏️ ${escH(n)}</button>`:`<button class="dnb" data-nk="${escH(k)}">${ntl(0)}</button>`;
 }
 setTimeout(()=>{const L=document.getElementById('lines');
+  L.addEventListener('click',e=>{const c=e.target.closest('[data-cq]');if(!c)return;const k=c.dataset.cq;cart[k]=(cart[k]||0)+(+c.dataset.d);if(cart[k]<=0)delete cart[k];saveNotes();renderList();renderBar();saveSent();renderSheet();if(!count()&&!sent.length)document.getElementById('closeSheet').click()});
   L.addEventListener('click',e=>{const b=e.target.closest('[data-nk]');if(!b)return;noteEdit=b.dataset.nk;renderSheet();const i=L.querySelector('[data-ni]');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}});
   L.addEventListener('input',e=>{const i=e.target.closest('[data-ni]');if(!i)return;NOTES[i.dataset.ni]=i.value;saveNotes();document.getElementById('kitchenText').textContent=kitchenText()});
   L.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.closest('[data-ni]')){e.preventDefault();e.target.blur()}});
@@ -1669,7 +1679,7 @@ function renderSheet(){
   document.getElementById('newPart').hidden=!n;
   document.getElementById('newH').hidden=!sent.length;
   document.getElementById('emptyNew').hidden=!!n;
-  document.getElementById('lines').innerHTML=rows(cart).map(r=>`<li><span>${r.q} × ${rowName(r)}${noteRow(r)}</span><span class="mono">${fmt(r.q*r.m.price)}</span></li>`).join('')+(rows(cart).length?`<li class="dnh">${ntl(2)}</li>`:'');
+  document.getElementById('lines').innerHTML=rows(cart).map(r=>`<li><span>${r.q} × ${rowName(r)}${noteRow(r)}<span class="cq"><button data-cq="${escH(r.k)}" data-d="-1" aria-label="-1">−</button><button data-cq="${escH(r.k)}" data-d="1" aria-label="+1">+</button><button class="del" data-cq="${escH(r.k)}" data-d="-99">🗑 ${({vi:'Xóa',en:'Remove',ru:'Удалить'})[lang]||'Remove'}</button></span></span><span class="mono">${fmt(r.q*r.m.price)}</span></li>`).join('')+(rows(cart).length?`<li class="dnh">${ntl(2)}</li>`:'');
   document.getElementById('sum').textContent=fmt(total());
   document.getElementById('kitchenText').textContent=kitchenText();
   const txt=encodeURIComponent(kitchenText());
