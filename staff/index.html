@@ -472,12 +472,12 @@ async function poll() {
   try {
     const d = await api(`/staff/orders?since=${maxId}&changed=${lastNow}`);
     const fresh = []; let added = 0;
-    d.orders.forEach(o => { if (!orders.has(o.id)) { orders.set(o.id, o); added++; if (o.status === 'new' && maxId && !mine.has(o.id)) fresh.push(o.id); } maxId = Math.max(maxId, o.id) });
+    d.orders.forEach(o => { if (!orders.has(o.id)) { orders.set(o.id, o); added++; if (o.status === 'new' && poll.ready && !mine.has(o.id)) fresh.push(o.id); } maxId = Math.max(maxId, o.id) });
     d.done.forEach(x => { const o = orders.get(x.id); if (o) { o.status = 'done'; o.done_at = x.done_at } });
     const ed = d.edited || [];
     ed.forEach(x => { const o = orders.get(x.id); if (o) { o.text = x.text; o.edited_at = x.edited_at; if (x.kind) o.kind = x.kind } });
     for (const [id, o] of orders) if (Date.now() - o.created > 12 * 3600e3) orders.delete(id);
-    lastNow = d.now;
+    lastNow = d.now; poll.ready = true;   /* orders already there when the screen opens are not new; everything after is, even the first of the day */
     setStatus('on', 'live');
     if (added || d.done.length || ed.length || !render.once) { render(fresh); render.once = true; if (!$('tbBg').hidden && !tbBusy && !$('tbBg').contains(document.activeElement && document.activeElement.matches('input') ? document.activeElement : null)) renderTb() }
     if (fresh.length) { beep(); remind = Date.now(); if (autoPrint) fresh.map(id => orders.get(id)).filter(o => ['order', 'bill'].includes(o.kind) && !printed.has(o.id)).forEach(o => { printOrder(o); autoAck(o) }) }
