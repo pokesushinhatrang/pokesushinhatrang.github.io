@@ -1,4 +1,0 @@
-android/app/build/
-android/.gradle/
-*.keystore
-*.jks
