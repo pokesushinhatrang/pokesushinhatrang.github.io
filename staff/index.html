@@ -662,12 +662,16 @@ function escposImage(c) {          /* ESC @, image in bands of 255 rows (GS v 0)
   out.push(0x1b, 0x64, 4, 0x1d, 0x56, 66, 0);
   let s = ''; const u = new Uint8Array(out); for (let i = 0; i < u.length; i += 8192) s += String.fromCharCode.apply(null, u.subarray(i, i + 8192)); return btoa(s);
 }
-function rawbtStatus(ok) { const b = $('rawbtBtn'); if (b && rawbt) b.textContent = t('rawbtOn') + (ok ? ' ✓' : ' · ' + t('rawbtNoSrv')) }
+function rawbtStatus(ok) { const b = $('rawbtBtn'); if (b && rawbt) b.textContent = t('rawbtOn') + (ok ? ' ✓' : ' · ' + (window.fully && fully.startIntent ? 'Fully ✓' : t('rawbtNoSrv'))) }
 function rawbtSend(b64) {          /* RawBT server on the tablet (ws://localhost:40213); if it is off, open RawBT by link */
   return new Promise(res => {
     let done = false; const fin = ok => { if (!done) { done = true; res(ok) } };
     try { const ws = new WebSocket('ws://127.0.0.1:40213/'); ws.binaryType = 'arraybuffer'; ws.onopen = () => { ws.send(Uint8Array.from(atob(b64), ch => ch.charCodeAt(0)));   /* RawBT server takes raw ESC/POS bytes */ setTimeout(() => { ws.close(); fin(true) }, 300) }; ws.onerror = () => fin(false); setTimeout(() => fin(false), 2500) } catch (e) { fin(false) }
-  }).then(ok => { rawbtStatus(ok); if (!ok) location.href = 'intent:base64,' + b64 + '#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;' });
+  }).then(ok => { rawbtStatus(ok); if (ok) return;
+    const url = 'intent:base64,' + b64 + '#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;';
+    /* Fully Kiosk Browser: its JavaScript interface starts RawBT without a tap */
+    if (window.fully && typeof fully.startIntent === 'function') { try { fully.startIntent(url); return } catch (e) {} }
+    location.href = url });
 }
 /* with auto-print on, a printed order / bill is marked «Taken» by itself: no reminder beeps, no button to press */
 async function autoAck(o) { if (o.status !== 'new') return; try { const r = await api('/staff/ack', { id: o.id }); o.status = 'done'; o.done_at = r.now || Date.now(); render() } catch (e) {} }
