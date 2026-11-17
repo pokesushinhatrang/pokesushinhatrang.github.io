@@ -642,12 +642,12 @@ function receiptHTML(o) {
   }
   const head = { order: tl[0].startsWith('GỌI THÊM') ? 'GỌI THÊM' : 'PHIẾU GỌI MÓN', bill: 'HÓA ĐƠN TẠM TÍNH', closed: 'HÓA ĐƠN' }[o.kind] || tl[0].split(' · ')[0];
   return `<!doctype html><html><head><meta charset="utf-8"><style>
-@page{size:80mm auto;margin:0} *{box-sizing:border-box} body{width:72mm;margin:0 auto;padding:3mm 0 6mm;font:12px/1.35 "Be Vietnam Pro",Arial,sans-serif;color:#000}
-.c{text-align:center} h1{font-size:16px;margin:0} h2{font-size:14px;margin:2mm 0 0;letter-spacing:.04em} .tb{font-size:22px;font-weight:800;margin:1mm 0}
+@page{size:80mm auto;margin:0} *{box-sizing:border-box} body{width:72mm;margin:0 auto;padding:3mm 0 6mm;font:18px/1.35 "Be Vietnam Pro",Arial,sans-serif;color:#000}
+.c{text-align:center} h1{font-size:24px;margin:0} h2{font-size:21px;margin:2mm 0 0;letter-spacing:.04em} .tb{font-size:33px;font-weight:800;margin:1mm 0}
 hr{border:0;border-top:1px dashed #000;margin:2mm 0} table{width:100%;border-collapse:collapse} td{padding:.6mm 0;vertical-align:top} .r{text-align:right;white-space:nowrap;padding-left:2mm}
-.row{display:flex;justify-content:space-between;gap:2mm;padding:.5mm 0} .row span:last-child{white-space:nowrap;text-align:right} .big{font-weight:800;font-size:14px} small{color:#444} .vq svg{width:42mm;height:42mm;display:block;margin:1mm auto}
-</style></head><body><div class="c"><h1>Poke Sushi Nha Trang</h1><div>SUSHI GO</div><h2>${head}</h2>${gl ? `<div style="font-size:11px">${RL[gl].head}</div>` : ''}<div class="tb">Bàn ${esc(o.tbl || '?')}${guestOf(o) ? ' · ' + esc(guestOf(o)) : ''}</div><div>${when}${o.id < 1e9 ? ' · #' + o.id : ''}</div></div><hr>${body}<hr>
-<div class="c">${['bill', 'closed'].includes(o.kind) ? '<small style="display:block;font-size:10px;margin-bottom:1.5mm">Phiếu tạm tính — không phải hóa đơn GTGT<br>Provisional bill — not a tax invoice</small>Cảm ơn quý khách! · Thank you!' + (gl === 'ru' ? ' · Спасибо!' : '') + '<br>Wi-Fi: pokesushinhatrang · xincamon' : 'Bếp / Kitchen'}</div></body></html>`;
+.row{display:flex;justify-content:space-between;gap:2mm;padding:.5mm 0} .row span:last-child{white-space:nowrap;text-align:right} .big{font-weight:800;font-size:21px} small{color:#444} .vq svg{width:42mm;height:42mm;display:block;margin:1mm auto}
+</style></head><body><div class="c"><h1>Poke Sushi Nha Trang</h1><div>SUSHI GO</div><h2>${head}</h2>${gl ? `<div style="font-size:16px">${RL[gl].head}</div>` : ''}<div class="tb">Bàn ${esc(o.tbl || '?')}${guestOf(o) ? ' · ' + esc(guestOf(o)) : ''}</div><div>${when}${o.id < 1e9 ? ' · #' + o.id : ''}</div></div><hr>${body}<hr>
+<div class="c">${['bill', 'closed'].includes(o.kind) ? '<small style="display:block;font-size:15px;margin-bottom:1.5mm">Phiếu tạm tính — không phải hóa đơn GTGT<br>Provisional bill — not a tax invoice</small>Cảm ơn quý khách! · Thank you!' + (gl === 'ru' ? ' · Спасибо!' : '') + '<br>Wi-Fi: pokesushinhatrang · xincamon' : 'Bếp / Kitchen'}</div></body></html>`;
 }
 let printQueue = Promise.resolve();
 /* Android + RawBT: the receipt is drawn as a picture (Vietnamese, Russian, QR all print) and sent to the printer without the print dialog */
@@ -656,7 +656,7 @@ function syncRawbtBtn() { const b = $('rawbtBtn'); b.textContent = rawbt ? t('ra
 async function receiptCanvas(html) {
   const W = 576, frame = document.createElement('iframe');
   frame.style.cssText = `position:fixed;left:-9999px;top:0;width:${W}px;height:10px;border:0`; document.body.appendChild(frame);
-  const css = '<style>body{width:' + (W - 16) + 'px!important;margin:0 8px!important;padding:8px 0 24px!important;font-size:24px!important;background:#fff}h1{font-size:32px!important}h2{font-size:28px!important}.tb{font-size:44px!important}.big{font-size:28px!important}small{font-size:20px!important;color:#000!important}.vq svg{width:300px!important;height:300px!important}</style>';
+  const css = '<style>body{width:' + (W - 16) + 'px!important;margin:0 8px!important;padding:8px 0 24px!important;font-size:36px!important;background:#fff}h1{font-size:48px!important}h2{font-size:42px!important}.tb{font-size:66px!important}.big{font-size:42px!important}small{font-size:30px!important;color:#000!important}.vq svg{width:300px!important;height:300px!important}</style>';
   frame.contentDocument.open(); frame.contentDocument.write(html.replace('</head>', css + '</head>')); frame.contentDocument.close();
   await new Promise(r => setTimeout(r, 150));
   const d = frame.contentDocument, H = Math.ceil(d.documentElement.scrollHeight) + 10;
