@@ -497,6 +497,7 @@ async function poll() {
     d.orders.forEach(o => { if (!orders.has(o.id)) { orders.set(o.id, o); added++; if (o.status === 'new' && poll.ready && !mine.has(o.id)) fresh.push(o.id); } maxId = Math.max(maxId, o.id) });
     d.done.forEach(x => { const o = orders.get(x.id); if (o) { o.status = 'done'; o.done_at = x.done_at } });
     const ed = d.edited || [];
+    if (d.tb) tbMerge(d.tb);
     ed.forEach(x => { const o = orders.get(x.id); if (o) { o.text = x.text; o.edited_at = x.edited_at; if (x.kind) o.kind = x.kind } });
     for (const [id, o] of orders) if (Date.now() - o.created > 12 * 3600e3) orders.delete(id);
     lastNow = d.now; poll.ready = true;   /* orders already there when the screen opens are not new; everything after is, even the first of the day */
@@ -899,7 +900,16 @@ function renderTb() {
   renderSplit(g, c);
 }
 const tbGroup = () => activeTables().find(g => g.key === tbSel);
-const tbSet = patch => { tbState.set(tbSel, Object.assign({}, tbState.get(tbSel), patch)); renderTb() };
+const tbAt = new Map();     /* when this device last changed a table's state: newer server copies replace it */
+const tbPush = new Map();
+const tbSet = patch => { const k = tbSel; tbState.set(k, Object.assign({}, tbState.get(k), patch)); tbAt.set(k, Date.now()); renderTb();
+  clearTimeout(tbPush.get(k)); tbPush.set(k, setTimeout(() => api('/staff/tbstate', { key: k, st: tbState.get(k) }).catch(() => {}), 600)) };
+function tbMerge(remote) {
+  let ch = false;
+  for (const [k, r] of Object.entries(remote || {})) { if (tbPush.has(k) && Date.now() - (tbAt.get(k) || 0) < 3000) continue;
+    if (JSON.stringify(tbState.get(k) || {}) !== JSON.stringify(r.st)) { tbState.set(k, r.st); ch = true } }
+  if (ch && !$('tbBg').hidden && !document.activeElement.matches('#tbBg input')) renderTb();
+}
 async function tbApply(change) {           /* change(parsed orders) edits them; the changed orders are saved */
   const g = tbGroup(); if (!g || tbBusy) return;
   const ps = g.ses.filter(o => o.kind === 'order').map(parseOrder), before = ps.map(e => buildText(e, e.note));
@@ -982,7 +992,7 @@ $('tbClose').onclick = async () => {
   const text = [`ĐÃ ĐÓNG BÀN · Bàn ${g.tbl}${g.guest ? ' · ' + g.guest : ''}`, ...c.lines.map(l => `${l.q} × [${l.id}] ${l.vi} — ${money(l.sum)}`), ...calcLines(c)].join('\n');
   const b = $('tbClose'); b.disabled = true;
   try { const r = await api('/staff/close', { text, ids: g.ses.filter(o => o.status === 'new').map(o => o.id) });
-    g.ses.forEach(o => { if (o.status === 'new') o.status = 'done' }); tbState.delete(g.key);
+    g.ses.forEach(o => { if (o.status === 'new') o.status = 'done' }); tbState.delete(g.key); api('/staff/tbstate', { key: g.key, st: null }).catch(() => {});
     orders.set(r.id, { id: r.id, kind: 'closed', tbl: g.tbl, text, created: r.now, status: 'done', done_at: r.now }); maxId = Math.max(maxId, r.id);
     render(); renderTb() }
   catch (err) { alert(err.message === 'code' ? t('wrongCode') : t('editFail')) }
