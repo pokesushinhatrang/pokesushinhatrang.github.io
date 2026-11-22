@@ -503,7 +503,9 @@ body.view-only #menuApp .qty,body.view-only #menuApp .bar,body.view-only #menuAp
 #menuApp .pay{grid-template-columns:1fr}
 #menuApp .pay img{width:100%;max-width:260px;justify-self:center;border-radius:8px;background:#fff}
 #menuApp .pay small{font-size:13px;line-height:1.45;margin-top:4px}
-</style>
+</style><style>#menuApp li.ost{display:flex;justify-content:space-between;gap:8px;font-size:14px;padding:6px 10px;margin-bottom:4px;border-radius:10px;background:#FFF4E5}
+#menuApp li.ost b{white-space:nowrap}#menuApp li.ost-cooking{background:#FFF0D6}#menuApp li.ost-served{background:#E6F4EA;color:#1E6B3A}#menuApp li.ost-sent{background:#F3EEE8}
+#menuApp .ostc{font-size:12px;padding:2px 8px;border-radius:999px;margin-right:6px;background:#F3EEE8}#menuApp .ostc.ost-cooking{background:#FFF0D6}#menuApp .ostc.ost-served{background:#E6F4EA;color:#1E6B3A}</style>
 </head>
 <body>
 <div id="menuApp">
@@ -1654,13 +1656,17 @@ function itemHTML(m){
 function renderList(){
   document.getElementById('list').innerHTML=catList().map(c=>`<section class="sect" id="s-${c}"><h2>${T('cat_'+c)}</h2><div class="items">${(c==='pop'?POPULAR.map(id=>MENU.find(m=>m.id===id)).filter(Boolean):MENU.filter(m=>m.cat===c)).map(itemHTML).join('')}</div></section>`).join('');
 }
+const OST={vi:{sent:'📨 Đã gửi',cooking:'👨‍🍳 Đang chuẩn bị',served:'✅ Đã mang ra',h:'Đơn'},en:{sent:'📨 Sent',cooking:'👨‍🍳 Being prepared',served:'✅ Served',h:'Order'},ru:{sent:'📨 Отправлен',cooking:'👨‍🍳 Готовится',served:'✅ Подано',h:'Заказ'}};
+const ost=k=>(OST[lang]||OST.en)[k];
+function statusHTML(){const L=sent.map((o,i)=>o.id?`<li class="ost ost-${o.st||'sent'}"><span>${ost('h')} ${i+1} · ${new Date(o.at).toTimeString().slice(0,5)}</span><b>${ost(o.st||'sent')}</b></li>`:'').join('');return L}
 function renderBar(){
   const n=count(), b=document.getElementById('openCart');
   b.disabled=!n;
   document.getElementById('barCount').textContent=n?`${T('view')} · ${plural(n)}`:T('empty');
   const st=document.getElementById('ostrip'), si=sentItems(), k=Object.values(si).reduce((a,b)=>a+b,0);
   st.hidden=!sent.length; document.body.classList.toggle('has-ostrip',!!sent.length);
-  document.getElementById('osCount').textContent=sent.length?' · '+plural(k):'';
+  const lastS=[...sent].reverse().find(o=>o.id);
+  document.getElementById('osCount').textContent=(sent.length?' · '+plural(k):'')+(lastS?' · '+ost(lastS.st||'sent'):'');
   document.getElementById('osSum').textContent=sent.length?fmt(sentTotal()):'';
   document.getElementById('barSum').textContent=n?fmt(total()):'';
 }
@@ -1674,7 +1680,7 @@ function kitchenText(){
 function renderSheet(){
   const si=sentItems(), n=count();
   document.getElementById('ordered').hidden=!sent.length;
-  document.getElementById('orderedLines').innerHTML=rows(si).map(r=>`<li><span>${r.q} × ${rowName(r)}</span><span class="mono">${fmt(r.q*r.m.price)}</span></li>`).join('');
+  document.getElementById('orderedLines').innerHTML=statusHTML()+rows(si).map(r=>`<li><span>${r.q} × ${rowName(r)}</span><span class="mono">${fmt(r.q*r.m.price)}</span></li>`).join('');
   document.getElementById('orderedSum').textContent=fmt(sentTotal());
   document.getElementById('newPart').hidden=!n;
   document.getElementById('newH').hidden=!sent.length;
@@ -1774,6 +1780,7 @@ async function sendDirect(text,kind){
     const post=t=>fetch(CONFIG.orderEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t,kind,table:table||'',lang,venue:CONFIG.venue})});
     let r=await post(text);
     if(r.status===400&&text.startsWith('XIN THÊM DỤNG CỤ ĂN'))r=await post(text.replace('XIN THÊM DỤNG CỤ ĂN / KHĂN GIẤY','XIN THÊM NƯỚC ĐÁ / KHĂN GIẤY'));
+    if(r.ok){const m=(await r.text().catch(()=>'')).match(/^ok (\d+)/);sendDirect.lastId=m?+m[1]:0}
     return r.ok;
   }catch(e){return false}
 }
@@ -1785,7 +1792,7 @@ function syncDirect(){
 function commitOrder(){
   if(!count())return;
   closedBill=0;
-  sent.push({at:Date.now(),items:{...cart},total:total()});
+  sent.push({at:Date.now(),items:{...cart},total:total(),id:sendDirect.lastId||0,st:'sent'});sendDirect.lastId=0;setTimeout(checkClosed,6000);
   Object.keys(cart).forEach(k=>delete cart[k]);Object.keys(NOTES).forEach(k=>delete NOTES[k]);saveNotes();
   document.getElementById('note').value='';
   saveSent();renderList();renderBar();renderSheet();toast(T('sent_ok'));
@@ -1843,7 +1850,7 @@ document.getElementById('wZl').addEventListener('click',()=>{if(reason==='bill')
 document.getElementById('billBtn').addEventListener('click',()=>{bg.hidden=true;billOnly(true);reason='bill';thanks.hidden=true;renderWaiter();document.getElementById('waiterBg').hidden=false});
 function renderHist(){
   const tf=d=>{const x=new Date(d);return String(x.getHours()).padStart(2,'0')+':'+String(x.getMinutes()).padStart(2,'0')};
-  document.getElementById('rounds').innerHTML=sent.map((o,i)=>`<div class="round"><div class="rh"><b>${i?T('round_more'):T('round_first')} ${i+1}</b><span>${tf(o.at)}</span></div><ul class="lines">${
+  document.getElementById('rounds').innerHTML=sent.map((o,i)=>`<div class="round"><div class="rh"><b>${i?T('round_more'):T('round_first')} ${i+1}</b><span>${o.id?`<b class="ostc ost-${o.st||'sent'}">${ost(o.st||'sent')}</b> `:''}${tf(o.at)}</span></div><ul class="lines">${
     rows(o.items).map(r=>`<li><span>${r.q} × ${rowName(r)}</span><span class="mono">${fmt(r.q*r.m.price)}</span></li>`).join('')}</ul></div>`).join('');
   document.getElementById('histSum').textContent=fmt(sentTotal());
 }
@@ -1951,11 +1958,12 @@ async function checkClosed(){
   if(STASH&&(STASH.table!==table||Date.now()-STASH.t>3*3600e3)){STASH=null;saveStash()}
   if(!sent.length&&!STASH)return;
   try{
-    const r=await fetch(CONFIG.orderEndpoint.replace(/\/$/,'')+'/table?venue='+CONFIG.venue+'&tbl='+encodeURIComponent(table),{cache:'no-store'});
+    const r=await fetch(CONFIG.orderEndpoint.replace(/\/$/,'')+'/table?venue='+CONFIG.venue+'&tbl='+encodeURIComponent(table)+'&ids='+sent.filter(o=>o.id).map(o=>o.id).join(',')+'&_='+Date.now(),{cache:'no-store'});
     if(!r.ok)return; const d=await r.json(), closes=d.closes||[], skew=d.now-Date.now(), me=(guestName||'').trim();
     if(STASH&&!closes.some(c=>c.at===STASH.closeAt)){
       sent=[...STASH.sent,...sent];STASH=null;saveStash();saveSent();renderBar();tcMsg(1);return;
     }
+    if(d.st){let ch=false;sent.forEach(o=>{const v=d.st[o.id];if(v&&v!==o.st){o.st=v;ch=true}});if(ch){saveSent();renderBar();if(!document.getElementById('sheetBg').hidden)renderSheet();if(!document.getElementById('histBg').hidden)renderHist()}}
     if(!sent.length)return;
     const last=Math.max(...sent.map(o=>o.at)), c=closes.find(c=>(c.guest||'')===me&&c.at-skew>last);
     if(c){
@@ -1966,7 +1974,7 @@ async function checkClosed(){
     }
   }catch(e){}
 }
-setInterval(checkClosed,30000);
+setInterval(checkClosed,30000);setInterval(()=>{if(sent.some(o=>o.id&&o.st!=='served'))checkClosed()},12000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkClosed()});
 setTimeout(checkClosed,3000);
 
