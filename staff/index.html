@@ -478,8 +478,11 @@ function body(o) {
 
 function render(freshIds = []) {
   const all = [...orders.values()].sort((a, b) => b.id - a.id);
-  const open = all.filter(o => o.status === 'new');
-  const show = filter === 'new' ? open : all.filter(o => o.status !== 'new');
+  /* a dish order stays in «Waiting» until the kitchen taps «Ready» (accepting / auto-printing only marks it taken) */
+  const closedAt = {}; all.forEach(o => { if (o.kind === 'closed') closedAt[o.tbl] = Math.max(closedAt[o.tbl] || 0, o.id) });
+  const isOpen = o => ['order', 'add'].includes(kindOf(o)) ? !o.served_at && !(closedAt[o.tbl] > o.id) : o.status === 'new';
+  const open = all.filter(isOpen);
+  const show = filter === 'new' ? open : all.filter(o => !isOpen(o));
   $('countH').textContent = open.length ? t('waiting')(open.length) : t('none');
   document.title = (open.length ? `(${open.length}) ` : '') + t('title');
   $('list').innerHTML = show.length ? show.map(o => {
