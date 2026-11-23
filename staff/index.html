@@ -1005,8 +1005,7 @@ function partsOf(g, c) {
 function splitTabs(g) {
   const c = tableCalc(g), P = partsOf(g, c); if (!P) return '';
   const lbl = k => `${t('table')} ${esc(g.tbl)}.${k}`, on = g.key === tbSel, v = (tbState.get(g.key) || {}).view || '';
-  return `<button data-tg="${esc(g.key)}" data-part="" aria-pressed="${on && !v}"><b>${t('table')} ${esc(g.tbl)}</b><span>${money(c.total)}</span></button>`
-    + (P.has1 ? `<button data-tg="${esc(g.key)}" data-part="a" aria-pressed="${on && v === 'a'}"><b>${lbl(P.n)}</b>${g.guest ? `<small>👤 ${esc(g.guest)}</small>` : ''}<span>${money(partCalc(g, c, tbState.get(g.key) || {}, 'a').final)}</span></button>` : '')
+  return (P.has1 ? `<button data-tg="${esc(g.key)}" data-part="a" aria-pressed="${on && v === 'a'}"><b>${lbl(P.n)}</b>${g.guest ? `<small>👤 ${esc(g.guest)}</small>` : ''}<span>${money(partCalc(g, c, tbState.get(g.key) || {}, 'a').final)}</span></button>` : '')
     + (P.has2 ? `<button data-tg="${esc(g.key)}" data-part="b" aria-pressed="${on && v === 'b'}" class="p2"><b>${lbl(P.has1 ? P.n + 1 : P.n)}</b><span>${money(partCalc(g, c, tbState.get(g.key) || {}, 'b').final)}</span></button>` : '');
 }
 /* one part of a split table: its own dishes, total, payment method, bill and «paid» */
@@ -1021,7 +1020,10 @@ function partCalc(g, c, st, w) {
   return pc;
 }
 function partView(g, c) {
-  const st = spSt(), w = st.view, pc = w ? partCalc(g, c, st, w) : null;
+  let st = spSt(), w = st.view;
+  const P0 = partsOf(g, c);
+  if (P0 && !(w && partCalc(g, c, st, w))) { w = P0.has2 ? 'b' : 'a'; st = { ...st, view: w }; tbState.set(tbSel, st) }   /* a split table always shows one of its parts */
+  const pc = w ? partCalc(g, c, st, w) : null;
   $('tbFinal').readOnly = !!pc; $('tbPrint').textContent = t('tbPrint') + (pc ? ' · ' + pc.label : ''); $('tbClose').textContent = pc ? t('spPaid') + ' · ' + pc.label : t('tbClose');
   if (!pc) { if (w) tbState.set(tbSel, { ...st, view: '' }); return }
   const P = partsOf(g, c), nm = l => { const n = NAMES[l.id]; return lang === 'vi' || !n ? l.vi : n[lang === 'en' ? 0 : 1] + baseTr(l.vi) };
