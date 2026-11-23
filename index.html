@@ -505,7 +505,11 @@ body.view-only #menuApp .qty,body.view-only #menuApp .bar,body.view-only #menuAp
 #menuApp .pay small{font-size:13px;line-height:1.45;margin-top:4px}
 </style><style>#menuApp li.ost{display:flex;justify-content:space-between;gap:8px;font-size:14px;padding:6px 10px;margin-bottom:4px;border-radius:10px;background:#FFF4E5}
 #menuApp li.ost b{white-space:nowrap}#menuApp li.ost-cooking{background:#FFF0D6}#menuApp li.ost-served{background:#E6F4EA;color:#1E6B3A}#menuApp li.ost-sent{background:#F3EEE8}
-#menuApp .ostc{font-size:12px;padding:2px 8px;border-radius:999px;margin-right:6px;background:#F3EEE8}#menuApp .ostc.ost-cooking{background:#FFF0D6}#menuApp .ostc.ost-served{background:#E6F4EA;color:#1E6B3A}</style>
+#menuApp .ostc{font-size:12px;padding:2px 8px;border-radius:999px;margin-right:6px;background:#F3EEE8}#menuApp .ostc.ost-cooking{background:#FFF0D6}#menuApp .ostc.ost-served{background:#E6F4EA;color:#1E6B3A}</style><style>#menuApp .tpl{display:grid;gap:6px;max-height:52vh;overflow:auto;margin-bottom:10px}
+#menuApp .tpl button{display:flex;justify-content:space-between;gap:10px;text-align:left;font:inherit;font-size:15px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+#menuApp .tpl button[aria-pressed="true"]{border-color:var(--primary,#B8456A);background:var(--primary-soft,#F7E3EA);font-weight:700}
+#menuApp .tpl button[aria-pressed="true"] span::before{content:'✓ '}
+#menuApp .bpick .bpo button.tpok{justify-content:center;width:100%;font:inherit;font-weight:800;padding:12px;border-radius:14px;border:0;background:var(--primary,#B8456A)!important;color:#fff!important}</style>
 </head>
 <body>
 <div id="menuApp">
@@ -1559,6 +1563,87 @@ const MENU=[
    en:['Coconut water, can', 'Natural coconut water, chilled.'],
    ru:['Кокосовая вода, банка', 'Натуральная кокосовая вода, охлаждённая.'],
    vd:'Nước dừa lon, ướp lạnh.'},   // ⚠ can or fresh coconut?
+  // ---- poke toppings (cat 'top': not listed in the menu, picked in the poke dialog) ----
+  {id:'105', cat:'top', vi:'Đậu hũ thêm', price:10000,
+   en:['Extra tofu', ''],
+   ru:['Доп. тофу', ''],
+   vd:''},
+  {id:'106', cat:'top', vi:'Thịt xá xíu', price:30000,
+   en:['Chashu pork', ''],
+   ru:['Свинина чашу', ''],
+   vd:''},
+  {id:'107', cat:'top', vi:'Trứng gà thêm', price:9000,
+   en:['Extra egg', ''],
+   ru:['Доп. яйцо', ''],
+   vd:''},
+  {id:'108', cat:'top', vi:'Trứng ngâm tương', price:15000,
+   en:['Soy-marinated egg', ''],
+   ru:['Яйцо в соевом маринаде', ''],
+   vd:''},
+  {id:'175', cat:'top', vi:'Cơm thêm size nhỏ', price:5000,
+   en:['Extra rice M', ''],
+   ru:['Доп. рис M', ''],
+   vd:''},
+  {id:'9176', cat:'top', vi:'Cơm thêm size lớn', price:15000,
+   en:['Extra rice L', ''],
+   ru:['Доп. рис L', ''],
+   vd:''},
+  {id:'152', cat:'top', vi:'Cá hồi', price:50000,
+   en:['Salmon yuke', ''],
+   ru:['Лосось юке', ''],
+   vd:''},
+  {id:'153', cat:'top', vi:'Cá ngừ', price:50000,
+   en:['Tuna yuke', ''],
+   ru:['Тунец юке', ''],
+   vd:''},
+  {id:'154', cat:'top', vi:'Trứng cá chuồn', price:30000,
+   en:['Tobiko', ''],
+   ru:['Икра тобико', ''],
+   vd:''},
+  {id:'155', cat:'top', vi:'Cá trích', price:50000,
+   en:['Herring (nishin) sashimi', ''],
+   ru:['Сельдь сашими', ''],
+   vd:''},
+  {id:'156', cat:'top', vi:'Lươn Nhật', price:90000,
+   en:['Unagi eel', ''],
+   ru:['Угорь унаги', ''],
+   vd:''},
+  {id:'157', cat:'top', vi:'Ba chỉ bò', price:50000,
+   en:['Beef belly', ''],
+   ru:['Говяжья грудинка', ''],
+   vd:''},
+  {id:'158', cat:'top', vi:'Bạch tuộc', price:50000,
+   en:['Octopus (tako)', ''],
+   ru:['Осьминог', ''],
+   vd:''},
+  {id:'159', cat:'top', vi:'Tôm luộc', price:50000,
+   en:['Boiled shrimp', ''],
+   ru:['Варёные креветки', ''],
+   vd:''},
+  {id:'160', cat:'top', vi:'Tôm tempura thêm', price:15000,
+   en:['Shrimp tempura', ''],
+   ru:['Креветка темпура', ''],
+   vd:''},
+  {id:'161', cat:'top', vi:'Ức gà thêm (100g)', price:35000,
+   en:['Chicken breast, 100 g', ''],
+   ru:['Куриная грудка, 100 г', ''],
+   vd:''},
+  {id:'162', cat:'top', vi:'Đùi gà teriyaki thêm (100g)', price:39000,
+   en:['Chicken thigh teriyaki, 100 g', ''],
+   ru:['Куриное бедро терияки, 100 г', ''],
+   vd:''},
+  {id:'163', cat:'top', vi:'Gà chiên xù (100g)', price:30000,
+   en:['Fried chicken katsu, 100 g', ''],
+   ru:['Курица кацу, 100 г', ''],
+   vd:''},
+  {id:'164', cat:'top', vi:'Rong biển thêm (20g)', price:10000,
+   en:['Chuka wakame, 20 g', ''],
+   ru:['Салат чука, 20 г', ''],
+   vd:''},
+  {id:'165', cat:'top', vi:'Gừng thêm (beni shoga)', price:5000,
+   en:['Pickled ginger (beni shoga)', ''],
+   ru:['Имбирь бени сёга', ''],
+   vd:''},
 ];
 let POPULAR=[];
 const catList=()=>POPULAR.length?['pop',...CATS]:CATS;
@@ -1598,8 +1683,10 @@ const BASES={s:['cơm sushi','sushi rice + salad','рис для суши + са
 const BP_T={vi:['Chọn đế cho poke','Nửa cơm và nửa salad, hoặc toàn bộ salad.','Hủy'],en:['Choose the base','Half rice and half salad, or salad only.','Cancel'],ru:['Выберите основу','Половина риса и половина салата или только салат.','Отмена']};
 const idOf=k=>k.split('~')[0];
 const baseName=(k,l)=>{const b=BASES[k.split('~')[1]];return b?b[{vi:0,en:1,ru:2}[l||lang]]:''};
-function rows(o){const r=[];MENU.forEach(m=>Object.keys(o).forEach(k=>{if(idOf(k)===m.id&&o[k]>0)r.push({k,m,q:o[k]})}));return r}
-const rowName=(r,l)=>{l=l||lang;const n=l==='vi'?r.m.vi:r.m[l][0],b=baseName(r.k,l);return b?n+' · '+b:n};
+function rows(o){const r=[];MENU.forEach(m=>Object.keys(o).forEach(k=>{if(idOf(k)===m.id&&o[k]>0)r.push({k,m:topM(m,k),q:o[k]})}));return r}
+const rowName=(r,l)=>{l=l||lang;const n=l==='vi'?r.m.vi:r.m[l][0],b=baseName(r.k,l),tp=(r.m.tops||[]).map(t=>'+ '+(l==='vi'?t.vi:t[l][0])).join(', ');return (b?n+' · '+b:n)+(tp?' · '+tp:'')};
+function topM(m,k){const ids=(k.split('~')[2]||'').split('.').filter(Boolean);if(!ids.length)return m;const tops=ids.map(i=>MENU.find(x=>x.id===i)).filter(Boolean);return {...m,bp:m.price,tops,price:m.price+tops.reduce((a,t)=>a+t.price,0)}}
+function topLines(r){return (r.m.tops||[]).map(t=>`\n${r.q} × [${t.id}] ↳ Topping: ${t.vi} — ${fmt(r.q*t.price,'vi')}`).join('')}
 const inCart=id=>Object.keys(cart).reduce((a,k)=>a+(idOf(k)===id?cart[k]:0),0);
 const lastBase={};
 const NOTES=(()=>{try{return JSON.parse(localStorage.getItem('sushigo_notes')||'{}')}catch(e){return{}}})();let noteEdit=null;
@@ -1621,6 +1708,15 @@ setTimeout(()=>{const L=document.getElementById('lines');
   L.addEventListener('focusout',e=>{if(e.target.closest('[data-ni]')){noteEdit=null;setTimeout(renderSheet,0)}});
 },0);
 
+const TP_T={vi:['Thêm topping?','Không bắt buộc — chọn một hoặc nhiều.','Thêm vào đơn','Không thêm topping'],en:['Add toppings?','Optional — pick one or more.','Add to order','No toppings'],ru:['Добавить топпинги?','Необязательно — можно выбрать несколько.','Добавить в заказ','Без топпингов']};
+function askTop(id,base){
+  const el=document.getElementById('bpick'),t=TP_T[lang]||TP_T.en,sel=[];el.dataset.base=base;el.dataset.tops='';
+  const tops=MENU.filter(m=>m.cat==='top'&&!(typeof SOLD_OUT!=='undefined'&&SOLD_OUT.includes(m.id)));
+  el.querySelector('h3').textContent=t[0];el.querySelector('.bps').textContent=t[1];
+  el.querySelector('.bpo').innerHTML=`<div class="tpl">${tops.map(m=>`<button data-top="${m.id}" aria-pressed="false"><span>${escH(lang==='vi'?m.vi:m[lang][0])}</span><b>+${fmt(m.price)}</b></button>`).join('')}</div><button class="tpok" data-topok>${t[3]}</button>`;
+}
+function topOk(el){const t=TP_T[lang]||TP_T.en,ids=(el.dataset.tops||'').split('.').filter(Boolean),m=MENU.find(x=>x.id===el.dataset.id);
+  const ok=el.querySelector('[data-topok]');ok.textContent=ids.length?`${t[2]} · ${fmt(m.price+ids.reduce((a,i)=>a+MENU.find(x=>x.id===i).price,0))}`:t[3]}
 function askBase(m){
   const el=document.getElementById('bpick'),t=BP_T[lang]||BP_T.en;
   el.querySelector('h3').textContent=t[0];el.querySelector('.bpn').textContent=(lang==='vi'?m.vi:m[lang][0]);el.querySelector('.bps').textContent=t[1];
@@ -1630,8 +1726,12 @@ function askBase(m){
 setTimeout(()=>document.getElementById('bpick').addEventListener('click',e=>{
   const el=document.getElementById('bpick');
   if(e.target===el||e.target.closest('.bpc')){el.hidden=true;return}
+  const tb=e.target.closest('[data-top]');
+  if(tb){const ids=(el.dataset.tops||'').split('.').filter(Boolean),i=ids.indexOf(tb.dataset.top);if(i<0)ids.push(tb.dataset.top);else ids.splice(i,1);el.dataset.tops=ids.join('.');tb.setAttribute('aria-pressed',i<0);topOk(el);return}
+  if(e.target.closest('[data-topok]')){const id=el.dataset.id,ids=(el.dataset.tops||'').split('.').filter(Boolean).sort((a,b)=>a-b),k=id+'~'+el.dataset.base+(ids.length?'~'+ids.join('.'):'');
+    cart[k]=(cart[k]||0)+1;lastBase[id]=k;el.hidden=true;track('add_dish',{dish:MENU.find(m=>m.id===id).vi,lang});renderList();renderBar();saveSent();return}
   const b=e.target.closest('[data-base]');if(!b)return;
-  const id=el.dataset.id,k=id+'~'+b.dataset.base;cart[k]=(cart[k]||0)+1;lastBase[id]=k;el.hidden=true;
+  askTop(el.dataset.id,b.dataset.base);return;
   track('add_dish',{dish:MENU.find(m=>m.id===id).vi,lang});renderList();renderBar();saveSent();
 }),0);
 
@@ -1673,7 +1773,7 @@ function renderBar(){
 let pm='qr', reason='come';
 function kitchenText(){
   const langName={vi:'tiếng Việt',en:'tiếng Anh',ru:'tiếng Nga'}[lang];
-  const lines=rows(cart).map(r=>`${r.q} × [${r.m.id}] ${r.m.vi}${baseName(r.k,'vi')?' · Đế: '+baseName(r.k,'vi'):''}${cleanNote(NOTES[r.k])?' · Yêu cầu: '+cleanNote(NOTES[r.k]):''} — ${fmt(r.q*r.m.price,'vi')}`).join('\n');
+  const lines=rows(cart).map(r=>`${r.q} × [${r.m.id}] ${r.m.vi}${baseName(r.k,'vi')?' · Đế: '+baseName(r.k,'vi'):''}${cleanNote(NOTES[r.k])?' · Yêu cầu: '+cleanNote(NOTES[r.k]):''} — ${fmt(r.q*(r.m.bp||r.m.price),'vi')}${topLines(r)}`).join('\n');
   const note=document.getElementById('note').value.trim();
   return `${sent.length?`GỌI THÊM (lần ${sent.length+1})`:'ĐƠN MỚI'} · Bàn ${table||'?'}${guestName?` · ${guestName}`:''}\n${lines}\nTổng: ${fmt(total(),'vi')}${note?`\nGhi chú: ${note}`:''}\nKhách nói ${langName}`;
 }
