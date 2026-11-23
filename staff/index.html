@@ -63,6 +63,7 @@ button{font:inherit;cursor:pointer}
 .il.trn{font-weight:800;color:var(--ink);padding-left:12px}
 .iadd{margin-top:8px;width:100%;font:inherit;font-size:14px;padding:8px;border:1px dashed var(--line);border-radius:10px;background:var(--bg);color:var(--muted)}
 .o .ed{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 12px;font-size:14px;font-weight:700;color:var(--ink)}
+.o.srv pre{text-decoration:line-through;text-decoration-thickness:2px;opacity:.55}
 .o .sv{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 12px;font-size:14px;font-weight:700;color:var(--ink)}.o .sv.on{background:#E6F4EA;color:#1E6B3A;border-color:#9CCFAE}
 .o .edited{font-size:12px;font-weight:800;color:#8a5a1c;background:var(--amber-soft);border-radius:999px;padding:3px 9px}
 .newbar{display:flex;gap:10px;margin:2px 0 14px;flex-wrap:wrap}
@@ -483,7 +484,7 @@ function render(freshIds = []) {
   document.title = (open.length ? `(${open.length}) ` : '') + t('title');
   $('list').innerHTML = show.length ? show.map(o => {
     const k = kindOf(o);
-    return `<article class="o k-${k}${o.status === 'done' ? ' done' : ''}${freshIds.includes(o.id) ? ' new' : ''}" data-id="${o.id}">
+    return `<article class="o k-${k}${o.status === 'done' ? ' done' : ''}${o.served_at ? ' srv' : ''}${freshIds.includes(o.id) ? ' new' : ''}" data-id="${o.id}">
       <div><div class="h"><span class="tb">${t('table')} ${esc(o.tbl || '?')}</span>${(o.text.split('\n')[0].match(/ · Bàn [^ ]+ · (.+)$/) || [])[1] ? `<span class="who">👤 ${esc(o.text.split('\n')[0].match(/ · Bàn [^ ]+ · (.+)$/)[1])}</span>` : ''}<span class="tag">${t('tag')[k]}</span>${o.edited_at ? `<span class="edited">${t('edited')}</span>` : ''}<span class="tm">${hhmm(o.created)} · ${ago(o.created)}</span></div>
       ${['order','add'].includes(k) && o.status === 'new' ? inlineBody(o) : `<pre>${esc(body(o))}</pre>`}</div>
       <div class="acts"><button class="ok" data-ack="${o.id}" ${o.status === 'done' ? 'disabled' : ''}>${o.status === 'done' ? t('acked') : t('ack')}</button>${['order','add'].includes(k) ? `<button class="sv${o.served_at ? ' on' : ''}" data-served="${o.id}">${o.served_at ? t('served') : t('serve')}</button><button class="ed" data-edit="${o.id}">${t('editBtn')}</button>` : ''}${['order','add','bill','closed'].includes(k) ? `<button class="pr" data-print="${o.id}">${t('printBtn')}</button>` : ''}${k === 'closed' ? `<button class="pr" data-reopen="${o.id}">${t('reopen')}</button>` : ''}</div></article>`;
