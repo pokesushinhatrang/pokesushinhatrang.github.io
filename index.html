@@ -1656,7 +1656,7 @@ function itemHTML(m){
 function renderList(){
   document.getElementById('list').innerHTML=catList().map(c=>`<section class="sect" id="s-${c}"><h2>${T('cat_'+c)}</h2><div class="items">${(c==='pop'?POPULAR.map(id=>MENU.find(m=>m.id===id)).filter(Boolean):MENU.filter(m=>m.cat===c)).map(itemHTML).join('')}</div></section>`).join('');
 }
-const OST={vi:{sent:'📨 Đã gửi',cooking:'👨‍🍳 Đang chuẩn bị',served:'✅ Đã mang ra',h:'Đơn'},en:{sent:'📨 Sent',cooking:'👨‍🍳 Being prepared',served:'✅ Served',h:'Order'},ru:{sent:'📨 Отправлен',cooking:'👨‍🍳 Готовится',served:'✅ Подано',h:'Заказ'}};
+const OST={vi:{sent:'📨 Đã gửi',cooking:'👨‍🍳 Đang chuẩn bị',served:'✅ Đã xong',h:'Đơn'},en:{sent:'📨 Sent',cooking:'👨‍🍳 Being prepared',served:'✅ Ready',h:'Order'},ru:{sent:'📨 Отправлен',cooking:'👨‍🍳 Готовится',served:'✅ Готово',h:'Заказ'}};
 const ost=k=>(OST[lang]||OST.en)[k];
 function statusHTML(){const L=sent.map((o,i)=>o.id?`<li class="ost ost-${o.st||'sent'}"><span>${ost('h')} ${i+1} · ${new Date(o.at).toTimeString().slice(0,5)}</span><b>${ost(o.st||'sent')}</b></li>`:'').join('');return L}
 function renderBar(){
