@@ -648,7 +648,8 @@ function receiptHTML(o) {
   } else {
     body = rest.map(l => { const m = l.match(/^(\d+ × )\[(\d+)\] (.+?) — (.+)$/);
       const rq = m && (m[3].match(/ · Yêu cầu: (.+)$/) || [])[1], rv = rq && noteTr(o, rq, 'vi');
-      return m ? `<div class="row"><span><b>${m[1]}</b>${esc(m[3])}<small> [${m[2]}]</small>${rv ? `<br><b>🌐 ${esc(rv)}</b>` : ''}</span><span>${esc(m[4])}</span></div>` : `<div class="row ${/^Tổng/.test(l) ? 'big' : ''}"><span>${esc(l)}</span></div>` }).join('');
+      const nmI = m && m[3].indexOf(' · ');
+      return m ? `<div class="row"><span><b>${m[1]}${esc(nmI > 0 ? m[3].slice(0, nmI) : m[3])}</b>${nmI > 0 ? esc(m[3].slice(nmI)) : ''}<small> [${m[2]}]</small>${rv ? `<br><b>🌐 ${esc(rv)}</b>` : ''}</span><span>${esc(m[4])}</span></div>` : `<div class="row ${/^Tổng/.test(l) ? 'big' : ''}"><span>${esc(l)}</span></div>` }).join('');
   }
   if (['bill', 'closed'].includes(o.kind)) {
     const ls = o.calc ? calcLines(o.calc) : rest, paidQr = ls.some(l => /^Thanh toán: Chuyển khoản VietQR/.test(l));
