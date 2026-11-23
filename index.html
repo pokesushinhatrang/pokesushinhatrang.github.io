@@ -2017,7 +2017,7 @@ document.getElementById('splitMode').addEventListener('click',e=>{const b=e.targ
 document.getElementById('splitPeople').addEventListener('click',e=>{const b=e.target.closest('button[data-d]');if(!b)return;splitN=Math.max(2,Math.min(10,splitN+(+b.dataset.d)));renderWaiter()});
 document.getElementById('splitList').addEventListener('click',e=>{const b=e.target.closest('button[data-u]');if(!b)return;assign[+b.dataset.u]=+b.dataset.p;renderWaiter()});
 document.getElementById('tips').addEventListener('click',e=>{const b=e.target.closest('button[data-tip]');if(!b)return;tipPct=+b.dataset.tip;renderWaiter()});
-function renderChip(){document.getElementById('tablechip').textContent=`${T('table_chip')} ${table||'—'}`}
+function renderChip(){const n=+table,L={vi:['Giao hàng','Mang về'],en:['Delivery','Takeaway'],ru:['Доставка','С собой']}[lang]||['Delivery','Takeaway'];document.getElementById('tablechip').textContent=n>=201&&n<=299?`🛵 ${L[0]} ${n%100}`:n>=101&&n<=199?`🥡 ${L[1]} ${n%100}`:`${T('table_chip')} ${table||'—'}`}
 function setLang(l){
   lang=l;document.documentElement.lang=l;
   try{localStorage.setItem('sushigo_lang',l)}catch(e){}
