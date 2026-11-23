@@ -420,6 +420,8 @@ async function api(path, body) {
 }
 
 /* staff app: a hidden «printer» copy of this page runs in the background; the visible copy («view») does not print, so nothing prints twice */
+/* only a device with a printer (RawBT on) prints by itself; a phone's background copy must not grab and accept orders */
+const canAutoPrint = () => appRole() === 'view' ? false : appRole() === 'printer' ? rawbt : true;
 const appRole = () => { try { return window.cafeupApp && cafeupApp.role ? cafeupApp.role() : '' } catch (e) { return '' } };
 function beep() {
   if (appRole() === 'printer') return;
@@ -509,7 +511,7 @@ async function poll() {
     lastNow = d.now; poll.ready = true;   /* orders already there when the screen opens are not new; everything after is, even the first of the day */
     setStatus('on', 'live');
     if (added || d.done.length || ed.length || !render.once) { render(fresh); render.once = true; if (!$('tbBg').hidden && !tbBusy && !$('tbBg').contains(document.activeElement && document.activeElement.matches('input') ? document.activeElement : null)) renderTb() }
-    if (fresh.length) { beep(); remind = Date.now(); if (autoPrint) fresh.map(id => orders.get(id)).filter(o => ['order', 'bill'].includes(o.kind) && !printed.has(o.id) && appRole() !== 'view').forEach(o => { printOrder(o); autoAck(o) }) }
+    if (fresh.length) { beep(); remind = Date.now(); if (autoPrint) fresh.map(id => orders.get(id)).filter(o => ['order', 'bill'].includes(o.kind) && !printed.has(o.id) && canAutoPrint()).forEach(o => { printOrder(o); autoAck(o) }) }
     else if ([...orders.values()].some(o => o.status === 'new') && Date.now() - remind > 45000) { beep(); remind = Date.now() }
   } catch (e) {
     if (e.message === 'code') return logout(t('codeChanged'));
@@ -845,7 +847,7 @@ $('newSave').onclick = async () => {
     ...draft.items.map(it => `${it.q} × [${it.id}] ${it.vi} — ${money(it.q * it.unit)}`), `Tổng: ${money(sum)}`,
     `Thanh toán: ${pmVi(draft.pm)}`, ...(note ? [`Ghi chú: ${note}`] : []), '✍️ Nhân viên nhập đơn'].join('\n');
   const b = $('newSave'); b.disabled = true;
-  try { const r = await api('/staff/create', { text }); mine.add(r.id); $('newBg').hidden = true; await poll(); const o = orders.get(r.id); if (autoPrint && o && !printed.has(o.id) && appRole() !== 'view') { printOrder(o); autoAck(o) } }
+  try { const r = await api('/staff/create', { text }); mine.add(r.id); $('newBg').hidden = true; await poll(); const o = orders.get(r.id); if (autoPrint && o && !printed.has(o.id) && canAutoPrint()) { printOrder(o); autoAck(o) } }
   catch (err) { alert(err.message === 'code' ? t('wrongCode') : t('editFail')) }
   b.disabled = false;
 };
