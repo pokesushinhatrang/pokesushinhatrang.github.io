@@ -155,6 +155,7 @@ button{font:inherit;cursor:pointer}
 .tbsplit .sph{font-size:13px;color:var(--muted)}.tbsplit .spd{font-weight:800}
 .trow .pick{display:flex;align-items:center;gap:4px;grid-column:1/-1;font-size:13px;font-weight:700;color:#8a3b5a}
 .trow .pick button{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--surface,#fff);font:inherit;font-weight:800;padding:0}
+.trow .ptag{display:inline-block;margin-right:6px;padding:2px 8px;border-radius:999px;background:#F7E3EA;color:#8a3b5a;font-weight:800}.trow .ptag.p2{background:#E8EEF7;color:#2f4a73}#tbTabs .p2{border-style:dashed}
 .trow .pd{grid-column:1/-1;font-size:12px;color:#2e7d4f;font-weight:700}
 .trow .qty button{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--bg);font-size:20px;font-weight:800}
 .trow .qty b{min-width:18px;text-align:center;font-size:17px}
@@ -892,7 +893,7 @@ function renderTb() {
   const groups = activeTables();
   if (!groups.find(g => g.key === tbSel)) tbSel = groups.length ? groups[0].key : '';
   $('tbEmpty').hidden = !!groups.length; $('tbCard').hidden = !groups.length;
-  $('tbTabs').innerHTML = groups.map(g => `<button data-tg="${esc(g.key)}" aria-pressed="${g.key === tbSel}"><b>${t('table')} ${esc(g.tbl)}</b>${g.guest ? `<small>👤 ${esc(g.guest)}</small>` : ''}<span>${money(tableCalc(g).total)}</span>${tableCalc(g).asked ? '<i>💳</i>' : ''}</button>`).join('');
+  $('tbTabs').innerHTML = groups.map(g => splitTabs(g) || `<button data-tg="${esc(g.key)}" aria-pressed="${g.key === tbSel}"><b>${t('table')} ${esc(g.tbl)}</b>${g.guest ? `<small>👤 ${esc(g.guest)}</small>` : ''}<span>${money(tableCalc(g).total)}</span>${tableCalc(g).asked ? '<i>💳</i>' : ''}</button>`).join('');
   const g = groups.find(x => x.key === tbSel); if (!g) return;
   const c = tableCalc(g), nm = l => { const n = NAMES[l.id]; return lang === 'vi' || !n ? l.vi : n[lang === 'en' ? 0 : 1] + baseTr(l.vi) };
   $('tbHead').innerHTML = `<b>${t('table')} ${esc(g.tbl)}</b>${g.guest ? ` · 👤 ${esc(g.guest)}` : ''} · ${t('tbOrders')(c.ords.length)} · ${t('tbSince')} ${hhmm(c.ords[0].created)}${c.asked ? `<span class="ask">${t('tbAsk')}</span>` : ''}`;
@@ -971,6 +972,8 @@ const spSt = () => tbState.get(tbSel) || {};
 function splitRow(l) {
   const st = spSt(), paid = (st.paid || {})[lk(l)] || 0, sel = (st.sel || {})[lk(l)] || 0;
   let h = paid ? `<div class="pd">✓ ${Math.min(paid, l.q)} ${t('spPaidL')}</div>` : '';
+  const P = st.sp === 'items' && partsOf(tbGroup(), tableCalc(tbGroup())), tb = tbGroup() ? tbGroup().tbl : '';
+  if (P && l.q - paid > 0) { const a = sel, r = l.q - paid - sel; h += `<div class="pick" style="color:#555">${a ? `<span class="ptag">${tb}.${P.n}: ${a}</span>` : ''}${r ? `<span class="ptag p2">${tb}.${P.has1 ? P.n + 1 : P.n}: ${r}</span>` : ''}</div>` }
   if (st.sp === 'items' && l.q - paid > 0) h += `<div class="pick">✂️ <button data-sp="${lk(l)}:-1">−</button><b>${sel}</b><button data-sp="${lk(l)}:1">+</button> / ${l.q - paid} ${t('spInBill')}</div>`;
   return h;
 }
@@ -986,6 +989,22 @@ function selCalc(c, st) {        /* the bill for the picked dishes; the last one
   const all = Object.keys(rest).length && Object.keys(rest).every(k => (sel[k] || 0) >= rest[k]);
   if (all && Object.keys(st.paid || {}).length) { const left = c.final - subCalc(c, st.paid).final; pc.taxAmt = Math.round(pc.taxAmt); pc.final = pc.total = left; pc.disc = pc.sub - (left - pc.taxAmt) }
   return pc;
+}
+/* «Table 1.1 / 1.2»: while a table is split by dishes, the picked part and the rest show as two tabs and on the bills */
+function partsOf(g, c) {
+  const st = tbState.get(g.key) || {}; if (st.sp !== 'items') return null;
+  const sel = st.sel || {}, rest = restPick(c, st), n = (st.parts || 0) + 1;
+  const other = {}; Object.keys(rest).forEach(k => { const x = rest[k] - (sel[k] || 0); if (x > 0) other[k] = x });
+  const has1 = Object.values(sel).some(x => x > 0), has2 = Object.keys(other).length > 0;
+  if (!has1 && !st.parts) return null;
+  const s1 = has1 ? selCalc(c, st).final : 0, paidSum = Object.keys(st.paid || {}).length ? subCalc(c, st.paid).final : 0;
+  return { n, has1, has2, s1, s2: c.final - paidSum - s1, other };
+}
+function splitTabs(g) {
+  const c = tableCalc(g), P = partsOf(g, c); if (!P) return '';
+  const lbl = k => `${t('table')} ${esc(g.tbl)}.${k}`, on = g.key === tbSel;
+  return (P.has1 ? `<button data-tg="${esc(g.key)}" aria-pressed="${on}"><b>${lbl(P.n)}</b>${g.guest ? `<small>👤 ${esc(g.guest)}</small>` : ''}<span>${money(P.s1)}</span></button>` : '')
+    + (P.has2 ? `<button data-tg="${esc(g.key)}" aria-pressed="${on}" class="p2"><b>${lbl(P.has1 ? P.n + 1 : P.n)}</b><span>${money(P.s2)}</span></button>` : '');
 }
 function renderSplit(g, c) {
   const st = spSt(), m = st.sp || '', paid = st.paid || {}, el = $('tbSplit');
@@ -1010,15 +1029,15 @@ $('tbSplit').addEventListener('click', ev => {
   if (b.id === 'spPrintEq') { const n = st.n || 2, per = Math.ceil(c.final / n / 1000) * 1000;
     for (let i = 1; i <= n; i++) { const amt = i < n ? per : c.final - per * (n - 1); const o = tbBill(g, { ...c, tipPct: 0, tip: 0, share: [i, n, amt] }); o.id += i; printOrder(o) } return }
   if (b.id === 'spRest') return tbSet({ sel: restPick(c, st) });
-  if (b.id === 'spPrintSel') { const pc = selCalc(c, st); if (!pc.lines.length) return alert(t('spNone')); printOrder(tbBill(g, pc));
+  if (b.id === 'spPrintSel') { const pc = selCalc(c, st); if (!pc.lines.length) return alert(t('spNone')); const n = (st.parts || 0) + 1, b1 = tbBill({ ...g, tbl: g.tbl + '.' + n }, pc); printOrder(b1);
     /* second bill: everything not picked and not paid yet, for the exact remainder */
     const rest = restPick(c, st), other = {}; Object.keys(rest).forEach(k => { const n = rest[k] - ((st.sel || {})[k] || 0); if (n > 0) other[k] = n });
     if (Object.keys(other).length) { const oc = subCalc(c, other), left = c.final - (Object.keys(st.paid || {}).length ? subCalc(c, st.paid).final : 0) - pc.final;
-      oc.final = oc.total = left; oc.disc = oc.sub - (left - oc.taxAmt); const o2 = tbBill(g, oc); o2.id += 1; printOrder(o2) }
+      oc.final = oc.total = left; oc.disc = oc.sub - (left - oc.taxAmt); const o2 = tbBill({ ...g, tbl: g.tbl + '.' + (n + 1) }, oc); o2.id += 1; printOrder(o2) }
     return }
   if (b.id === 'spPaid') { const st2 = Object.values(st.sel || {}).some(n => n > 0) ? st : { ...st, sel: restPick(c, st) }; const pc = selCalc(c, st2); if (!pc.lines.length) return alert(t('spNone')); if (!confirm(t('spPaidQ')(money(pc.final)))) return;
-    const paid = { ...(st.paid || {}) }; pc.lines.forEach(l => paid[lk(l)] = (paid[lk(l)] || 0) + l.q); return tbSet({ paid, sel: {} }) }
-  if (b.id === 'spReset') return tbSet({ paid: {}, sel: {} });
+    const paid = { ...(st.paid || {}) }; pc.lines.forEach(l => paid[lk(l)] = (paid[lk(l)] || 0) + l.q); return tbSet({ paid, sel: {}, parts: (st.parts || 0) + 1 }) }
+  if (b.id === 'spReset') return tbSet({ paid: {}, sel: {}, parts: 0 });
 });
 $('tbSplit').addEventListener('change', ev => { if (ev.target.id === 'spN') tbSet({ n: Math.max(2, Math.min(30, +ev.target.value.replace(/\D/g, '') || 2)) }) });
 $('tbRows').addEventListener('click', ev => { const b = ev.target.closest('[data-sp]'); if (!b) return; const [k, d] = b.dataset.sp.split(':'), st = spSt();
