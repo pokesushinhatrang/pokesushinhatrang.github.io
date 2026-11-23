@@ -509,7 +509,7 @@ body.view-only #menuApp .qty,body.view-only #menuApp .bar,body.view-only #menuAp
 #menuApp .tpl button{display:flex;justify-content:space-between;gap:10px;text-align:left;font:inherit;font-size:15px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
 #menuApp .tpl button[aria-pressed="true"]{border-color:var(--primary,#B8456A);background:var(--primary-soft,#F7E3EA);font-weight:700}
 #menuApp .tpl button[aria-pressed="true"] span::before{content:'✓ '}
-#menuApp .bpick .bpo button.tpok{justify-content:center;width:100%;font:inherit;font-weight:800;padding:12px;border-radius:14px;border:0;background:var(--primary,#B8456A)!important;color:#fff!important}</style>
+#menuApp .bpick .bpo button.tpok{justify-content:center;width:100%;font:inherit;font-weight:800;padding:12px;border-radius:14px;border:0;background:var(--primary,#B8456A)!important;color:#fff!important}</style><style>#menuApp li.rdy>span:first-child{color:#1E6B3A}#menuApp .rdyt{display:inline-block;margin-left:6px;font-size:12px;padding:1px 8px;border-radius:999px;background:#E6F4EA;color:#1E6B3A;white-space:nowrap}</style>
 </head>
 <body>
 <div id="menuApp">
@@ -1948,10 +1948,14 @@ const copyText=t=>{try{navigator.clipboard.writeText(t).then(()=>toast(T('copied
 document.getElementById('wTg').addEventListener('click',()=>{if(reason==='bill')setTimeout(closeTable,400);track('waiter_call',{reason,channel:'telegram',table:table||'-'});copyText(waiterText());document.getElementById('wHint').textContent=T('hint_tg')});
 document.getElementById('wZl').addEventListener('click',()=>{if(reason==='bill')setTimeout(closeTable,400);track('waiter_call',{reason,channel:'zalo',table:table||'-'});copyText(waiterText());document.getElementById('wHint').textContent=T('hint_zl')});
 document.getElementById('billBtn').addEventListener('click',()=>{bg.hidden=true;billOnly(true);reason='bill';thanks.hidden=true;renderWaiter();document.getElementById('waiterBg').hidden=false});
+let RDY={};
+function readyMarks(){   /* ready pieces per dish, handed to the rounds oldest first; a «Ready» round has all its dishes ready */
+  const left={...RDY};return sent.map(o=>{const out={};rows(o.items).forEach(r=>{const k=r.m.id+'@'+(r.m.bp||r.m.price),n=o.st==='served'?r.q:Math.min(r.q,left[k]||0);left[k]=Math.max(0,(left[k]||0)-r.q);out[r.k]=n});return out});
+}
 function renderHist(){
   const tf=d=>{const x=new Date(d);return String(x.getHours()).padStart(2,'0')+':'+String(x.getMinutes()).padStart(2,'0')};
-  document.getElementById('rounds').innerHTML=sent.map((o,i)=>`<div class="round"><div class="rh"><b>${i?T('round_more'):T('round_first')} ${i+1}</b><span>${o.id?`<b class="ostc ost-${o.st||'sent'}">${ost(o.st||'sent')}</b> `:''}${tf(o.at)}</span></div><ul class="lines">${
-    rows(o.items).map(r=>`<li><span>${r.q} × ${rowName(r)}</span><span class="mono">${fmt(r.q*r.m.price)}</span></li>`).join('')}</ul></div>`).join('');
+  const RM=readyMarks();document.getElementById('rounds').innerHTML=sent.map((o,i)=>`<div class="round"><div class="rh"><b>${i?T('round_more'):T('round_first')} ${i+1}</b><span>${o.id?`<b class="ostc ost-${o.st||'sent'}">${ost(o.st||'sent')}</b> `:''}${tf(o.at)}</span></div><ul class="lines">${
+    rows(o.items).map(r=>{const n=(RM[i]||{})[r.k]||0;return `<li class="${n>=r.q?'rdy':''}"><span>${r.q} × ${rowName(r)}${n?`<b class="rdyt">${n>=r.q?ost('served'):'✅ '+n+'/'+r.q}</b>`:''}</span><span class="mono">${fmt(r.q*r.m.price)}</span></li>`}).join('')}</ul></div>`).join('');
   document.getElementById('histSum').textContent=fmt(sentTotal());
 }
 const hbg=document.getElementById('histBg');
@@ -2063,6 +2067,7 @@ async function checkClosed(){
     if(STASH&&!closes.some(c=>c.at===STASH.closeAt)){
       sent=[...STASH.sent,...sent];STASH=null;saveStash();saveSent();renderBar();tcMsg(1);return;
     }
+    {const r=JSON.stringify((d.rdy||{})[(guestName||'').trim()]||{});if(r!==JSON.stringify(RDY)){RDY=JSON.parse(r);if(!document.getElementById('histBg').hidden)renderHist()}}
     if(d.st){let ch=false;sent.forEach(o=>{const v=d.st[o.id];if(v&&v!==o.st){o.st=v;ch=true}});if(ch){saveSent();renderBar();if(!document.getElementById('sheetBg').hidden)renderSheet();if(!document.getElementById('histBg').hidden)renderHist()}}
     if(!sent.length)return;
     const last=Math.max(...sent.map(o=>o.at)), c=closes.find(c=>(c.guest||'')===me&&c.at-skew>last);
@@ -2074,7 +2079,7 @@ async function checkClosed(){
     }
   }catch(e){}
 }
-setInterval(checkClosed,30000);setInterval(()=>{if(sent.some(o=>o.id&&o.st!=='served'))checkClosed()},12000);
+setInterval(checkClosed,30000);setInterval(()=>{if(sent.some(o=>o.id&&o.st==='cooking'))checkClosed()},12000);setInterval(()=>{if(sent.some(o=>o.id&&o.st!=='served'))checkClosed()},12000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkClosed()});
 setTimeout(checkClosed,3000);
 
