@@ -649,6 +649,12 @@ const CONFIG={
   vietqr:{bank:'Techcombank', bin:'970407', account:'MS00P00000001139284'},  // from the venue's Techcombank / NAPAS 247 QR at the counter  // bank code (e.g. 'VCB', 'MB', 'TCB'), account number, account holder (CAPITALS, no accents)
   sheetId:'1U_hNYZbWaZgpX_Bgw0AbhVJ1xovGlWeSHL170R3wlEI'  // Google Sheet "SUSHI GO · Thực đơn & hết món": prices + sold out (anyone with the link can view)
 };
+if(location.hash==='#delivery'){let s=null;try{s=JSON.parse(localStorage.getItem('sushigo_dslot')||'null')}catch(e){}
+  const go=t=>{try{localStorage.setItem('sushigo_dslot',JSON.stringify({t,at:s&&s.t===t?s.at:Date.now()}))}catch(e){}location.replace(location.pathname+location.search+'#table-'+t)};
+  let mine=false;try{const x=JSON.parse(localStorage.getItem('sushigo_sent')||'null');mine=!!(s&&x&&x.table===s.t&&x.sent&&x.sent.length)}catch(e){}   /* keep the number only while this phone still has an open order there */
+  if(s&&mine&&Date.now()-s.at<6*3600e3)go(s.t);
+  else fetch(CONFIG.orderEndpoint.replace(/\/$/,'')+'/delivery-slot?venue='+CONFIG.venue,{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d.tbl)go(d.tbl)}).catch(()=>{});
+}
 /* counter: sends events to Umami when umamiId is set; does nothing otherwise */
 function track(name,data){try{if(window.umami&&umami.track)umami.track(name,data)}catch(e){}}
 function loadCounter(){
