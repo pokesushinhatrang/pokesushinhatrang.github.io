@@ -144,7 +144,7 @@ button{font:inherit;cursor:pointer}
 .tbtabs button[aria-pressed="true"]{border-color:var(--pink);background:var(--pink-soft)}
 .tbhead{font-size:15px;color:var(--muted);padding-bottom:6px;border-bottom:1px solid var(--line)}.tbhead b{color:var(--ink);font-size:18px}
 .tbhead .ask{display:inline-block;margin-left:8px;color:var(--green);font-weight:800}
-.trow{display:grid;grid-template-columns:1fr auto auto auto auto;gap:8px;align-items:center;padding:9px 0;border-bottom:1px dashed var(--line)}
+.trow{display:grid;grid-template-columns:1fr auto auto auto auto auto;gap:8px;align-items:center;padding:9px 0;border-bottom:1px dashed var(--line)}
 .trow .nm{font-weight:700;line-height:1.3}.trow .nm small{display:block;font-weight:400;color:var(--muted)}
 .trow .qty{display:flex;align-items:center;gap:6px}
 .tbsplit{margin:12px 0 4px;border:1px solid var(--line);border-radius:14px;padding:10px 12px}
@@ -156,6 +156,7 @@ button{font:inherit;cursor:pointer}
 .trow .pick{display:flex;align-items:center;gap:4px;grid-column:1/-1;font-size:13px;font-weight:700;color:#8a3b5a}
 .trow .pick button{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--surface,#fff);font:inherit;font-weight:800;padding:0}
 .trow .ptag{display:inline-block;margin-right:6px;padding:2px 8px;border-radius:999px;background:#F7E3EA;color:#8a3b5a;font-weight:800}.trow .ptag.p2{background:#E8EEF7;color:#2f4a73}#tbTabs .p2{border-style:dashed}
+.trow .rdy{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:8px 10px;font:inherit;font-weight:800;white-space:nowrap}.trow .rdy.on{background:#E6F4EA;border-color:#9CCFAE}.trow.srv .rdy{opacity:1}
 .tbrd{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.rdo{display:inline-flex;align-items:center;gap:6px;font-size:13px;border:1px solid var(--line);border-radius:12px;padding:4px 4px 4px 10px}.rdo.on{background:#F1F8F3}.rdo b{font-size:13px}.rdo .sv{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:6px 10px;font:inherit;font-weight:800}.rdo .sv.on{background:#E6F4EA;color:#1E6B3A;border-color:#9CCFAE}
 .trow .mvs{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}#tbTabs .paid{opacity:.6}
 .trow .mv{border:1px dashed #9aa9c2;background:#F2F5FA;color:#2f4a73;border-radius:999px;padding:6px 10px;font:inherit;font-weight:800;white-space:nowrap}
@@ -906,10 +907,11 @@ function renderTb() {
   $('tbNotes').innerHTML = notes.join(''); $('tbNotes').hidden = !notes.length;
   /* «Ready» per order right in the table: the guest sees «✅ Ready» */
   $('tbHead').innerHTML += `<div class="tbrd">${c.ords.map((o, i) => `<span class="rdo${o.served_at ? ' on' : ''}"><b>${t('orderN')} ${i + 1}</b> · ${hhmm(o.created)}<button class="sv${o.served_at ? ' on' : ''}" data-tbsv="${o.id}">${o.served_at ? t('served') : t('serve')}</button></span>`).join('')}</div>`;
+  const rdy = (tbState.get(g.key) || {}).rdy || {}; c.lines.forEach(l => l.sv = Math.min(l.q, Math.max(l.sv, rdy[l.id + '@' + l.unit] || 0)));
   $('tbRows').innerHTML = c.lines.length ? c.lines.map(l => `<div class="trow${l.sv >= l.q ? ' srv' : ''}"><div class="nm">${l.sv && l.sv < l.q ? `<small class="svp">✅ ${l.sv} / ${l.q} ${t('served').replace(/^✅ /, '').toLowerCase()}</small>` : ''}[${l.id}] ${esc(nm(l))}${reqTr(l.o, l.vi)}${lang !== 'vi' ? `<small>${esc(l.vi)}</small>` : ''}${NAMES[l.id] && NAMES[l.id][3] !== l.unit ? `<small class="chg">✏️ ${t('tbChanged')} · ${t('prWas')}: ${money(NAMES[l.id][3])}</small>` : ''}</div>
     <div class="qty"><button data-tq="${l.id}@${l.unit}:-1" aria-label="−">−</button><b>${l.q}</b><button data-tq="${l.id}@${l.unit}:1" aria-label="+">+</button></div>
     <label class="up"><small>${t('tbUnit')}</small><input data-up="${l.id}@${l.unit}" inputmode="numeric" value="${l.unit}" aria-label="${t('tbUnit')}"></label>
-    <div class="sum">${money(l.sum)}</div><button class="rm" data-tq="${l.id}@${l.unit}:x" aria-label="${t('editRm')}">✕</button>${splitRow(l)}</div>`).join('') : `<div class="cempty">${t('tbNone')}</div>`;
+    <div class="sum">${money(l.sum)}</div><button class="rdy${l.sv >= l.q ? ' on' : ''}" data-rdy="${l.id}@${l.unit}" title="${t('serve')}">${l.sv >= l.q ? '✅' : l.sv ? `🍽 ${l.sv}/${l.q}` : '🍽'}</button><button class="rm" data-tq="${l.id}@${l.unit}:x" aria-label="${t('editRm')}">✕</button>${splitRow(l)}</div>`).join('') : `<div class="cempty">${t('tbNone')}</div>`;
   $('tbSubSum').textContent = money(c.sub);
   const f = document.activeElement;
   if (f !== $('tbPct')) $('tbPct').value = c.pct == null ? '' : (c.pct || '');
@@ -965,6 +967,19 @@ $('tbRows').addEventListener('change', ev => { const inp = ev.target.closest('[d
 $('tbRows').addEventListener('keydown', ev => { if (ev.key === 'Enter' && ev.target.matches('[data-up]')) ev.target.blur() });
 $('tbHead').addEventListener('click', async ev => { const b = ev.target.closest('[data-tbsv]'); if (!b) return; const o = orders.get(+b.dataset.tbsv); if (!o) return; b.disabled = true;
   try { const r = await api('/staff/served', { id: o.id, undo: !!o.served_at }); o.served_at = o.served_at ? null : r.now; o.status = 'done'; render(); renderTb() } catch (err) { alert(t('sendFail')); b.disabled = false } });
+/* «Ready» per dish: one tap = one piece ready (a full line taps back to none). When every dish of an order is ready, the order turns «Ready» for the guest */
+$('tbRows').addEventListener('click', async ev => { const b = ev.target.closest('[data-rdy]'); if (!b) return; const g = tbGroup(); if (!g) return;
+  const c = tableCalc(g), k = b.dataset.rdy, l = c.lines.find(x => x.id + '@' + x.unit === k); if (!l) return;
+  const st = spSt(), rdy = { ...(st.rdy || {}) }, cur = Math.min(l.q, Math.max(l.sv, rdy[k] || 0));
+  rdy[k] = cur >= l.q ? 0 : cur + 1;
+  if (rdy[k] === 0) c.ords.forEach(o => { if (o.served_at && parseOrder(o).items.some(x => x.id + '@' + x.unit === k && x.q)) { api('/staff/served', { id: o.id, undo: true }).catch(() => {}); o.served_at = null } });
+  tbSet({ rdy });
+  const left = { ...rdy };       /* hand the ready pieces to the orders, oldest first */
+  for (const o of c.ords) { if (o.served_at) { parseOrder(o).items.forEach(x => { const kk = x.id + '@' + x.unit; left[kk] = Math.max(0, (left[kk] || 0) - x.q) }); continue }
+    const its = parseOrder(o).items.filter(x => x.q), full = its.length && its.every(x => (left[x.id + '@' + x.unit] || 0) >= x.q);
+    its.forEach(x => { const kk = x.id + '@' + x.unit; left[kk] = Math.max(0, (left[kk] || 0) - x.q) });
+    if (full) { try { const r = await api('/staff/served', { id: o.id }); o.served_at = r.now; o.status = 'done' } catch (e) {} } }
+  render(); renderTb() });
 $('tbTabs').onclick = ev => { const b = ev.target.closest('[data-tg]'); if (!b) return; tbSel = b.dataset.tg; if (b.dataset.part != null) tbSet({ view: b.dataset.part }); else renderTb() };
 $('tbPcts').onclick = ev => { const b = ev.target.closest('[data-pct]'); if (b) tbSet({ pct: +b.dataset.pct, final: null }) };
 $('tbTaxes').onclick = ev => { const b = ev.target.closest('[data-tax]'); if (b) tbSet({ tax: +b.dataset.tax, final: null }) };
