@@ -521,7 +521,9 @@ body.view-only #menuApp .qty,body.view-only #menuApp .bar,body.view-only #menuAp
 #menuApp .hbph{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}#menuApp .hbph img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:14px}
 #menuApp .hblinks{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}#menuApp .hbl{display:inline-block;padding:10px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-weight:700;text-decoration:none;color:var(--ink);margin-top:8px}
 #menuApp .nwp{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:12px}#menuApp .nwp img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}#menuApp .nwp>div{padding:10px 12px}#menuApp .nwp small{color:var(--muted)}#menuApp .nwp p{margin:2px 0 0}
-#menuApp .hbclose{display:block;width:100%;margin-top:16px;padding:12px;border:0;border-radius:14px;font:inherit;font-weight:800;background:var(--primary,#B8456A);color:#fff}</style>
+#menuApp .hbclose{display:block;width:100%;margin-top:16px;padding:12px;border:0;border-radius:14px;font:inherit;font-weight:800;background:var(--primary,#B8456A);color:#fff}</style><style>#menuApp .srch{position:relative;margin:0 0 8px}#menuApp .srch input{width:100%;font:inherit;font-size:16px;padding:11px 40px 11px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+#menuApp .srch input::-webkit-search-cancel-button{display:none}#menuApp #srchX{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;border:0;background:var(--line);font-size:18px;line-height:1;color:var(--ink)}
+#menuApp .srnone{color:var(--muted);padding:12px 4px}#menuApp #cats[hidden]{display:none}</style>
 </head>
 <body>
 <div id="menuApp">
@@ -1771,7 +1773,21 @@ function itemHTML(m){
    <div class="row"><span class="p mono">${fmt(m.price)}${m.unit?' '+T('per_piece'):''}${usd}</span>
    ${so?`<span class="sold">${T('sold_out')}</span>`:`<span class="qty">${q?`<button class="minus" data-id="${m.id}" data-d="-1" aria-label="−">−</button><span class="q mono">${q}</span>`:''}<button data-id="${m.id}" data-d="1" aria-label="${T('add')}">+</button></span>`}</div></div></article>`;
 }
+let SQ='';
+const SR_T={vi:['🔍 Tìm món: tên hoặc số…','Kết quả','Không tìm thấy món.'],en:['🔍 Find a dish: name or number…','Results','No dish found.'],ru:['🔍 Поиск блюда: название или номер…','Найдено','Блюдо не найдено.']};
+const srt=i=>(SR_T[lang]||SR_T.en)[i];
+const fold=x=>String(x||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d');
+function searchHits(){const q=fold(SQ).trim();if(!q)return null;const w=q.split(/\s+/);
+  return MENU.filter(m=>m.cat!=='top'&&CATS.includes(m.cat)).filter(m=>{const h=fold([m.id,m.vi,m.vd,m.en&&m.en.join(' '),m.ru&&m.ru.join(' ')].join(' '));return /^\d+$/.test(q)?m.id===q||h.includes(' '+q):w.every(x=>h.includes(x))})}
+function renderSearchBox(){let b=document.getElementById('srch');if(!b){const c=document.getElementById('cats');b=document.createElement('div');b.id='srch';b.className='srch';
+  b.innerHTML='<input type="search" id="srchIn" enterkeyhint="search" autocomplete="off"><button type="button" id="srchX" aria-label="×" hidden>×</button>';c.before(b);
+  const i=b.querySelector('input');i.addEventListener('input',()=>{SQ=i.value;document.getElementById('srchX').hidden=!SQ;renderList();window.scrollTo({top:0})});
+  b.querySelector('#srchX').addEventListener('click',()=>{i.value='';SQ='';document.getElementById('srchX').hidden=true;renderList();i.focus()})}
+  b.querySelector('input').placeholder=srt(0)}
+setTimeout(renderSearchBox,0);
 function renderList(){
+  const hits=searchHits();document.getElementById('cats').hidden=!!hits;
+  if(hits){document.getElementById('list').innerHTML=`<section class="sect" id="s-search"><h2>${srt(1)} · ${hits.length}</h2><div class="items">${hits.length?hits.map(itemHTML).join(''):`<p class="srnone">${srt(2)}</p>`}</div></section>`;return}
   document.getElementById('list').innerHTML=catList().map(c=>`<section class="sect" id="s-${c}"><h2>${T('cat_'+c)}</h2><div class="items">${(c==='pop'?POPULAR.map(id=>MENU.find(m=>m.id===id)).filter(Boolean):MENU.filter(m=>m.cat===c)).map(itemHTML).join('')}</div></section>`).join('');
 }
 const OST={vi:{sent:'📨 Đã gửi',cooking:'👨‍🍳 Đang chuẩn bị',served:'✅ Đã xong',h:'Đơn'},en:{sent:'📨 Sent',cooking:'👨‍🍳 Being prepared',served:'✅ Ready',h:'Order'},ru:{sent:'📨 Отправлен',cooking:'👨‍🍳 Готовится',served:'✅ Готово',h:'Заказ'}};
@@ -2040,7 +2056,7 @@ function setLang(l){
   document.querySelectorAll('#menuApp [data-mt]').forEach(el=>el.textContent=T(el.dataset.mt));
   document.getElementById('note').placeholder=T('note_ph');
   document.getElementById('guestName').placeholder=T('name_ph');
-  renderCats();renderList();renderBar();renderChip();if(typeof renderHb==='function')renderHb();if(!document.getElementById('histBg').hidden)renderHist();if(!bg.hidden)renderSheet();if(!document.getElementById('waiterBg').hidden)renderWaiter();
+  renderCats();renderList();renderBar();renderChip();if(typeof renderHb==='function')renderHb();if(typeof renderSearchBox==='function')renderSearchBox();if(!document.getElementById('histBg').hidden)renderHist();if(!bg.hidden)renderSheet();if(!document.getElementById('waiterBg').hidden)renderWaiter();
 }
 document.querySelector('#menuApp .lang').addEventListener('click',e=>{const b=e.target.closest('button[data-lang]');if(b)track('lang_change',{lang:b.dataset.lang});if(b)setLang(b.dataset.lang)});
 
