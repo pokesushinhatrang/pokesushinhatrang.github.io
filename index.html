@@ -2137,7 +2137,7 @@ async function checkClosed(){
     }
   }catch(e){}
 }
-setInterval(checkClosed,30000);setInterval(()=>{if(sent.some(o=>o.id&&o.st==='cooking'))checkClosed()},12000);setInterval(()=>{if(sent.some(o=>o.id&&o.st==='served'))checkClosed()},30000);setInterval(()=>{if(sent.some(o=>o.id&&o.st!=='served'))checkClosed()},12000);
+(function stTick(){const busy=sent.some(o=>o.id&&o.st!=='served');setTimeout(()=>{checkClosed();stTick()},document.hidden?60000:busy?12000:30000)})();
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkClosed()});
 setTimeout(checkClosed,3000);
 
@@ -2199,7 +2199,7 @@ function renderNotice(){
   el.hidden=!tx; el.innerHTML=tx.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])).replace(/\*\*([^*\n]+?)\*\*/g,'<b>$1</b>');
 }
 document.querySelector('#menuApp .lang').addEventListener('click',()=>setTimeout(renderNotice,0));
-setTimeout(loadPopular,0);setInterval(loadPopular,60000);
+setTimeout(loadPopular,0);setInterval(()=>{if(!document.hidden)loadPopular()},60000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadPopular()});setInterval(loadSheet,60000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadSheet()});
 

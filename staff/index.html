@@ -543,7 +543,13 @@ function render(freshIds = []) {
   }).join('') : `<div class="empty">${filter === 'new' ? t('emptyNew') : t('emptyAll')}</div>`;
 }
 
+/* a phone with the screen off or the app in the background checks every 30 s (new orders still arrive by push); the POS printer copy never slows down */
+let lastPoll = 0;
+const slowPoll = () => document.hidden && appRole() !== 'printer' && !(rawbt && autoPrint);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && code && !$('board').hidden && Date.now() - lastPoll > 3000) poll() });
 async function poll() {
+  if (slowPoll() && Date.now() - lastPoll < 30000) return;
+  lastPoll = Date.now();
   if (appRole() === 'printer') { autoPrint = store.get('autoprint') === '1'; rawbt = store.get('rawbt') === '1' }   /* settings changed in the visible screen */
   try {
     const d = await api(`/staff/orders?since=${maxId}&changed=${lastNow}`);
