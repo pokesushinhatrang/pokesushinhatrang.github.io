@@ -545,9 +545,12 @@ function render(freshIds = []) {
 
 /* a phone with the screen off or the app in the background checks every 30 s (new orders still arrive by push); the POS printer copy never slows down */
 let lastPoll = 0;
+/* the restaurant is closed 23:00–11:00 (Nha Trang time) */
+const nightPoll = () => { const h = +new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', hour12: false }).format(new Date()) % 24; return h >= 23 || h < 11 };
 const slowPoll = () => document.hidden && appRole() !== 'printer' && !(rawbt && autoPrint);
 document.addEventListener('visibilitychange', () => { if (!document.hidden && code && !$('board').hidden && Date.now() - lastPoll > 3000) poll() });
 async function poll() {
+  if (nightPoll() && Date.now() - lastPoll < 60000) return;      /* closed hours: every screen, the POS included, checks once a minute */
   if (slowPoll() && Date.now() - lastPoll < 30000) return;
   lastPoll = Date.now();
   if (appRole() === 'printer') { autoPrint = store.get('autoprint') === '1'; rawbt = store.get('rawbt') === '1' }   /* settings changed in the visible screen */
