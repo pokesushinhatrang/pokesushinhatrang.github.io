@@ -520,6 +520,7 @@ body.view-only #menuApp .qty,body.view-only #menuApp .bar,body.view-only #menuAp
 #menuApp .hbbox h3{font-family:var(--f-display);font-size:24px;margin:0 0 12px}#menuApp .hbbox p{margin:6px 0;line-height:1.5}
 #menuApp .hbph{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}#menuApp .hbph img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:14px}
 #menuApp .hblinks{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}#menuApp .hbl{display:inline-block;padding:10px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-weight:700;text-decoration:none;color:var(--ink);margin-top:8px}
+#menuApp .nwp{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:12px}#menuApp .nwp img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}#menuApp .nwp>div{padding:10px 12px}#menuApp .nwp small{color:var(--muted)}#menuApp .nwp p{margin:2px 0 0}
 #menuApp .hbclose{display:block;width:100%;margin-top:16px;padding:12px;border:0;border-radius:14px;font:inherit;font-weight:800;background:var(--primary,#B8456A);color:#fff}</style>
 </head>
 <body>
@@ -2131,7 +2132,7 @@ async function loadPopular(){
     const r=await fetch(CONFIG.orderEndpoint.replace(/\/$/,'')+'/popular?venue='+CONFIG.venue,{cache:'no-store'});
     if(!r.ok)return; const d=await r.json(); const menuChanged=applyMenu(d.menu); const ids=(d.ids||[]).filter(id=>MENU.some(m=>m.id===id));
     SOLD_STAFF=(d.soldout||[]).filter(id=>MENU.some(m=>m.id===id));
-    NOTICE=d.notice||{}; renderNotice(); INFO=d.info||{};
+    NOTICE=d.notice||{}; renderNotice(); INFO=d.info||{}; NEWS=d.news||[];
     PRICES=d.prices||{}; let priceChanged=menuChanged;
     if(JSON.stringify(d.photos||{})!==JSON.stringify(window.__PH||{})){window.__PH=d.photos||{};priceChanged=true}
     MENU.forEach(m=>{const p=+PRICES[m.id];if(p>=1000&&p!==m.price){m.price=p;priceChanged=true}});
@@ -2140,10 +2141,10 @@ async function loadPopular(){
     if(!document.getElementById('sheetBg').hidden)renderSheet();
   }catch(e){}
 }
-var NOTICE={},INFO={};
-const HB_T={vi:['ℹ️ Về chúng tôi','📍 Liên hệ','⭐ Đánh giá','Địa chỉ','Giờ mở cửa','Điện thoại','Mật khẩu','Gọi điện','Đóng','Poke Sushi Nha Trang (SUSHI GO) — sushi, sashimi, poke và món Nhật nấu chín. Cá tươi mỗi ngày, thực đơn 3 ngôn ngữ và những chú mèo dễ thương.','Trang web'],
- en:['ℹ️ About us','📍 Contacts','⭐ Review','Address','Opening hours','Phone','Password','Call','Close','Poke Sushi Nha Trang (SUSHI GO) — sushi, sashimi, poke bowls and cooked Japanese dishes. Fresh fish every day, a menu in three languages and our friendly cats.','Website'],
- ru:['ℹ️ О нас','📍 Контакты','⭐ Отзыв','Адрес','Часы работы','Телефон','Пароль','Позвонить','Закрыть','Poke Sushi Nha Trang (SUSHI GO) — суши, сашими, поке и горячие японские блюда. Свежая рыба каждый день, меню на трёх языках и наши котики.','Сайт']};
+var NOTICE={},INFO={},NEWS=[];
+const HB_T={vi:['ℹ️ Giới thiệu','📍 Liên hệ','⭐ Đánh giá','Địa chỉ','Giờ mở cửa','Điện thoại','Mật khẩu','Gọi điện','Đóng','Poke Sushi Nha Trang (SUSHI GO) — sushi, sashimi, poke và món Nhật nấu chín. Cá tươi mỗi ngày, thực đơn 3 ngôn ngữ và những chú mèo dễ thương.','Trang web','📰 Tin tức','Chưa có tin mới.'],
+ en:['ℹ️ About us','📍 Contacts','⭐ Review','Address','Opening hours','Phone','Password','Call','Close','Poke Sushi Nha Trang (SUSHI GO) — sushi, sashimi, poke bowls and cooked Japanese dishes. Fresh fish every day, a menu in three languages and our friendly cats.','Website','📰 News','No news yet.'],
+ ru:['ℹ️ О нас','📍 Контакты','⭐ Отзыв','Адрес','Часы работы','Телефон','Пароль','Позвонить','Закрыть','Poke Sushi Nha Trang (SUSHI GO) — суши, сашими, поке и горячие японские блюда. Свежая рыба каждый день, меню на трёх языках и наши котики.','Сайт','📰 Новости','Пока нет новостей.']};
 const hbt=i=>(HB_T[lang]||HB_T.en)[i];
 const MAPS_URL='https://www.google.com/maps/search/?api=1&query=Poke+Sushi+Nha+Trang&query_place_id=ChIJZ3RscxBdcDERaW9wmMgdxVo';
 function infoPhoto(id){const v=(window.__PH||{})[id];return v?CONFIG.orderEndpoint.replace(/\/$/,'')+'/photo?venue='+CONFIG.venue+'&id='+id+'&v='+v:''}
@@ -2156,9 +2157,12 @@ function showContacts(){const I=INFO,row=(k,v)=>v?`<p><b>${k}:</b> ${escH(v)}</p
   const tel=(I.phone||'').replace(/[^\d+]/g,''),zl=(I.zalo||I.phone||'').replace(/\D/g,''),url=v=>!v?'':/^https?:/.test(v)?v:'https://'+v.replace(/^@/,'');
   hbSheet(`<h3>${hbt(1)}</h3>${row(hbt(3),I.address)}${row(hbt(4),I.hours)}${row(hbt(5),I.phone)}<p><b>Wi-Fi:</b> ${escH(I.wifi||'pokesushinhatrang')} · ${hbt(6)} ${escH(I.wifipass||'xincamon')}</p>
   <div class="hblinks">${lk(I.maps||MAPS_URL,'🗺 Google Maps')}${tel?lk('tel:'+tel,'📞 '+hbt(7)):''}${zl?lk('https://zalo.me/'+zl,'💬 Zalo'):''}${lk(url(I.facebook),'📘 Facebook')}${lk(I.instagram?(/^https?:/.test(I.instagram)?I.instagram:'https://instagram.com/'+I.instagram.replace(/^@/,'')):'','📸 Instagram')}${lk(url(I.tiktok),'🎵 TikTok')}${lk(url(I.site),'🌐 '+hbt(10))}</div>`)}
+function showNews(){const ml={vi:'tháng',en:'',ru:''}[lang],fd=t=>{const d=new Date(t);return lang==='vi'?`${d.getDate()} tháng ${d.getMonth()+1}`:d.toLocaleDateString(lang==='ru'?'ru-RU':'en-GB',{day:'numeric',month:'long'})};
+  hbSheet(`<h3>${hbt(11)}</h3>${NEWS.length?NEWS.map(n=>{const u=infoPhoto('nw'+n.id),tx=(n.text||{})[lang]||n.text.en||n.text.vi||n.text.ru||'';
+    return `<div class="nwp">${u?`<img src="${u}" alt="" loading="lazy">`:''}<div><small>${fd(n.at)}</small><p>${escH(tx).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>')}</p></div></div>`}).join(''):`<p>${hbt(12)}</p>`}`)}
 function renderHb(){let d=document.getElementById('hbtns');if(!d){d=document.createElement('div');d.id='hbtns';d.className='hbtns';const h=document.querySelector('#menuApp header');h.after(d);d.after(document.getElementById('tablechip'));
-  d.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.hb==='a')showAbout();else if(b.dataset.hb==='c')showContacts();else{track('review_click',{table:table||'-'});window.open(CONFIG.googleReview||MAPS_URL,'_blank')}})}
-  d.innerHTML=`<button data-hb="a">${hbt(0)}</button><button data-hb="c">${hbt(1)}</button><button data-hb="r">${hbt(2)}</button>`}
+  d.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.hb==='a')showAbout();else if(b.dataset.hb==='c')showContacts();else showNews()})}
+  d.innerHTML=`<button data-hb="n">${hbt(11)}</button><button data-hb="a">${hbt(0)}</button><button data-hb="c">${hbt(1)}</button>`}
 setTimeout(renderHb,0);
 /* a notice without this language: show another one and translate it automatically (cached on the phone) */
 const NT_TR=(()=>{try{return JSON.parse(localStorage.getItem('sushigo_nt')||'{}')}catch(e){return{}}})(), NT_WAIT={};
