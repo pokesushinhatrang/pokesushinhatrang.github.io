@@ -1700,13 +1700,13 @@ const desc=m=>lang==='vi'?m.vd:m[lang][1];
 const total=()=>rows(cart).reduce((s,r)=>s+r.q*r.m.price,0);
 const count=()=>Object.values(cart).reduce((a,b)=>a+b,0);
 const BASES={s:['cơm sushi','sushi rice + salad','рис для суши + салат'],g:['gạo lứt','brown rice + salad','бурый рис + салат'],x:['toàn salad','salad only','только салат']};
-const BP_T={vi:['Chọn đế cho poke','Nửa cơm và nửa salad, hoặc toàn bộ salad.','Hủy'],en:['Choose the base','Half rice and half salad, or salad only.','Cancel'],ru:['Выберите основу','Половина риса и половина салата или только салат.','Отмена']};
+const BP_T={vi:['Chọn đế','Nửa cơm và nửa salad, hoặc toàn bộ salad.','Hủy'],en:['Choose the base','Half rice and half salad, or salad only.','Cancel'],ru:['Выберите основу','Половина риса и половина салата или только салат.','Отмена']};
 const idOf=k=>k.split('~')[0];
 const baseName=(k,l)=>{const b=BASES[k.split('~')[1]];return b?b[{vi:0,en:1,ru:2}[l||lang]]:''};
 function rows(o){const r=[];MENU.forEach(m=>Object.keys(o).forEach(k=>{if(idOf(k)===m.id&&o[k]>0)r.push({k,m:topM(m,k),q:o[k]})}));return r}
-const rowName=(r,l)=>{l=l||lang;const n=l==='vi'?r.m.vi:r.m[l][0],b=baseName(r.k,l),tp=(r.m.tops||[]).map(t=>'+ '+(l==='vi'?t.vi:t[l][0])).join(', ');return (b?n+' · '+b:n)+(tp?' · '+tp:'')};
-function topM(m,k){const ids=(k.split('~')[2]||'').split('.').filter(Boolean);if(!ids.length)return m;const tops=ids.map(i=>MENU.find(x=>x.id===i)).filter(Boolean);return {...m,bp:m.price,tops,price:m.price+tops.reduce((a,t)=>a+t.price,0)}}
-function topLines(r){return (r.m.tops||[]).map(t=>`\n${r.q} × [${t.id}] ↳ Topping: ${t.vi} — ${fmt(r.q*t.price,'vi')}`).join('')}
+const rowName=(r,l)=>{l=l||lang;const n=l==='vi'?r.m.vi:r.m[l][0],b=baseName(r.k,l),tp=(r.m.tpl||[]).map(t=>'+ '+(l==='vi'?t.vi:t[l][0])).join(', ');return (b?n+' · '+b:n)+(tp?' · '+tp:'')};
+function topM(m,k){const ids=(k.split('~')[2]||'').split('.').filter(Boolean);if(!ids.length)return m;const tops=ids.map(i=>MENU.find(x=>x.id===i)).filter(Boolean);return {...m,bp:m.price,tpl:tops,price:m.price+tops.reduce((a,t)=>a+t.price,0)}}
+function topLines(r){return (r.m.tpl||[]).map(t=>`\n${r.q} × [${t.id}] ↳ Topping: ${t.vi} — ${fmt(r.q*t.price,'vi')}`).join('')}
 const inCart=id=>Object.keys(cart).reduce((a,k)=>a+(idOf(k)===id?cart[k]:0),0);
 const lastBase={};
 const NOTES=(()=>{try{return JSON.parse(localStorage.getItem('sushigo_notes')||'{}')}catch(e){return{}}})();let noteEdit=null;
@@ -1737,7 +1737,11 @@ function askTop(id,base){
 }
 function topOk(el){const t=TP_T[lang]||TP_T.en,ids=(el.dataset.tops||'').split('.').filter(Boolean),m=MENU.find(x=>x.id===el.dataset.id);
   const ok=el.querySelector('[data-topok]');ok.textContent=ids.length?`${t[2]} · ${fmt(m.price+ids.reduce((a,i)=>a+MENU.find(x=>x.id===i).price,0))}`:t[3]}
+const pickBase=m=>typeof m.base==='boolean'?m.base:m.cat==='poke', pickTops=m=>typeof m.tops==='boolean'?m.tops:m.cat==='poke';
+function addPicked(el){const id=el.dataset.id,ids=(el.dataset.tops||'').split('.').filter(Boolean).sort((a,b)=>a-b),bs=el.dataset.base||'',k=id+(bs||ids.length?'~'+bs:'')+(ids.length?'~'+ids.join('.'):'');
+  cart[k]=(cart[k]||0)+1;lastBase[id]=k;el.hidden=true;track('add_dish',{dish:MENU.find(m=>m.id===id).vi,lang});renderList();renderBar();saveSent()}
 function askBase(m){
+  if(!pickBase(m)){const el=document.getElementById('bpick');el.dataset.id=m.id;el.querySelector('.bpn').textContent=(lang==='vi'?m.vi:m[lang][0]);el.querySelector('.bpc').textContent=(BP_T[lang]||BP_T.en)[2];el.hidden=false;return askTop(m.id,'')}
   const el=document.getElementById('bpick'),t=BP_T[lang]||BP_T.en;
   el.querySelector('h3').textContent=t[0];el.querySelector('.bpn').textContent=(lang==='vi'?m.vi:m[lang][0]);el.querySelector('.bps').textContent=t[1];
   el.querySelector('.bpo').innerHTML=Object.keys(BASES).map(b=>`<button data-base="${b}">${{s:'🍚',g:'🟤',x:'🥗'}[b]} ${BASES[b][{vi:0,en:1,ru:2}[lang]]}</button>`).join('');
@@ -1748,10 +1752,9 @@ setTimeout(()=>document.getElementById('bpick').addEventListener('click',e=>{
   if(e.target===el||e.target.closest('.bpc')){el.hidden=true;return}
   const tb=e.target.closest('[data-top]');
   if(tb){const ids=(el.dataset.tops||'').split('.').filter(Boolean),i=ids.indexOf(tb.dataset.top);if(i<0)ids.push(tb.dataset.top);else ids.splice(i,1);el.dataset.tops=ids.join('.');tb.setAttribute('aria-pressed',i<0);topOk(el);return}
-  if(e.target.closest('[data-topok]')){const id=el.dataset.id,ids=(el.dataset.tops||'').split('.').filter(Boolean).sort((a,b)=>a-b),k=id+'~'+el.dataset.base+(ids.length?'~'+ids.join('.'):'');
-    cart[k]=(cart[k]||0)+1;lastBase[id]=k;el.hidden=true;track('add_dish',{dish:MENU.find(m=>m.id===id).vi,lang});renderList();renderBar();saveSent();return}
+  if(e.target.closest('[data-topok]')){addPicked(el);return}
   const b=e.target.closest('[data-base]');if(!b)return;
-  askTop(el.dataset.id,b.dataset.base);return;
+  {const mm=MENU.find(x=>x.id===el.dataset.id);if(mm&&!pickTops(mm)){el.dataset.base=b.dataset.base;el.dataset.tops='';addPicked(el);return}}askTop(el.dataset.id,b.dataset.base);return;
   track('add_dish',{dish:MENU.find(m=>m.id===id).vi,lang});renderList();renderBar();saveSent();
 }),0);
 
@@ -1940,7 +1943,7 @@ let tt;function toast(s){const el=document.getElementById('toast');el.textConten
 document.getElementById('list').addEventListener('click',e=>{
   const b=e.target.closest('button[data-id]');if(!b)return;
   const id=b.dataset.id,m=MENU.find(x=>x.id===id),d=+b.dataset.d;
-  if(m&&m.cat==='poke'){
+  if(m&&(pickBase(m)||pickTops(m))){
     if(d>0)return askBase(m);
     const ks=Object.keys(cart).filter(k=>idOf(k)===id),k=ks.includes(lastBase[id])?lastBase[id]:ks[ks.length-1];if(!k)return;
     cart[k]--;if(cart[k]<=0)delete cart[k];renderList();renderBar();saveSent();return;
@@ -2102,10 +2105,10 @@ function applyMenu(o){
   const hid=new Set(o.hidden||[]),ed=o.edits||{},list=[];
   const fix=(m,e)=>{if(!e)return m;if(e.vi)m.vi=e.vi;if(e.vd!=null)m.vd=e.vd;
     ['en','ru'].forEach(l=>{if(Array.isArray(e[l])){m[l]=[e[l][0]||m[l][0],e[l][1]!=null&&e[l][1]!==''?e[l][1]:m[l][1]]}});
-    if(e.cat&&CATS.includes(e.cat))m.cat=e.cat;if(+e.price>=1000)m.price=+e.price;return m};
+    if(e.cat&&CATS.includes(e.cat))m.cat=e.cat;if(+e.price>=1000)m.price=+e.price;if(typeof e.base==='boolean')m.base=e.base;if(typeof e.tops==='boolean')m.tops=e.tops;return m};
   MENU_BASE.forEach(b=>{if(!hid.has(b.id))list.push(fix(JSON.parse(JSON.stringify(b)),ed[b.id]))});
   (o.added||[]).forEach(a=>{if(hid.has(a.id)||list.some(m=>m.id===a.id)||!CATS.includes(a.cat))return;
-    list.push({id:a.id,cat:a.cat,vi:a.vi,vd:a.vd||'',price:+a.price||0,en:[(a.en||[])[0]||a.vi,(a.en||[])[1]||''],ru:[(a.ru||[])[0]||a.vi,(a.ru||[])[1]||'']})});
+    list.push({id:a.id,cat:a.cat,vi:a.vi,vd:a.vd||'',price:+a.price||0,en:[(a.en||[])[0]||a.vi,(a.en||[])[1]||''],ru:[(a.ru||[])[0]||a.vi,(a.ru||[])[1]||''],...(typeof a.base==='boolean'?{base:a.base}:{}),...(typeof a.tops==='boolean'?{tops:a.tops}:{})})});
   MENU.length=0;MENU.push(...list);return true;
 }
 
